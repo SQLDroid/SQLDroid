@@ -20,6 +20,7 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -135,16 +136,28 @@ public class SqldroidPreparedStatement implements PreparedStatement {
 	
 	
 
+	private String[] makeArgListQueryString() {
+		// convert our parameter list objects to strings
+		List<String> strList = new ArrayList<String>();
+		
+		for(Object o : l) {
+			strList.add(o.toString());
+		}
+		
+		return strList.toArray(new String [1]);
+	}
+	private Object[] makeArgListQueryObject() {
+		return l.toArray();
+	}
+	
 	@Override
 	public boolean execute() throws SQLException {
 		boolean ok = false;
 		try {
 			
-			Log.i("SQLDRoid", "Executing \"" + sql + "\" on " + db + " with args");
-			
-			
+//			System.out.print("Executing \"" + sql + "\" on " + db + " with args ");
 						
-			db.execSQL(sql, l.toArray());
+			db.execSQL(sql, makeArgListQueryObject());
 			ok = true;
 			
 		} catch (android.database.SQLException e) {
@@ -158,7 +171,8 @@ public class SqldroidPreparedStatement implements PreparedStatement {
 	@Override
 	public ResultSet executeQuery() throws SQLException {
 
-		Cursor c = db.rawQuery(sql, makeArgListQuery());
+		// when querying, all ? values must be converted to Strings for some reason
+		Cursor c = db.rawQuery(sql, makeArgListQueryString());
 		rs = new SqldroidResultSet(c);
 
 		return rs;
@@ -220,9 +234,6 @@ public class SqldroidPreparedStatement implements PreparedStatement {
 
 	
 	
-	private String[] makeArgListQuery() {
-		return null;
-	}
 	
 	
 	

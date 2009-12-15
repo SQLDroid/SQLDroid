@@ -116,11 +116,8 @@ public class SqldroidConnection implements Connection {
 
 	@Override
 	public DatabaseMetaData getMetaData() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-
-		return null;
+		
+		return new SqldroidDatabaseMetaData(this);
 	}
 
 	@Override
