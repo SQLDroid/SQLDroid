@@ -1,9 +1,3 @@
-/**
- * 
- * 
- * 
- */
-
 package com.lemadi.storage.database.sqldroid;
 
 import java.io.InputStream;
@@ -14,11 +8,14 @@ import java.sql.Array;
 import java.sql.Blob;
 import java.sql.Clob;
 import java.sql.Date;
+import java.sql.NClob;
 import java.sql.Ref;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.sql.RowId;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
+import java.sql.SQLXML;
 import java.sql.Statement;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -28,18 +25,12 @@ import java.util.Map;
 import android.database.Cursor;
 
 public class SqldroidResultSet implements ResultSet {
-
-	Cursor c;
-	
-	
-
+	private Cursor c;
+	private int lastColumnRead;
 	
 	public SqldroidResultSet(Cursor c) {
 		this.c = c;
 	}
-	
-	
-	
 	
 	/**
 	 * convert JDBC columns index count (from one) to sqlite (from zero)
@@ -82,8 +73,10 @@ public class SqldroidResultSet implements ResultSet {
 
 	@Override
 	public void close() throws SQLException {
-		c.close();
-		c = null;
+		if (c != null) {
+			c.close();
+			c = null;
+		}
 	}
 
 	@Override
@@ -95,7 +88,6 @@ public class SqldroidResultSet implements ResultSet {
 
 	@Override
 	public int findColumn(String columnName) throws SQLException {
-		
 		return c.getColumnIndex(columnName);
 	}
 
@@ -167,49 +159,56 @@ public class SqldroidResultSet implements ResultSet {
 	}
 
 	@Override
-	public Blob getBlob(int colID) throws SQLException {
-		byte [] b = c.getBlob(ci(colID));
+	public Blob getBlob(int index) throws SQLException {
+		lastColumnRead = index;
+		byte [] b = c.getBlob(ci(index));
 		return new SqldroidBlob(b);
 	}
 
 	@Override
 	public Blob getBlob(String columnName) throws SQLException {
 		int index = c.getColumnIndex(columnName);
+		lastColumnRead = index;
 		return new SqldroidBlob(c.getBlob(index));
 	}
 
 	@Override
-	public boolean getBoolean(int colID) throws SQLException {
-		
-		return c.getInt(ci(colID)) != 0;
+	public boolean getBoolean(int index) throws SQLException {
+		lastColumnRead = index;
+		return c.getInt(ci(index)) != 0;
 	}
 
 	@Override
 	public boolean getBoolean(String columnName) throws SQLException {
-		int colID = c.getColumnIndex(columnName);
-		return c.getInt(colID) != 0;
+		int index = c.getColumnIndex(columnName);
+		lastColumnRead = index;
+		return c.getInt(index) != 0;
 	}
 
 	@Override
-	public byte getByte(int colID) throws SQLException {
-		return (byte)c.getShort(ci(colID));
+	public byte getByte(int index) throws SQLException {
+		lastColumnRead = index;
+		return (byte)c.getShort(ci(index));
 	}
 
 	@Override
 	public byte getByte(String columnName) throws SQLException {
-		int colID = c.getColumnIndex(columnName);
-		return (byte)c.getShort(colID);
+		int index = c.getColumnIndex(columnName);
+		lastColumnRead = index;
+		return (byte)c.getShort(index);
 	}
 
 	@Override
-	public byte[] getBytes(int colID) throws SQLException {
-		return c.getBlob(ci(colID));
+	public byte[] getBytes(int index) throws SQLException {
+		lastColumnRead = index;
+		return c.getBlob(ci(index));
 	}
 
 	@Override
 	public byte[] getBytes(String columnName) throws SQLException {
-		int colID = c.getColumnIndex(columnName);
-		return c.getBlob(colID);
+		int index = c.getColumnIndex(columnName);
+		lastColumnRead = index;
+		return c.getBlob(index);
 	}
 
 	@Override
@@ -273,14 +272,16 @@ public class SqldroidResultSet implements ResultSet {
 	}
 
 	@Override
-	public double getDouble(int colID) throws SQLException {
-		return c.getDouble(ci(colID));
+	public double getDouble(int index) throws SQLException {
+		lastColumnRead = index;
+		return c.getDouble(ci(index));
 	}
 
 	@Override
 	public double getDouble(String columnName) throws SQLException {
-		int colID = c.getColumnIndex(columnName);
-		return c.getDouble(colID);
+		int index = c.getColumnIndex(columnName);
+		lastColumnRead = index;
+		return c.getDouble(index);
 	}
 
 	@Override
@@ -296,42 +297,47 @@ public class SqldroidResultSet implements ResultSet {
 	}
 
 	@Override
-	public float getFloat(int colID) throws SQLException {
-		return c.getFloat(ci(colID));
+	public float getFloat(int index) throws SQLException {
+		lastColumnRead = index;
+		return c.getFloat(ci(index));
 	}
 
 	@Override
 	public float getFloat(String columnName) throws SQLException {
-		int colID = c.getColumnIndex(columnName);
-		return c.getFloat(colID);
+		int index = c.getColumnIndex(columnName);
+		lastColumnRead = index;
+		return c.getFloat(index);
 	}
 
 	@Override
-	public int getInt(int colID) throws SQLException {
-		return c.getInt(ci(colID));
+	public int getInt(int index) throws SQLException {
+		lastColumnRead = index;
+		return c.getInt(ci(index));
 	}
 
 	@Override
 	public int getInt(String columnName) throws SQLException {
-		int colID = c.getColumnIndex(columnName);
-		return c.getInt(colID);
+		int index = c.getColumnIndex(columnName);
+		lastColumnRead = index;
+		return c.getInt(index);
 	}
 
 	@Override
-	public long getLong(int colID) throws SQLException {
-		return c.getLong(ci(colID));
+	public long getLong(int index) throws SQLException {
+		lastColumnRead = index;
+		return c.getLong(ci(index));
 	}
 
 	@Override
 	public long getLong(String columnName) throws SQLException {
-		int colID = c.getColumnIndex(columnName);
-		return c.getLong(colID);
+		int index = c.getColumnIndex(columnName);
+		lastColumnRead = index;
+		return c.getLong(index);
 	}
 
 	@Override
 	public ResultSetMetaData getMetaData() throws SQLException {
-		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-		return null;
+		return new SqldroidResultSetMetaData(c);
 	}
 
 	@Override
@@ -379,14 +385,16 @@ public class SqldroidResultSet implements ResultSet {
 	}
 
 	@Override
-	public short getShort(int colID) throws SQLException {
-		return c.getShort(ci(colID));
+	public short getShort(int index) throws SQLException {
+		lastColumnRead = index;
+		return c.getShort(ci(index));
 	}
 
 	@Override
 	public short getShort(String columnName) throws SQLException {
-		int colID = c.getColumnIndex(columnName);
-		return c.getShort(colID);
+		int index = c.getColumnIndex(columnName);
+		lastColumnRead = index;
+		return c.getShort(index);
 	}
 
 	@Override
@@ -396,14 +404,16 @@ public class SqldroidResultSet implements ResultSet {
 	}
 
 	@Override
-	public String getString(int colID) throws SQLException {
-		return c.getString(ci(colID));
+	public String getString(int index) throws SQLException {
+		lastColumnRead = index;
+		return c.getString(ci(index));
 	}
 
 	@Override
 	public String getString(String columnName) throws SQLException {
-		int colID = c.getColumnIndex(columnName);
-		return c.getString(colID);
+		int index = c.getColumnIndex(columnName);
+		lastColumnRead = index;
+		return c.getString(index);
 	}
 
 	@Override
@@ -758,7 +768,7 @@ public class SqldroidResultSet implements ResultSet {
 
 	@Override
 	public void updateInt(String columnName, int x) throws SQLException {
-		// TODO Auto-generated method stub
+		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
 
 	}
 
@@ -877,13 +887,343 @@ public class SqldroidResultSet implements ResultSet {
 	public void updateTimestamp(String columnName, Timestamp x)
 			throws SQLException {
 		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-
 	}
 
 	@Override
 	public boolean wasNull() throws SQLException {
+		return c.isNull(ci(lastColumnRead));
+	}
+
+	@Override
+	public boolean isWrapperFor(Class<?> arg0) throws SQLException {
 		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
 		return false;
+	}
+
+	@Override
+	public <T> T unwrap(Class<T> arg0) throws SQLException {
+		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+		return null;
+	}
+
+	@Override
+	public int getHoldability() throws SQLException {
+		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+		return 0;
+	}
+
+	@Override
+	public Reader getNCharacterStream(int columnIndex) throws SQLException {
+		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+		return null;
+	}
+
+	@Override
+	public Reader getNCharacterStream(String columnLabel) throws SQLException {
+		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+		return null;
+	}
+
+	@Override
+	public NClob getNClob(int columnIndex) throws SQLException {
+		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+		return null;
+	}
+
+	@Override
+	public NClob getNClob(String columnLabel) throws SQLException {
+		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+		return null;
+	}
+
+	@Override
+	public String getNString(int columnIndex) throws SQLException {
+		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+		return null;
+	}
+
+	@Override
+	public String getNString(String columnLabel) throws SQLException {
+		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+		return null;
+	}
+
+	@Override
+	public RowId getRowId(int columnIndex) throws SQLException {
+		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+		return null;
+	}
+
+	@Override
+	public RowId getRowId(String columnLabel) throws SQLException {
+		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+		return null;
+	}
+
+	@Override
+	public SQLXML getSQLXML(int columnIndex) throws SQLException {
+		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+		return null;
+	}
+
+	@Override
+	public SQLXML getSQLXML(String columnLabel) throws SQLException {
+		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+		return null;
+	}
+
+	@Override
+	public boolean isClosed() throws SQLException {
+		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+		return false;
+	}
+
+	@Override
+	public void updateAsciiStream(int columnIndex, InputStream x)
+			throws SQLException {
+		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+		
+	}
+
+	@Override
+	public void updateAsciiStream(String columnLabel, InputStream x)
+			throws SQLException {
+		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+		
+	}
+
+	@Override
+	public void updateAsciiStream(int columnIndex, InputStream x, long length)
+			throws SQLException {
+		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+		
+	}
+
+	@Override
+	public void updateAsciiStream(String columnLabel, InputStream x, long length)
+			throws SQLException {
+		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+		
+	}
+
+	@Override
+	public void updateBinaryStream(int columnIndex, InputStream x)
+			throws SQLException {
+		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+		
+	}
+
+	@Override
+	public void updateBinaryStream(String columnLabel, InputStream x)
+			throws SQLException {
+		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+		
+	}
+
+	@Override
+	public void updateBinaryStream(int columnIndex, InputStream x, long length)
+			throws SQLException {
+		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+		
+	}
+
+	@Override
+	public void updateBinaryStream(String columnLabel, InputStream x,
+			long length) throws SQLException {
+		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+		
+	}
+
+	@Override
+	public void updateBlob(int columnIndex, InputStream inputStream)
+			throws SQLException {
+		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+		
+	}
+
+	@Override
+	public void updateBlob(String columnLabel, InputStream inputStream)
+			throws SQLException {
+		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+		
+	}
+
+	@Override
+	public void updateBlob(int columnIndex, InputStream inputStream, long length)
+			throws SQLException {
+		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+		
+	}
+
+	@Override
+	public void updateBlob(String columnLabel, InputStream inputStream,
+			long length) throws SQLException {
+		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+		
+	}
+
+	@Override
+	public void updateCharacterStream(int columnIndex, Reader x)
+			throws SQLException {
+		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+		
+	}
+
+	@Override
+	public void updateCharacterStream(String columnLabel, Reader reader)
+			throws SQLException {
+		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+		
+	}
+
+	@Override
+	public void updateCharacterStream(int columnIndex, Reader x, long length)
+			throws SQLException {
+		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+		
+	}
+
+	@Override
+	public void updateCharacterStream(String columnLabel, Reader reader,
+			long length) throws SQLException {
+		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+		
+	}
+
+	@Override
+	public void updateClob(int columnIndex, Reader reader) throws SQLException {
+		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+		
+	}
+
+	@Override
+	public void updateClob(String columnLabel, Reader reader)
+			throws SQLException {
+		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+		
+	}
+
+	@Override
+	public void updateClob(int columnIndex, Reader reader, long length)
+			throws SQLException {
+		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+		
+	}
+
+	@Override
+	public void updateClob(String columnLabel, Reader reader, long length)
+			throws SQLException {
+		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+		
+	}
+
+	@Override
+	public void updateNCharacterStream(int columnIndex, Reader x)
+			throws SQLException {
+		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+		
+	}
+
+	@Override
+	public void updateNCharacterStream(String columnLabel, Reader reader)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void updateNCharacterStream(int columnIndex, Reader x, long length)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void updateNCharacterStream(String columnLabel, Reader reader,
+			long length) throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void updateNClob(int columnIndex, NClob nClob) throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void updateNClob(String columnLabel, NClob nClob)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void updateNClob(int columnIndex, Reader reader) throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void updateNClob(String columnLabel, Reader reader)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void updateNClob(int columnIndex, Reader reader, long length)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void updateNClob(String columnLabel, Reader reader, long length)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void updateNString(int columnIndex, String nString)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void updateNString(String columnLabel, String nString)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void updateRowId(int columnIndex, RowId value) throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void updateRowId(String columnLabel, RowId value)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void updateSQLXML(int columnIndex, SQLXML xmlObject)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void updateSQLXML(String columnLabel, SQLXML xmlObject)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

@@ -67,5 +67,18 @@ public class SqldroidBlob implements Blob {
 
 	}
 
+	@Override
+	public void free() throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public InputStream getBinaryStream(long pos, long length)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 
 }

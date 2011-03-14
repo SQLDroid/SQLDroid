@@ -7,6 +7,7 @@ import java.util.Properties;
 
 public class SqldroidDriver implements java.sql.Driver {
 
+	// TODO(uwe):  Allow jdbc:sqlite: url as well
 	public static String sqldroidPrefix = "jdbc:sqldroid:";
 	
 	static {

@@ -9,13 +9,16 @@ import java.sql.Blob;
 import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.Date;
+import java.sql.NClob;
 import java.sql.ParameterMetaData;
 import java.sql.PreparedStatement;
 import java.sql.Ref;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.sql.RowId;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
+import java.sql.SQLXML;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -31,22 +34,16 @@ public class SqldroidPreparedStatement implements PreparedStatement {
 
 	SQLiteDatabase db;
 	SqldroidConnection sqldroidConnection;
-	SqldroidResultSet rs = null;
-	
+	SqldroidResultSet rs = null;	
 	String sql;
-
 	ContentValues cv = new ContentValues();
-
 	ArrayList<Object> l = new ArrayList<Object>();
 	
-
 	public SqldroidPreparedStatement(String sql, SqldroidConnection sqldroid) {
 		Log.i("SQLDRoid", "new SqlDRoid prepared statement from " + sqldroid);
 		this.sqldroidConnection = sqldroid;
 		this.db = sqldroid.getDb();
-		
 		this.sql = sql;
-		
 	}
 
 	
@@ -114,8 +111,9 @@ public class SqldroidPreparedStatement implements PreparedStatement {
 
 	@Override
 	public void close() throws SQLException {
-		
-
+		System.err.println(" ********************* not implemented @ "
+				+ DebugPrinter.getFileName() + " line "
+				+ DebugPrinter.getLineNumber());
 	}
 
 	
@@ -154,12 +152,10 @@ public class SqldroidPreparedStatement implements PreparedStatement {
 	public boolean execute() throws SQLException {
 		boolean ok = false;
 		try {
-			
-//			System.out.print("Executing \"" + sql + "\" on " + db + " with args ");
+			System.out.print("Executing \"" + sql + "\" on " + db + " with args ");
 						
 			db.execSQL(sql, makeArgListQueryObject());
 			ok = true;
-			
 		} catch (android.database.SQLException e) {
 			System.out.println("SqlDRoid exception: ");
 			e.printStackTrace();
@@ -170,11 +166,12 @@ public class SqldroidPreparedStatement implements PreparedStatement {
 
 	@Override
 	public ResultSet executeQuery() throws SQLException {
-
+		Log.d("sqldroid", "executeQuery " + sql);
 		// when querying, all ? values must be converted to Strings for some reason
 		Cursor c = db.rawQuery(sql, makeArgListQueryString());
+		Log.d("sqldroid", "executeQuery " + 2);
 		rs = new SqldroidResultSet(c);
-
+		Log.d("sqldroid", "executeQuery " + 3);
 		return rs;
 	}
 
@@ -482,10 +479,7 @@ public class SqldroidPreparedStatement implements PreparedStatement {
 
 	@Override
 	public void clearParameters() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-
+		l = new ArrayList<Object>();
 	}
 
 	@Override
@@ -756,6 +750,182 @@ public class SqldroidPreparedStatement implements PreparedStatement {
 				+ DebugPrinter.getFileName() + " line "
 				+ DebugPrinter.getLineNumber());
 
+	}
+
+
+	@Override
+	public boolean isClosed() throws SQLException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+
+	@Override
+	public boolean isPoolable() throws SQLException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+
+	@Override
+	public void setPoolable(boolean poolable) throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public boolean isWrapperFor(Class<?> arg0) throws SQLException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+
+	@Override
+	public <T> T unwrap(Class<T> arg0) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public void setAsciiStream(int parameterIndex, InputStream inputStream)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void setAsciiStream(int parameterIndex, InputStream inputStream,
+			long length) throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void setBinaryStream(int parameterIndex, InputStream inputStream)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void setBinaryStream(int parameterIndex, InputStream inputStream,
+			long length) throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void setBlob(int parameterIndex, InputStream inputStream)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void setBlob(int parameterIndex, InputStream inputStream, long length)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void setCharacterStream(int parameterIndex, Reader reader)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void setCharacterStream(int parameterIndex, Reader reader,
+			long length) throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void setClob(int parameterIndex, Reader reader) throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void setClob(int parameterIndex, Reader reader, long length)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void setNCharacterStream(int parameterIndex, Reader reader)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void setNCharacterStream(int parameterIndex, Reader reader,
+			long length) throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void setNClob(int parameterIndex, NClob value) throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void setNClob(int parameterIndex, Reader reader) throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void setNClob(int parameterIndex, Reader reader, long length)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void setNString(int parameterIndex, String theString)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void setRowId(int parameterIndex, RowId theRowId)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void setSQLXML(int parameterIndex, SQLXML xmlObject)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

@@ -1,13 +1,20 @@
 package com.lemadi.storage.database.sqldroid;
 
+import java.sql.Array;
+import java.sql.Blob;
 import java.sql.CallableStatement;
+import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.NClob;
 import java.sql.PreparedStatement;
+import java.sql.SQLClientInfoException;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
+import java.sql.SQLXML;
 import java.sql.Savepoint;
 import java.sql.Statement;
+import java.sql.Struct;
 import java.util.Map;
 import java.util.Properties;
 
@@ -15,16 +22,12 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 public class SqldroidConnection implements Connection {
-
-	SQLiteDatabase sqlitedb;
-	String url;
+	private SQLiteDatabase sqlitedb;
+    private boolean autoCommit = true;
 
 	public SqldroidConnection(String url, Properties info) {
-		this.url = url;
+		Log.i("SQLDRoid", "new sqlite jdbc from url '" + url + "', " + "'" + info + "'");
 
-		Log.i("SQLDRoid", "new sqlite jdbc from url '" + url + "'");
-		
-		 
 		// Make a filename from url
 		String dbQname = url.substring(SqldroidDriver.sqldroidPrefix.length());
 		Log.i("SQlDRoid", "opening database " + dbQname);
@@ -32,7 +35,6 @@ public class SqldroidConnection implements Connection {
 		sqlitedb = SQLiteDatabase.openDatabase(dbQname, null,
 				SQLiteDatabase.CREATE_IF_NECESSARY
 				| SQLiteDatabase.OPEN_READWRITE);
-
 	}
 
 	public SQLiteDatabase getDb() {
@@ -45,24 +47,22 @@ public class SqldroidConnection implements Connection {
 
 	@Override
 	public void close() throws SQLException {
-
 		if (sqlitedb != null)
 			sqlitedb.close();
 		
 		sqlitedb = null;
-
 	}
 
 	@Override
 	public void commit() throws SQLException {
-
+        if (autoCommit) throw new SQLException("database in auto-commit mode");
+        sqlitedb.setTransactionSuccessful();
 		sqlitedb.endTransaction();
-
+		sqlitedb.beginTransaction();
 	}
-
+	
 	@Override
 	public Statement createStatement() throws SQLException {
-
 		return new SqldroidStatement(this);
 	}
 
@@ -89,11 +89,7 @@ public class SqldroidConnection implements Connection {
 
 	@Override
 	public boolean getAutoCommit() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-
-		return false;
+		return autoCommit;
 	}
 
 	@Override
@@ -149,11 +145,7 @@ public class SqldroidConnection implements Connection {
 
 	@Override
 	public boolean isClosed() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-
-		return false;
+		return sqlitedb == null || !sqlitedb.isOpen();
 	}
 
 	@Override
@@ -206,9 +198,6 @@ public class SqldroidConnection implements Connection {
 
 	@Override
 	public PreparedStatement prepareStatement(String sql) throws SQLException {
-
-		
-		
 		return new SqldroidPreparedStatement(sql, this);
 	}
 
@@ -273,10 +262,9 @@ public class SqldroidConnection implements Connection {
 
 	@Override
 	public void rollback() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-
+        if (autoCommit) throw new SQLException("database in auto-commit mode");
+        sqlitedb.endTransaction();
+		sqlitedb.beginTransaction();
 	}
 
 	@Override
@@ -284,15 +272,18 @@ public class SqldroidConnection implements Connection {
 		System.err.println(" ********************* not implemented @ "
 				+ DebugPrinter.getFileName() + " line "
 				+ DebugPrinter.getLineNumber());
-
 	}
 
-	@Override
+    @Override
 	public void setAutoCommit(boolean autoCommit) throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-
+        if (this.autoCommit == autoCommit) return;
+        this.autoCommit = autoCommit;
+        if (autoCommit) {
+            sqlitedb.setTransactionSuccessful();
+    		sqlitedb.endTransaction();
+    	} else {
+    		sqlitedb.beginTransaction();
+        }
 	}
 
 	@Override
@@ -362,5 +353,87 @@ public class SqldroidConnection implements Connection {
 		
 		sqlitedb = null;
 		super.finalize();
+	}
+
+	@Override
+	public boolean isWrapperFor(Class<?> arg0) throws SQLException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public <T> T unwrap(Class<T> arg0) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Array createArrayOf(String typeName, Object[] elements)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Blob createBlob() throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Clob createClob() throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public NClob createNClob() throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SQLXML createSQLXML() throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Struct createStruct(String typeName, Object[] attributes)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Properties getClientInfo() throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getClientInfo(String name) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean isValid(int timeout) throws SQLException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void setClientInfo(Properties properties)
+			throws SQLClientInfoException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setClientInfo(String name, String value)
+			throws SQLClientInfoException {
+		// TODO Auto-generated method stub
+		
 	}
 }

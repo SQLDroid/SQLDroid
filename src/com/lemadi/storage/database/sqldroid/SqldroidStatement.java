@@ -17,7 +17,6 @@ public class SqldroidStatement implements Statement {
 	SqldroidResultSet rs = null;
 	
 	public SqldroidStatement(SqldroidConnection sqldroid) {
-		
 		this.sqldroidConnection = sqldroid;
 		this.db = sqldroid.getDb();
 	}
@@ -49,26 +48,55 @@ public class SqldroidStatement implements Statement {
 
 	@Override
 	public void close() throws SQLException {
-				System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-
-		
+		if (rs != null) {
+			rs.close();
+			rs = null;
+		}
 	}
 
 	@Override
 	public boolean execute(String sql) throws SQLException {
-		
 		boolean ok = false;
-		
+		close();
 		try {
-			Log.i("SQLdroid", "Executing \"" + sql + "\" on " + db);
-			db.execSQL(sql);
+			boolean isSelect = sql.toUpperCase().matches("(?m)(?s)\\s*SELECT.*");
+			if (isSelect) {
+				rs = new SqldroidResultSet(db.rawQuery(sql, new String[0]));
+			} else {
+				db.execSQL(sql);
+			}
 			ok = true;
+			
+			boolean resultSetAvailable = ok && !sql.toUpperCase().startsWith("CREATE") && rs != null && rs.getMetaData().getColumnCount() != 0;
+
+			if (resultSetAvailable) {
+				while (rs.next()) {
+					System.out.print(" | ");
+					for(int i = 1 ; i <= rs.getMetaData().getColumnCount() ; i++) {
+						System.out.print(rs.getMetaData().getColumnLabel(i));
+						System.out.print(": ");
+						System.out.print(rs.getString(i));
+						System.out.print(" | ");
+					}
+					System.out.println();
+				}
+				rs.beforeFirst();
+			}
+			
+			return resultSetAvailable;
 		} catch (android.database.SQLException e) {
-			System.out.println("Sqldroid exception: ");
+			Log.e("Sqldroid", "SQLException: '" + e.getClass().getName() + "' '" + e.getMessage() + "'");
 			e.printStackTrace();
+			throw e;
+		} catch (java.lang.RuntimeException e) {
+			Log.e("Sqldroid", "RuntimeException: '" + e.getClass().getName() + "' '" + e.getMessage() + "'");
+			e.printStackTrace();
+			throw e;
+		} catch (Error e) {
+			Log.e("Sqldroid", "Error: '" + e.getClass().getName() + "' '" + e.getMessage() + "'");
+			e.printStackTrace();
+			throw e;
 		}
-		
-		return ok;
 	}
 
 	@Override
@@ -105,17 +133,16 @@ public class SqldroidStatement implements Statement {
 
 	@Override
 	public ResultSet executeQuery(String sql) throws SQLException {
-		
-		Cursor c = db.rawQuery(sql, null);
-		
+		close();
+		Cursor c = db.rawQuery(sql, null);		
 		rs = new SqldroidResultSet(c);
 		return rs;
 	}
 
 	@Override
 	public int executeUpdate(String sql) throws SQLException {
+		close();
 		db.execSQL(sql);
-		
 		return 0;
 	}
 
@@ -177,13 +204,12 @@ public class SqldroidStatement implements Statement {
 
 	@Override
 	public boolean getMoreResults() throws SQLException {
-				System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-		return false;
+		return getMoreResults(CLOSE_CURRENT_RESULT);
 	}
 
 	@Override
 	public boolean getMoreResults(int current) throws SQLException {
-				System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+		close();
 		return false;
 	}
 
@@ -195,8 +221,7 @@ public class SqldroidStatement implements Statement {
 
 	@Override
 	public ResultSet getResultSet() throws SQLException {
-				System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-		return null;
+		return rs;
 	}
 
 	@Override
@@ -269,6 +294,36 @@ public class SqldroidStatement implements Statement {
 	public void setQueryTimeout(int seconds) throws SQLException {
 				System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
 
+	}
+
+	@Override
+	public boolean isWrapperFor(Class<?> arg0) throws SQLException {
+		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+		return false;
+	}
+
+	@Override
+	public <T> T unwrap(Class<T> arg0) throws SQLException {
+		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+		return null;
+	}
+
+	@Override
+	public boolean isClosed() throws SQLException {
+		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+		return false;
+	}
+
+	@Override
+	public boolean isPoolable() throws SQLException {
+		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+		return false;
+	}
+
+	@Override
+	public void setPoolable(boolean poolable) throws SQLException {
+		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+		
 	}
 
 }

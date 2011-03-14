@@ -4,13 +4,14 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.RowIdLifetime;
 import java.sql.SQLException;
+import java.sql.Types;
 
 public class SqldroidDatabaseMetaData implements DatabaseMetaData {
 
-
 	SqldroidConnection con;
-	
+    
 	public SqldroidDatabaseMetaData(SqldroidConnection con) {
 		this.con = con;
 	}
@@ -145,7 +146,7 @@ public class SqldroidDatabaseMetaData implements DatabaseMetaData {
 
 	@Override
 	public int getDatabaseMajorVersion() throws SQLException {
-		return con.sqlitedb.getVersion();
+		return con.getDb().getVersion();
 	}
 
 	@Override
@@ -579,14 +580,50 @@ public class SqldroidDatabaseMetaData implements DatabaseMetaData {
 		return null;
 	}
 
-	@Override
-	public ResultSet getTypeInfo() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return null;
-	}
+    public ResultSet getTypeInfo() throws SQLException {
+        String sql = "select "
+                + "tn as TYPE_NAME, "
+                + "dt as DATA_TYPE, "
+                + "0 as PRECISION, "
+                + "null as LITERAL_PREFIX, "
+                + "null as LITERAL_SUFFIX, "
+                + "null as CREATE_PARAMS, "
+                + typeNullable + " as NULLABLE, "
+                + "1 as CASE_SENSITIVE, "
+                + typeSearchable + " as SEARCHABLE, "
+                + "0 as UNSIGNED_ATTRIBUTE, "
+                + "0 as FIXED_PREC_SCALE, "
+                + "0 as AUTO_INCREMENT, "
+                + "null as LOCAL_TYPE_NAME, "
+                + "0 as MINIMUM_SCALE, "
+                + "0 as MAXIMUM_SCALE, "
+                + "0 as SQL_DATA_TYPE, "
+                + "0 as SQL_DATETIME_SUB, "
+                + "10 as NUM_PREC_RADIX from ("
+                + "    select 'BLOB' as tn, " + Types.BLOB + " as dt union"
+                + "    select 'NULL' as tn, " + Types.NULL + " as dt union"
+                + "    select 'REAL' as tn, " + Types.REAL+ " as dt union"
+                + "    select 'TEXT' as tn, " + Types.VARCHAR + " as dt union"
+                + "    select 'INTEGER' as tn, "+ Types.INTEGER +" as dt"
+                + ") order by TYPE_NAME";
 
+        //      if (getTypeInfo == null) {
+//      getTypeInfo = con.prepareStatement(sql);
+//            
+//        }
+//
+//        getTypeInfo.clearParameters();
+//        return getTypeInfo.executeQuery();
+
+        return new SqldroidResultSet(con.getDb().rawQuery(sql, new String[0]));
+    }
+
+	
+	
+	
+	
+	
+	
 	@Override
 	public ResultSet getUDTs(String catalog, String schemaPattern,
 			String typeNamePattern, int[] types) throws SQLException {
@@ -775,9 +812,6 @@ public class SqldroidDatabaseMetaData implements DatabaseMetaData {
 
 	@Override
 	public boolean storesUpperCaseIdentifiers() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
 		return false;
 	}
 
@@ -970,9 +1004,6 @@ public class SqldroidDatabaseMetaData implements DatabaseMetaData {
 
 	@Override
 	public boolean supportsGetGeneratedKeys() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
 		return false;
 	}
 
@@ -1344,6 +1375,64 @@ public class SqldroidDatabaseMetaData implements DatabaseMetaData {
 		System.err.println(" ********************* not implemented @ "
 				+ DebugPrinter.getFileName() + " line "
 				+ DebugPrinter.getLineNumber());
+		return false;
+	}
+
+	@Override
+	public boolean isWrapperFor(Class<?> arg0) throws SQLException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public <T> T unwrap(Class<T> arg0) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean autoCommitFailureClosesAllResultSets() throws SQLException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public ResultSet getClientInfoProperties() throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ResultSet getFunctionColumns(String catalog, String schemaPattern,
+			String functionNamePattern, String columnNamePattern)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ResultSet getFunctions(String catalog, String schemaPattern,
+			String functionNamePattern) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public RowIdLifetime getRowIdLifetime() throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ResultSet getSchemas(String catalog, String schemaPattern)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean supportsStoredFunctionsUsingCallSyntax() throws SQLException {
+		// TODO Auto-generated method stub
 		return false;
 	}
 
