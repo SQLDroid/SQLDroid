@@ -1,0 +1,19 @@
+
+SQLDroid
+========
+
+SQLDroid is a JDBC driver for Android's sqlite database (android.database.sqlite.SQLiteDatabase) by Kristian Lein-Mathisen and other authors. See http://sqldroid.org/.
+
+SqlDroid lets you access your app's database through JDBC. Android ships with the necessary interfaces needed to use JDBC drivers, but it does not officially ship with a driver for its build-in SQLite database engine. There is a JDBC driver included, but it is unofficial. The unofficial driver can be used as illustrated below.
+
+	// Android's undocumented built-in JDBC
+	Class.forName("SQLite.JDBCDriver");
+	DriverManager.getConnection("jdbc:sqlite:/data/data/your-package/db.sqlite");
+
+However, according to the Android ticket http://code.google.com/p/android/issues/detail?id=5437#makechanges, this built-in JDBC driver is not supposed to be used as it is unsupported and undocumented. A discussion can be seen at http://groups.google.com/group/android-developers/browse_thread/thread/cf3dea94d2f6243c/38052d1c4ec3371f#38052d1c4ec3371f
+
+Exactly why Android does not document its JDBC driver is beyond me, so I do not guarantee that using one is a good idea! However, it works and in my non-Android target, I conveniently replace the JDBC url from jdbc:sqldroid to jdbc:smallsql, jdbc:hsqldb or whatever I wish and I have the portability I wanted.
+
+The JDBC driver for Android is 17 kB.
+
+
