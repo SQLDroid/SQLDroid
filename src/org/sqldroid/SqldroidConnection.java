@@ -1,4 +1,4 @@
-package com.lemadi.storage.database.sqldroid;
+package org.sqldroid;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
@@ -26,7 +26,7 @@ import android.database.sqlite.SQLiteDatabaseLockedException;
 import android.util.Log;
 
 public class SqldroidConnection implements Connection {
-    private com.lemadi.storage.database.sqldroid.SQLiteDatabase sqlitedb;
+    private org.sqldroid.SQLiteDatabase sqlitedb;
     private boolean                                             autoCommit = true;
 
     public SqldroidConnection(String url, Properties info) throws SQLException {
@@ -55,6 +55,7 @@ public class SqldroidConnection implements Connection {
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e1) {
+                    Thread.currentThread().interrupt();
                 }
             }
         }
@@ -73,22 +74,19 @@ public class SqldroidConnection implements Connection {
         InvocationHandler handler = new InvocationHandler() {
             @Override
             public Object invoke(Object proxy, Method method, Object[] args) throws SQLException {
-                // System.out.println("With retry: " + method + "(" + args.length + ")");
+                // System.out.println("With retry: " + method + "(" +
+                // args.length + ")");
                 long timeout = 30000;
                 long start = System.currentTimeMillis();
                 Method target_method;
                 try {
                     target_method = object.getClass().getMethod(method.getName(), method.getParameterTypes());
-                } catch (SecurityException e1) {
-                    throw new SQLException(e1);
                 } catch (NoSuchMethodException e1) {
                     throw new SQLException(e1);
                 }
                 while (System.currentTimeMillis() - start < timeout) {
                     try {
                         return target_method.invoke(object, args);
-                    } catch (IllegalArgumentException e) {
-                        throw new SQLException(e);
                     } catch (IllegalAccessException e) {
                         throw new SQLException(e);
                     } catch (InvocationTargetException e) {
@@ -97,6 +95,7 @@ public class SqldroidConnection implements Connection {
                             try {
                                 Thread.sleep(1000);
                             } catch (InterruptedException e1) {
+                                Thread.currentThread().interrupt();
                             }
                         } else {
                             throw new SQLException("Timeout writing to SQLiteDatabase", e.getCause());

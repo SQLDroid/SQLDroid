@@ -1,4 +1,4 @@
-package com.lemadi.storage.database.sqldroid;
+package org.sqldroid;
 
 import java.sql.Array;
 import java.sql.Blob;
