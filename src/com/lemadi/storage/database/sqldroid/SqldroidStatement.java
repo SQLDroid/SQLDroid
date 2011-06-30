@@ -7,7 +7,6 @@ import java.sql.SQLWarning;
 import java.sql.Statement;
 
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 public class SqldroidStatement implements Statement {
