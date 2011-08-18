@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="MacRoman" standalone="no"?>
+<jardesc>
+    <jar path="sqldroid/sqldroid-0.2-src.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/sqldroid/sqldroid-src.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
+    <selectedProjects/>
+    <selectedElements exportClassFiles="false" exportJavaFiles="true" exportOutputFolder="false">
+        <javaElement handleIdentifier="=sqldroid/src"/>
+    </selectedElements>
+</jardesc>
