@@ -33,7 +33,7 @@ public class SqldroidConnection implements Connection {
         Log.i("Sqldroid", "new sqlite jdbc from url '" + url + "', " + "'" + info + "'");
 
         // Make a filename from url
-        String dbQname = url.substring(SqldroidDriver.sqldroidPrefix.length());
+        String dbQname = url.substring(SQLDroidDriver.sqldroidPrefix.length());
         Log.i("Sqldroid", "opening database " + dbQname);
 
         long timeout = 30000;

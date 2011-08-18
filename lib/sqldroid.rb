@@ -1,5 +1,6 @@
 require "sqldroid/version"
+require "sqldroid/sqldroid-#{Sqldroid::VERSION}.jar"
 
 module Sqldroid
-  # Your code goes here...
+  # No code, yet.
 end

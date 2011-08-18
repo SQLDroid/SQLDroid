@@ -7,14 +7,14 @@ Gem::Specification.new do |s|
   s.version     = Sqldroid::VERSION
   s.authors     = ["donv"]
   s.email       = ["uwe@kubosch.no"]
-  s.homepage    = ""
-  s.summary     = %q{TODO: Write a gem summary}
-  s.description = %q{TODO: Write a gem description}
+  s.homepage    = "http://sqldroid.org/"
+  s.summary     = %q{SQLDroid is a JDBC driver for Android's sqlite database (android.database.sqlite.SQLiteDatabase).}
+  s.description = %q{SQLDroid is a JDBC driver for Android's sqlite database (android.database.sqlite.SQLiteDatabase).}
 
-  s.rubyforge_project = "sqldroid"
+  # s.rubyforge_project = "sqldroid"
 
-  s.files         = `git ls-files`.split("\n")
-  s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
-  s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
+  s.files         = Dir['lib']
+  s.test_files    = []
+  s.executables   = []
   s.require_paths = ["lib"]
 end
