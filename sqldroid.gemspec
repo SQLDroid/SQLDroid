@@ -13,8 +13,9 @@ Gem::Specification.new do |s|
 
   # s.rubyforge_project = "sqldroid"
 
-  s.files         = Dir['lib']
+  s.files         = Dir['lib/**/*']
   s.test_files    = []
   s.executables   = []
   s.require_paths = ["lib"]
+  s.platform      = 'android' # Should be 'android'
 end
