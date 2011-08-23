@@ -17,5 +17,5 @@ Gem::Specification.new do |s|
   s.test_files    = []
   s.executables   = []
   s.require_paths = ["lib"]
-  s.platform      = 'android' # Should be 'android'
+  s.platform      = 'android'
 end
