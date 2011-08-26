@@ -1071,9 +1071,7 @@ public class SqldroidResultSet implements ResultSet {
 
     @Override
     public boolean isClosed() throws SQLException {
-        System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "
-                + DebugPrinter.getLineNumber());
-        return false;
+        return c.isClosed();
     }
 
     @Override

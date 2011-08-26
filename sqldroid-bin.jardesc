@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <jardesc>
-    <jar path="sqldroid/pkg/sqldroid-0.2.jar"/>
+    <jar path="sqldroid/pkg/sqldroid-0.2.1.jar"/>
     <options buildIfNeeded="true" compress="true" descriptionLocation="/sqldroid/my-export-bin.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
     <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
     <selectedProjects/>

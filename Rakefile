@@ -15,5 +15,5 @@ task :gem do
 end
 
 task :release do
-  sh "gem push pkg/#{GEM_FILE}"
+  sh "gem push #{GEM_FILE_PKG}"
 end
