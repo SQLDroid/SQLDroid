@@ -2,8 +2,8 @@ require 'fileutils'
 require 'lib/sqldroid/version'
 
 JAR = "sqldroid-#{Sqldroid::VERSION}.jar"
-GEM_FILE = "sqldroid-#{Sqldroid::VERSION}-unknown.gem" # Platform should be 'android'
-GEM_FILE_PKG = "pkg/sqldroid-#{Sqldroid::VERSION}-android.gem" # Platform should be 'android'
+GEM_FILE = "sqldroid-#{Sqldroid::VERSION}.gem"
+GEM_FILE_PKG = "pkg/sqldroid-#{Sqldroid::VERSION}.gem"
 
 file JAR do
   sh 'javac -d bin -sourcepath src'
