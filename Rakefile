@@ -16,8 +16,10 @@ desc 'Generate the binary and source jars'
 task :jar => JAR_IN_PKG
 
 file JAR_IN_PKG => JAVA_SRC_FILES do
+  FileUtils.mkdir_p 'bin'
   sh "javac -cp #{ANDROID_SDK_HOME}/platforms/android-11/android.jar -d bin -sourcepath src src/*/*/*.java"
   Dir.chdir 'bin' do
+    FileUtils.mkdir_p PKG_DIR
     sh "jar cf #{PKG_DIR}/#{JAR} org"
   end
 end
@@ -27,6 +29,7 @@ file JAR_IN_GEM => JAR_IN_PKG do
   FileUtils.cp JAR_IN_PKG, JAR_IN_GEM
 end
 
+desc 'Create a RubyGem for SQLDroid'
 task :gem => GEM_FILE_PKG
   
 file GEM_FILE_PKG => JAR_IN_GEM do
@@ -34,6 +37,7 @@ file GEM_FILE_PKG => JAR_IN_GEM do
   FileUtils.mv GEM_FILE, GEM_FILE_PKG
 end
 
+desc 'Release SQLDroid as a Ruby gem to rubygems.org'
 task :release => GEM_FILE_PKG do
   sh "gem push #{GEM_FILE_PKG}"
 end
