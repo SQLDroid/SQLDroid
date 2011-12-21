@@ -1,59 +1,71 @@
 package org.sqldroid;
 
+import java.lang.reflect.Method;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
 
 import android.database.Cursor;
 
-public class SqldroidResultSetMetaData implements ResultSetMetaData {
-    private final Cursor cursor;
+public class SQLDroidResultSetMetaData implements ResultSetMetaData {
 
-    public SqldroidResultSetMetaData(Cursor cursor) {
-        if (cursor == null) {
-            throw new RuntimeException("Cursor required to be not null.");
-        }
-        this.cursor = cursor;
-    }
+	private final Cursor cursor;
+    private Method getType;
+    
+	public SQLDroidResultSetMetaData(Cursor cursor) {
+     if (cursor == null) {
+            throw new NullPointerException("Cursor required to be not null.");
+        }		this.cursor = cursor;
+	    try {
+          getType = Cursor.class.getMethod("getType", Integer.class);
+      } catch (Exception e) {
+          getType = null;
+      }
+  }
 
-    @Override
-    public String getCatalogName(int column) throws SQLException {
-        System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "
-                + DebugPrinter.getLineNumber());
-        return null;
-    }
+  private int getType(Cursor cursor, int column) {
+      try {
+          return (Integer) getType.invoke(cursor, column);
+      } catch (Exception e) {
+          return Types.OTHER; // return something that can be used to understand that the type is unknown.
+      }
+  }
 
-    @Override
-    public String getColumnClassName(int column) throws SQLException {
-        System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "
-                + DebugPrinter.getLineNumber());
-        return null;
-    }
+	@Override
+	public String getCatalogName(int column) throws SQLException {
+		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+		return null;
+	}
 
-    @Override
-    public int getColumnCount() throws SQLException {
-        int columnCount = cursor.getColumnCount();
-        return columnCount;
-    }
+	@Override
+	public String getColumnClassName(int column) throws SQLException {
+		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+		return null;
+	}
 
-    @Override
-    public int getColumnDisplaySize(int column) throws SQLException {
-        System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "
-                + DebugPrinter.getLineNumber());
-        return 0;
-    }
+	@Override
+	public int getColumnCount() throws SQLException {
+		int columnCount = cursor.getColumnCount();
+		return columnCount;
+	}
 
-    @Override
-    public String getColumnLabel(int column) throws SQLException {
-        return cursor.getColumnName(column - 1);
-    }
+	@Override
+	public int getColumnDisplaySize(int column) throws SQLException {
+		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+		return 0;
+	}
 
-    @Override
-    public String getColumnName(int column) throws SQLException {
-        return cursor.getColumnName(column - 1);
-    }
+	@Override
+	public String getColumnLabel(int column) throws SQLException {
+		return cursor.getColumnName(column - 1);
+	}
 
-    @Override
+	@Override
+	public String getColumnName(int column) throws SQLException {
+		return cursor.getColumnName(column - 1);
+	}
+
+	@Override
     public int getColumnType(int column) throws SQLException {
         int oldPos = cursor.getPosition();
         boolean moved = false;
@@ -65,7 +77,7 @@ public class SqldroidResultSetMetaData implements ResultSetMetaData {
             cursor.moveToFirst();
             moved = true;
         }
-        int nativeType = cursor.getType(column - 1);
+        int nativeType = getType(cursor, column - 1);
         int type;
         switch (nativeType) {
         case Cursor.FIELD_TYPE_NULL:

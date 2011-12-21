@@ -5,11 +5,11 @@ import java.io.OutputStream;
 import java.sql.Blob;
 import java.sql.SQLException;
 
-public class SqldroidBlob implements Blob {
+public class SQLDroidBlob implements Blob {
 
 	byte [] b;
 	
-	public SqldroidBlob(byte [] b) {
+	public SQLDroidBlob(byte [] b) {
 		this.b = b;
 	}
 	

@@ -7,12 +7,19 @@ import java.sql.ResultSet;
 import java.sql.RowIdLifetime;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.ArrayList;
+import java.util.List;
 
-public class SqldroidDatabaseMetaData implements DatabaseMetaData {
+import android.database.Cursor;
+import android.database.MatrixCursor;
+import android.database.MergeCursor;
+//import android.database.sqlite.SQLiteDatabase;
 
-	SqldroidConnection con;
+public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
+
+	SQLDroidConnection con;
     
-	public SqldroidDatabaseMetaData(SqldroidConnection con) {
+	public SQLDroidDatabaseMetaData(SQLDroidConnection con) {
 		this.con = con;
 	}
 	
@@ -118,12 +125,148 @@ public class SqldroidDatabaseMetaData implements DatabaseMetaData {
 
 	@Override
 	public ResultSet getColumns(String catalog, String schemaPattern,
-			String tableNamePattern, String columnNamePattern)
-			throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return null;
+	    String tableNamePattern, String columnNamePattern) throws SQLException {
+
+
+	  // get the list of tables matching the pattern (getTables)
+	  // create a Matrix Cursor for each of the tables
+	  // create a merge cursor from all the Matrix Cursors
+	  // and return the columname and type from:
+	  //	"PRAGMA table_info(tablename)"
+	  // which returns data like this:
+	  //		sqlite> PRAGMA lastyear.table_info(gross_sales); 
+	  //		cid|name|type|notnull|dflt_value|pk 
+	  //		0|year|INTEGER|0|'2006'|0 
+	  //		1|month|TEXT|0||0 
+	  //		2|monthlygross|REAL|0||0 
+	  //		3|sortcol|INTEGER|0||0 
+	  //		sqlite>
+
+	  // and then make the cursor have these columns
+	  //		TABLE_CAT String => table catalog (may be null)
+	  //		TABLE_SCHEM String => table schema (may be null)
+	  //		TABLE_NAME String => table name
+	  //		COLUMN_NAME String => column name
+	  //		DATA_TYPE int => SQL type from java.sql.Types
+	  //		TYPE_NAME String => Data source dependent type name, for a UDT the type name is fully qualified
+	  //		COLUMN_SIZE int => column size.
+	  //		BUFFER_LENGTH is not used.
+	  //		DECIMAL_DIGITS int => the number of fractional digits. Null is returned for data types where DECIMAL_DIGITS is not applicable.
+	  //		NUM_PREC_RADIX int => Radix (typically either 10 or 2)
+	  //		NULLABLE int => is NULL allowed.
+	  //		columnNoNulls - might not allow NULL values
+	  //		columnNullable - definitely allows NULL values
+	  //		columnNullableUnknown - nullability unknown
+	  //		REMARKS String => comment describing column (may be null)
+	  //		COLUMN_DEF String => default value for the column, which should be interpreted as a string when the value is enclosed in single quotes (may be null)
+	  //		SQL_DATA_TYPE int => unused
+	  //		SQL_DATETIME_SUB int => unused
+	  //		CHAR_OCTET_LENGTH int => for char types the maximum number of bytes in the column
+	  //		ORDINAL_POSITION int => index of column in table (starting at 1)
+	  //		IS_NULLABLE String => ISO rules are used to determine the nullability for a column.
+	  //		YES --- if the parameter can include NULLs
+	  //		NO --- if the parameter cannot include NULLs
+	  //		empty string --- if the nullability for the parameter is unknown
+	  //		SCOPE_CATLOG String => catalog of table that is the scope of a reference attribute (null if DATA_TYPE isn't REF)
+	  //		SCOPE_SCHEMA String => schema of table that is the scope of a reference attribute (null if the DATA_TYPE isn't REF)
+	  //		SCOPE_TABLE String => table name that this the scope of a reference attribure (null if the DATA_TYPE isn't REF)
+	  //		SOURCE_DATA_TYPE short => source type of a distinct type or user-generated Ref type, SQL type from java.sql.Types (null if DATA_TYPE isn't DISTINCT or user-generated REF)
+	  //		IS_AUTOINCREMENT String => Indicates whether this column is auto incremented
+	  //		YES --- if the column is auto incremented
+	  //		NO --- if the column is not auto incremented
+	  //		empty string --- if it cannot be determined whether the column is auto incremented parameter is unknown
+	  final String[] columnNames = new String [] {"TABLE_CAT", "TABLE_SCHEM", "TABLE_NAME", "COLUMN_NAME", 
+	      "DATA_TYPE",  "TYPE_NAME",  "COLUMN_SIZE", "BUFFER_LENGTH", "DECIMAL_DIGITS", "NUM_PREC_RADIX", 
+	      "NULLABLE", "REMARKS","COLUMN_DEF", "SQL_DATA_TYPE", "SQL_DATETIME_SUB", "CHAR_OCTET_LENGTH", 
+	      "ORDINAL_POSITION", "IS_NULLABLE", "SCOPE_CATLOG", "SCOPE_SCHEMA", "SCOPE_TABLE", "SOURCE_DATA_TYPE", 
+	  "IS_AUTOINCREMENT"};
+	  final Object[] columnValues = new Object[] {null, null, null, null, null, null, null, null, null, new Integer(10), 
+	      new Integer(2) /* columnNullableUnknown */, null, null, null, null, new Integer(-1), new Integer(-1), "",
+	      null, null, null, null, ""};
+
+	  SQLiteDatabase db = con.getDb();
+	  final String[] types = new String[] {"table","view"};
+	  ResultSet rs = null;
+	  List<Cursor> cursorList = new ArrayList<Cursor>();
+	  try {
+	    rs = getTables(catalog, schemaPattern,	tableNamePattern, types);
+	    while ( rs.next() ) {
+	      Cursor c = null;
+	      try {
+	        String tableName = rs.getString(3);
+	        String pragmaStatement = "PRAGMA table_info('"+ tableName + "')";   // ?)";  substitutions don't seem to work in a pragma statment...
+	        c = db.rawQuery(pragmaStatement, new String[] {});
+	        MatrixCursor mc = new MatrixCursor (columnNames,c.getCount());
+	        while (c.moveToNext() ) {
+	          Object[] column = columnValues.clone();
+	          column[2] = tableName;
+	          column[3] = c.getString(1);
+	          String type = c.getString(2);
+              column[5] = type;
+	          type = type.toUpperCase();
+	          // types are (as far as I can tell, the pragma document is not specific):
+	          if ( type.equals("TEXT" ) || type.startsWith("CHAR") ) {
+	            column[4] = java.sql.Types.VARCHAR;
+	          }
+	          else if ( type.equals("NUMERIC") ) {
+	            column[4] = java.sql.Types.NUMERIC;
+	          }
+	          else if ( type.startsWith("INT") ) {
+	            column[4] = java.sql.Types.INTEGER;
+	          }
+	          else if ( type.equals("REAL") ) {
+	            column[4] = java.sql.Types.REAL;
+	          }
+	          else if ( type.equals("BLOB") ) {
+	            column[4] = java.sql.Types.BLOB;
+	          }
+	          else {  // manufactured columns, eg select 100 as something from tablename, may not have a type.
+	            column[4] = java.sql.Types.NULL;
+	          }
+	          int nullable = c.getInt(3);
+	          if ( nullable == 0 ) {
+	            column[10] = new Integer[1];
+	          }
+	          else if ( nullable == 1 ) {
+	            column[10] = new Integer[0];
+	          }
+	          column[12] = c.getString(4);  // we should check the type for this, but I'm not going to.
+	          mc.addRow(column);
+	        }
+	        cursorList.add(mc);
+	      } catch (SQLException e) {
+	        // failure of one query will no affect the others...
+	        // this will already have been printed.  e.printStackTrace();
+	      } finally {
+	        if ( c != null ) {
+	          c.close();
+	        }
+	      }
+	    }
+	  } finally {
+	    if ( rs != null ) {
+	      try {
+	        rs.close();
+	      } catch (Exception e) {
+	        e.printStackTrace();
+	      }
+	    }
+	  }
+
+	  SQLDroidResultSet resultSet;
+	  Cursor[] cursors = new Cursor[cursorList.size()];
+	  cursors = cursorList.toArray(cursors);
+
+	  if ( cursors.length == 0 ) {
+	    resultSet = new SQLDroidResultSet(new MatrixCursor(columnNames,0));
+	  }
+	  else if ( cursors.length == 1 ) {
+	    resultSet = new SQLDroidResultSet(cursors[0]);
+	  }
+	  else {
+	    resultSet = new SQLDroidResultSet(new MergeCursor( cursors )); 
+	  }
+	  return resultSet;
 	}
 
 	@Override
@@ -146,7 +289,7 @@ public class SqldroidDatabaseMetaData implements DatabaseMetaData {
 
 	@Override
 	public int getDatabaseMajorVersion() throws SQLException {
-		return con.getDb().getVersion();
+		return con.getDb().getSqliteDatabase().getVersion();
 	}
 
 	@Override
@@ -189,7 +332,7 @@ public class SqldroidDatabaseMetaData implements DatabaseMetaData {
 	@Override
 	public String getDriverName() throws SQLException {
 		
-		return "Lemadi's Sqldroid";
+		return "SQLDroid";
 	}
 
 	@Override
@@ -562,14 +705,61 @@ public class SqldroidDatabaseMetaData implements DatabaseMetaData {
 	@Override
 	public ResultSet getTables(String catalog, String schemaPattern,
 			String tableNamePattern, String[] types) throws SQLException {
-		
-		// TODO table is here :)
-		
-		PreparedStatement ps = con.prepareStatement("SELECT tbl_name FROM sqlite_master WHERE tbl_name = ?");
-		ps.setString(1, tableNamePattern);
-		ResultSet rs = ps.executeQuery();
-		
-		return rs;
+
+	  if ( types == null ) {
+	    types = new String[] {"table"};
+	  }
+		//		.tables command from here:
+		//			http://www.sqlite.org/sqlite.html		
+		//		
+		//	  SELECT name FROM sqlite_master 
+		//		WHERE type IN ('table','view') AND name NOT LIKE 'sqlite_%'
+		//		UNION ALL 
+		//		SELECT name FROM sqlite_temp_master 
+		//		WHERE type IN ('table','view') 
+		//		ORDER BY 1
+
+		// Documentation for getTables() mandates a certain format for the returned result set.
+		// To make the return here compatible with the standard, the following statement is
+		// executed.  Note that the only returned value of any consequence is still the table name
+		// but now it's the third column in the result set and all the other columns are present
+		// The type, which can be 'view', 'table' (maybe also 'index') is returned as the type.
+		// The sort will be wrong if multiple types are selected.  The solution would be to select
+		// one time with type = ('table' | 'view' ), etc. but I think these would have to be 
+		// substituted by hand (that is, I don't think a ? option could be used - but I could be wrong about that.
+		final String selectStringStart = "SELECT null AS TABLE_CAT,null AS TABLE_SCHEM, tbl_name as TABLE_NAME, '";
+		final String selectStringMiddle = "' as TABLE_TYPE, 'No Comment' as REMARKS, null as TYPE_CAT, null as TYPE_SCHEM, null as TYPE_NAME, null as SELF_REFERENCING_COL_NAME, null as REF_GENERATION" +
+		" FROM sqlite_master WHERE tbl_name LIKE ? AND name NOT LIKE 'sqlite_%' AND name NOT LIKE 'android_metadata' AND type = ?" +
+		" UNION ALL SELECT null AS TABLE_CAT,null AS TABLE_SCHEM, tbl_name as TABLE_NAME, '";
+		final String selectStringEnd = "' as TABLE_TYPE, 'No Comment' as REMARKS, null as TYPE_CAT, null as TYPE_SCHEM, null as TYPE_NAME, null as SELF_REFERENCING_COL_NAME, null as REF_GENERATION" +
+		" FROM sqlite_temp_master WHERE tbl_name LIKE ? AND name NOT LIKE 'android_metadata' AND type = ? ORDER BY 3";
+
+		SQLiteDatabase db = con.getDb();
+		List<Cursor> cursorList = new ArrayList<Cursor>();
+		for ( String tableType : types ) {
+			StringBuffer selectString = new StringBuffer ();
+			selectString.append(selectStringStart);
+			selectString.append(tableType);
+			selectString.append(selectStringMiddle);
+			selectString.append(tableType);
+			selectString.append(selectStringEnd);
+			Cursor c = db.rawQuery(selectString.toString(), new String[] {tableNamePattern,tableType,tableNamePattern,tableType});
+			cursorList.add(c);
+		}
+		SQLDroidResultSet resultSet;
+		Cursor[] cursors = new Cursor[cursorList.size()];
+		cursors = cursorList.toArray(cursors);
+
+		if ( cursors.length == 0 ) {
+			resultSet = null;  // is this a valid return?? I think this can only occur on a SQL exception
+		}
+		else if ( cursors.length == 1 ) {
+			resultSet = new SQLDroidResultSet(cursors[0]);
+		}
+		else {
+			resultSet = new SQLDroidResultSet(new MergeCursor( cursors )); 
+		}
+		return resultSet;
 	}
 
 	@Override
@@ -615,7 +805,7 @@ public class SqldroidDatabaseMetaData implements DatabaseMetaData {
 //        getTypeInfo.clearParameters();
 //        return getTypeInfo.executeQuery();
 
-        return new SqldroidResultSet(con.getDb().rawQuery(sql, new String[0]));
+        return new SQLDroidResultSet(con.getDb().rawQuery(sql, new String[0]));
     }
 
 	
