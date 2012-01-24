@@ -22,7 +22,7 @@ https://github.com/SQLDroid/SQLDroid/wiki
 
 ## Old project site
 
-http://code.google.com/p/sqldroid/source/checkout
+http://code.google.com/p/sqldroid
 
 ## Download
 
