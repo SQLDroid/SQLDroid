@@ -2,11 +2,9 @@
 
 SQLDroid is a JDBC driver for Android's sqlite database (android.database.sqlite.SQLiteDatabase) originally conceived by Kristian Lein-Mathisen. See http://sqldroid.org/.
 
-SQLDroid lets you access your app's database through JDBC. Android ships with the necessary interfaces needed to use JDBC drivers, but it does not officially ship with a driver for its built-in SQLite database engine.
+SQLDroid lets you access your app's database through JDBC. Android ships with the necessary interfaces needed to use JDBC drivers, but it does not officially ship with a driver for its built-in SQLite database engine.  When porting code from other projects, you can conveniently replace the JDBC url to jdbc:sqlite to access an SQLite database on Android.
 
-When porting code from other projects, you can conveniently replace the JDBC url to jdbc:sqldroid to access an SQLite database on Android.
-
-The SQLDroid JAR with the JDBC driver for Android is 27 kB.  We also offer a RubyGem "sqldroid" for use with [Ruboto](http://ruboto.org/).
+The SQLDroid JAR with the JDBC driver for Android is 33KB.  We also offer a RubyGem "sqldroid" for use with [Ruboto](http://ruboto.org/).
 
 ## Project site
 
