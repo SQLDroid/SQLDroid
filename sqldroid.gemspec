@@ -4,7 +4,7 @@ require "sqldroid/version"
 
 Gem::Specification.new do |s|
   s.name        = "sqldroid"
-  s.version     = Sqldroid::VERSION
+  s.version     = SQLDroid::VERSION
   s.authors     = ["donv"]
   s.email       = ["uwe@kubosch.no"]
   s.homepage    = "http://sqldroid.org/"

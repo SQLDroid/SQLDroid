@@ -568,7 +568,7 @@ public class SQLDroidResultSet implements ResultSet {
           break;
 
       }
-      //System.err.println("SqldroidResultSet Timestamp:getTimestamp(int) " + md.getColumnType(index) + " Value " + getString(index) + " TimeStamp " +  timestamp);
+      //System.err.println("SQLDroidResultSet Timestamp:getTimestamp(int) " + md.getColumnType(index) + " Value " + getString(index) + " TimeStamp " +  timestamp);
       return timestamp;
     } catch (android.database.SQLException e) {
       throw SQLDroidConnection.chainException(e);

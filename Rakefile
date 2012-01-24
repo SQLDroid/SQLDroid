@@ -3,11 +3,11 @@ require 'lib/sqldroid/version'
 
 ANDROID_SDK_HOME = File.dirname(File.dirname(`which dx`))
 PKG_DIR          = File.expand_path "pkg"
-JAR              = "sqldroid-#{Sqldroid::VERSION}.jar"
+JAR              = "sqldroid-#{SQLDroid::VERSION}.jar"
 JAR_IN_PKG       = "#{PKG_DIR}/#{JAR}"
 LIB_DIR          = File.expand_path 'lib/sqldroid'
 JAR_IN_GEM       = "#{LIB_DIR}/#{JAR}"
-GEM_FILE         = "sqldroid-#{Sqldroid::VERSION}.gem"
+GEM_FILE         = "sqldroid-#{SQLDroid::VERSION}.gem"
 GEM_FILE_PKG     = "#{PKG_DIR}/#{GEM_FILE}"
 JAVA_SRC_FILES   = Dir[File.expand_path 'src/**/*.java']
 
@@ -18,8 +18,8 @@ task :jar => JAR_IN_PKG
 file JAR_IN_PKG => JAVA_SRC_FILES do
   FileUtils.mkdir_p 'bin'
   sh "javac -cp #{ANDROID_SDK_HOME}/platforms/android-11/android.jar -d bin -sourcepath src src/*/*/*.java"
+  FileUtils.mkdir_p PKG_DIR
   Dir.chdir 'bin' do
-    FileUtils.mkdir_p PKG_DIR
     sh "jar cf #{PKG_DIR}/#{JAR} org"
   end
 end
