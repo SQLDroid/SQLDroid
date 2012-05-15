@@ -638,6 +638,9 @@ public class SQLDroidResultSet implements ResultSet {
 
   @Override
   public boolean isAfterLast() throws SQLException {
+    if ( isClosed() ) {
+      return false;
+    }
     try {
       return c.isAfterLast();
     } catch (android.database.SQLException e) {
@@ -647,6 +650,9 @@ public class SQLDroidResultSet implements ResultSet {
 
   @Override
   public boolean isBeforeFirst() throws SQLException {
+    if ( isClosed() ) {
+      return false;
+    }
     try {
       return c.isBeforeFirst();
     } catch (android.database.SQLException e) {
@@ -656,6 +662,9 @@ public class SQLDroidResultSet implements ResultSet {
 
   @Override
   public boolean isFirst() throws SQLException {
+    if ( isClosed() ) {
+      return false;
+    }
     try {
       return c.isFirst();
     } catch (android.database.SQLException e) {
@@ -665,6 +674,9 @@ public class SQLDroidResultSet implements ResultSet {
 
   @Override
   public boolean isLast() throws SQLException {
+    if ( isClosed() ) {
+      return false;
+    }
     try {
       return c.isLast();
     } catch (android.database.SQLException e) {
