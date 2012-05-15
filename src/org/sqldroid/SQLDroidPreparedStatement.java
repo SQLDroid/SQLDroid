@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import android.content.ContentValues;
+//import android.content.ContentValues;
 import android.database.Cursor;
 import android.util.Log;
 
@@ -37,7 +37,7 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
   protected SQLDroidConnection sqldroidConnection;
   protected SQLDroidResultSet rs = null;	
   protected String sql;
-  protected ContentValues cv = new ContentValues();
+  //protected ContentValues cv = new ContentValues();
   protected ArrayList<Object> l = new ArrayList<Object>();
 
   /** True if the sql statement is a select. */
@@ -85,15 +85,15 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
 
 
     int additions = n - l.size() + 1;
-    System.out.println("adding " + additions + " elements");
+    //System.out.println("adding " + additions + " elements");
     for(int i = 0 ; i < additions ; i++) {
-      System.out.println("ADD NULL");
+     // System.out.println("ADD NULL");
       l.add(null);
     }
 
-    System.out.println("n = " + n + " size now " + l.size() + " we @ " + n);
+    //System.out.println("n = " + n + " size now " + l.size() + " we @ " + n);
     l.set(n, obj);
-    System.out.println("POST set n = " + n + " size now " + l.size() + " we @ " + n);
+    //System.out.println("POST set n = " + n + " size now " + l.size() + " we @ " + n);
   }
 
 
@@ -588,7 +588,7 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
   public void setBlob(int parameterIndex, Blob theBlob) throws SQLException {
 
     ensureCap(parameterIndex);
-    setObj(parameterIndex, theBlob.getBytes(0, (int)theBlob.length()));
+    setObj(parameterIndex, theBlob.getBytes(1, (int)theBlob.length()));
 
   }
 
