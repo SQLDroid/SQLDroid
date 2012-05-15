@@ -80,5 +80,43 @@ public class SQLDroidBlob implements Blob {
 		return null;
 	}
 
+  /** Print the length of the blob along with the first 10 characters.
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    StringBuffer sb = new StringBuffer();
+    if ( b == null ) {
+      sb.append("Null Blob");
+    }
+    sb.append ("Blob length ");
+    long length = 0;
+    try {
+      length = length();
+    } catch (SQLException e) {
+      // never thrown
+    }
+    sb.append (length);
+    sb.append(" ");
+    if ( length > 10 ) {
+      length = 10;
+    }
+    for ( int counter = 0 ; counter < length ; counter++ ) {
+      sb.append ("0x");
+      sb.append (Integer.toHexString(b[counter]));
+      sb.append(" ");
+    }
+    sb.append("(");
+    for ( int counter = 0 ; counter < length ; counter++ ) {
+      sb.append (Character.toString((char)b[counter]));
+      if ( counter == length-1 ) {
+        sb.append(")");
+      } else {
+        sb.append(" ");
+      }
+    }
+    return sb.toString();
+  }
+
 
 }
