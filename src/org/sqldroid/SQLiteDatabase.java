@@ -1,9 +1,11 @@
 package org.sqldroid;
 
 import java.sql.SQLException;
+import java.util.Locale;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
+import android.util.Log;
 
 
 /** A  proxy class for the database that allows actions to be retried without forcing every method 
@@ -77,7 +79,7 @@ public class SQLiteDatabase {
     long delta = 0;
     do {
       try {
-        sqliteDatabase = android.database.sqlite.SQLiteDatabase.openDatabase(dbQname, null, android.database.sqlite.SQLiteDatabase.CREATE_IF_NECESSARY | android.database.sqlite.SQLiteDatabase.OPEN_READWRITE);
+        sqliteDatabase = android.database.sqlite.SQLiteDatabase.openDatabase(dbQname, null, android.database.sqlite.SQLiteDatabase.CREATE_IF_NECESSARY | android.database.sqlite.SQLiteDatabase.OPEN_READWRITE | android.database.sqlite.SQLiteDatabase.NO_LOCALIZED_COLLATORS);
       } catch (SQLiteException e) {
         if ( isLockedException(e) ) {
           try {
@@ -95,6 +97,11 @@ public class SQLiteDatabase {
         }
       }
     } while (sqliteDatabase == null && delta < timeout);
+    try {
+      sqliteDatabase.setLocale(Locale.getDefault());
+    } catch ( Exception any ) {
+      Log.e("Sqldroid","Exception Setting Locale to \"" + Locale.getDefault() + "\" the collator LOCALIZED may not be available" + any.getLocalizedMessage());
+    }
   }
 
   /** Proxy for the "rawQuery" command. 

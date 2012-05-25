@@ -1,10 +1,6 @@
 package org.sqldroid;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.sql.Array;
 import java.sql.Blob;
 import java.sql.CallableStatement;
@@ -23,8 +19,8 @@ import java.sql.Struct;
 import java.util.Map;
 import java.util.Properties;
 
-import android.database.sqlite.SQLiteDatabaseLockedException;
 import android.util.Log;
+
 
 public class SQLDroidConnection implements Connection {
   /** The Android sqlitedb. */
@@ -48,7 +44,8 @@ public class SQLDroidConnection implements Connection {
    * @param info currently not used
    */
   public SQLDroidConnection(String url, Properties info) throws SQLException {
-    Log.i("Sqldroid", "new sqlite jdbc from url '" + url + "', " + "'" + info + "'");
+    String note = "new sqlite jdbc from url '" + url + "', " + "'" + info + "'";
+    Log.i("Sqldroid", note);
 
     // Make a filename from url
     String dbQname;
