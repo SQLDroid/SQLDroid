@@ -13,6 +13,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -315,7 +316,9 @@ public class DriverUnitTest extends TestCase {
         // String jdbcURL = "jdbc:sqlite:" + databasePath;           
         // Class.forName("SQLite.JDBCDriver");
 
-        Connection conn1 = DriverManager.getConnection(jdbcURL);
+        Properties removeLocale = new Properties();
+        removeLocale.put(SQLDroidDriver.ADDITONAL_DATABASE_FLAGS, android.database.sqlite.SQLiteDatabase.NO_LOCALIZED_COLLATORS);
+        Connection conn1 = DriverManager.getConnection(jdbcURL,removeLocale);
         System.out.println("After getting connection...1");
         
         conn1.setAutoCommit(true);

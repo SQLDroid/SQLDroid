@@ -71,7 +71,7 @@ public class SQLiteDatabase {
    * @throws SQLException thrown if the attempt to connect to the database throws an exception 
    * other than a locked exception or throws a locked exception after the timeout has expired.
    */
-  public SQLiteDatabase(String dbQname, long timeout) throws SQLException {
+  public SQLiteDatabase(String dbQname, long timeout, int flags) throws SQLException {
     super();
     this.dbQname = dbQname;
     this.timeout = timeout;
@@ -79,7 +79,8 @@ public class SQLiteDatabase {
     long delta = 0;
     do {
       try {
-        sqliteDatabase = android.database.sqlite.SQLiteDatabase.openDatabase(dbQname, null, android.database.sqlite.SQLiteDatabase.CREATE_IF_NECESSARY | android.database.sqlite.SQLiteDatabase.OPEN_READWRITE | android.database.sqlite.SQLiteDatabase.NO_LOCALIZED_COLLATORS);
+        sqliteDatabase = android.database.sqlite.SQLiteDatabase.openDatabase(dbQname, null, flags );
+        // android.database.sqlite.SQLiteDatabase.CREATE_IF_NECESSARY | android.database.sqlite.SQLiteDatabase.OPEN_READWRITE | android.database.sqlite.SQLiteDatabase.NO_LOCALIZED_COLLATORS);
       } catch (SQLiteException e) {
         if ( isLockedException(e) ) {
           try {
