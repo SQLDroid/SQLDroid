@@ -10,4 +10,8 @@ import android.database.SQLException;
 
 public class SQLiteDatabaseLockedException extends SQLException {
 
+  public SQLiteDatabaseLockedException(String string) {
+    super(string);
+  }
+
 }
