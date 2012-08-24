@@ -7,7 +7,6 @@ import java.sql.SQLWarning;
 import java.sql.Statement;
 
 import android.database.Cursor;
-import android.util.Log;
 
 public class SQLDroidStatement implements Statement {
 
@@ -15,6 +14,22 @@ public class SQLDroidStatement implements Statement {
   private SQLDroidConnection sqldroidConnection;
   private SQLDroidResultSet rs = null;
   private Integer maxRows = null;
+
+  /** The update count.  We don't know this, but need to respond in such a way that:
+   * (from getMoreResults) There are no more results when the following is true:
+   * 
+   *      // stmt is a Statement object
+   *      ((stmt.getMoreResults() == false) && (stmt.getUpdateCount() == -1))
+
+   * This is used by <code>getUpdateCount()</code>.  If there is a resultSet
+   * then getUpdateCount will return -1.  If there is no result set, then, presumably, 
+   * <code>execute()</code> was called and we have one result and so can return something
+   * other than -1 on the first call to getUpdateCount.   In this case, the second call to getUpdateCount
+   * we should return -1;
+   * We set this to zero on execute() and decrement it on getUpdateCount.  If the value of updateCount
+   * is -1 then we just return it from getUpdateCount.
+   */
+  public int updateCount = -1;
 
   public SQLDroidStatement(SQLDroidConnection sqldroid) {
     this.sqldroidConnection = sqldroid;
@@ -58,12 +73,24 @@ public class SQLDroidStatement implements Statement {
   }
   @Override
   public boolean execute(String sql) throws SQLException {
-    boolean ok = false;
+   updateCount = 0;
+   boolean ok = false;
     closeResultSet();
     boolean isSelect = sql.toUpperCase().matches("(?m)(?s)\\s*SELECT.*");
+    // problem, a PRAGMA statement (and maybe others) should also cause a result set
+    if ( !isSelect && sql.toUpperCase().matches("(?m)(?s)\\s*PRAGMA.*") ) {
+      isSelect = true;
+    }
+    if ( rs!= null && !rs.isClosed() ) {
+      rs.close();
+    }
+    rs = null;
     if (isSelect) {
       String limitedSql = sql + (maxRows != null ? " LIMIT " + maxRows : "");
-      rs = new SQLDroidResultSet(db.rawQuery(limitedSql, new String[0]));
+      Cursor c = db.rawQuery(limitedSql, new String[0]);
+      if  ( c.getColumnCount() != 0 ) {
+        rs = new SQLDroidResultSet(c);
+      }
     } else {
       db.execSQL(sql);
     }
@@ -71,26 +98,26 @@ public class SQLDroidStatement implements Statement {
 
     boolean resultSetAvailable = ok && !sql.toUpperCase().startsWith("CREATE") && rs != null && rs.getMetaData().getColumnCount() != 0;
 
-    if (resultSetAvailable) {
-      boolean headerDrawn = false;
-      while (rs.next()) {
-        if (!headerDrawn) {
-          Log.d("SqlDroid", sql);
-          for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
-            System.out.print(" | ");
-            System.out.print(rs.getMetaData().getColumnLabel(i));
-          }
-          System.out.println(" | ");
-          headerDrawn = true;
-        }
-        for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
-          System.out.print(" | ");
-          System.out.print(rs.getString(i));
-        }
-        System.out.println(" | ");
-      }
-      rs.beforeFirst();
-    }
+//    if (resultSetAvailable) {
+//      boolean headerDrawn = false;
+//      while (rs.next()) {
+//        if (!headerDrawn) {
+//          Log.d("SqlDroid", sql);
+//          for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
+//            System.out.print(" | ");
+//            System.out.print(rs.getMetaData().getColumnLabel(i));
+//          }
+//          System.out.println(" | ");
+//          headerDrawn = true;
+//        }
+//        for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
+//          System.out.print(" | ");
+//          System.out.print(rs.getString(i));
+//        }
+//        System.out.println(" | ");
+//      }
+//      rs.beforeFirst();
+//    }
     return resultSetAvailable;
   }
 
@@ -248,9 +275,10 @@ public class SQLDroidStatement implements Statement {
 
   @Override
   public int getUpdateCount() throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "
-        + DebugPrinter.getLineNumber());
-    return 0;
+    if ( updateCount == -1 ) {
+      return -1;
+    }
+    return updateCount--;
   }
 
   @Override

@@ -124,6 +124,7 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
     this.sql = sql;
     isSelect = sql.toUpperCase().matches("(?m)(?s)\\s*SELECT.*");
     potentialResultSet = true;
+    // examples of a failure on the next line (so isSelect is false and potentialResultSet remains true, are PRAGMA and INSERT (why INSERT?)
     if (!isSelect && (sql.toUpperCase().matches("(?m)(?s)\\s*CREATE.*") || sql.toUpperCase().matches("(?m)(?s)\\s*DROP.*")) ) {
       potentialResultSet = false;
     }
@@ -185,11 +186,14 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
   @Override
   public boolean execute() throws SQLException {
     updateCount	= 0;
+    if ( rs!= null && !rs.isClosed() ) {
+      rs.close();
+    }
     rs = null;
     if (isSelect) {
       Cursor c = db.rawQuery(sql, makeArgListQueryString());
-      rs = new SQLDroidResultSet(c);
-      if  ( rs.getMetaData().getColumnCount() != 0 ) {
+      //rs = new SQLDroidResultSet(c);
+      if  ( c.getColumnCount() != 0 ) {
         rs = new SQLDroidResultSet(c);
       }
       else {
@@ -414,9 +418,6 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
 	Returns:
 	the current result as an update count; -1 if the current result is a ResultSet object or there are no more results*/	
   public int getUpdateCount() throws SQLException {
-    System.err.println(" ********************* not (fully) implemented @ "
-        + DebugPrinter.getFileName() + " line "
-        + DebugPrinter.getLineNumber());
     if ( updateCount == -1 ) {
       return -1;
     }
