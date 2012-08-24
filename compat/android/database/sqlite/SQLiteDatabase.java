@@ -90,7 +90,13 @@ public class SQLiteDatabase {
             res1 = SQLite.sqlite3_bind_blob(ppStmt.getValue(), counter+1, blobData, blobData.length, SQLite.SQLITE_TRANSIENT);
           }
           else {
-            res1 = SQLite.sqlite3_bind_text(ppStmt.getValue(), counter+1, makeArgListQueryString[counter].toString(), -1, SQLite.SQLITE_TRANSIENT);
+            //res1 = SQLite.sqlite3_bind_text(ppStmt.getValue(), counter+1, makeArgListQueryString[counter].toString(), -1, SQLite.SQLITE_TRANSIENT);
+            if (makeArgListQueryString[counter] != null) {
+                res1 = SQLite.sqlite3_bind_text(ppStmt.getValue(), counter+1, makeArgListQueryString[counter].toString(), -1, SQLite.SQLITE_TRANSIENT);
+            }
+            else {
+                res1 = SQLite.sqlite3_bind_null(ppStmt.getValue(), counter+1);
+            }
           }
           if (res1 != SQLite.SQLITE_OK) {
             throw new SQLiteException("error binding " +   makeArgListQueryString[counter] + " to " + sql);
