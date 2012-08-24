@@ -98,11 +98,11 @@ public class SQLiteDatabase {
         }
       }
     } while (sqliteDatabase == null && delta < timeout);
-    try {
-      sqliteDatabase.setLocale(Locale.getDefault());
-    } catch ( Exception any ) {
-      Log.e("Sqldroid","Exception Setting Locale to \"" + Locale.getDefault() + "\" the collator LOCALIZED may not be available" + any.getLocalizedMessage());
-    }
+//    try {
+//      sqliteDatabase.setLocale(Locale.getDefault());
+//    } catch ( Exception any ) {
+//      Log.e("Sqldroid","Exception Setting Locale to \"" + Locale.getDefault() + "\" the collator LOCALIZED may not be available" + any.getLocalizedMessage());
+//    }
   }
 
   /** Proxy for the "rawQuery" command. 
