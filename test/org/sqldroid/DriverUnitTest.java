@@ -132,56 +132,122 @@ public class DriverUnitTest extends TestCase {
 
   public void testCursors () throws Exception {
 
-    DriverManager.registerDriver((Driver)(Class.forName(driverName, true, getClass().getClassLoader()).newInstance()));
+      DriverManager.registerDriver((Driver)(Class.forName(driverName, true, getClass().getClassLoader()).newInstance()));
 
-    File f = new File("cursortest");
-    if ( f.exists() ) {
-      f.delete();
+      File f = new File("cursortest");
+      if ( f.exists() ) {
+        f.delete();
+      }
+      Connection con = DriverManager.getConnection("jdbc:sqldroid:cursortest");
+
+      con.createStatement().execute(createTable);
+
+      for ( String insertSQL : inserts ) {
+        con.createStatement().execute(insertSQL);
+      }
+
+      ResultSet rs = con.createStatement().executeQuery("SELECT * FROM dummytable order by value");
+      checkResultSet ( rs, false, true, false, false, false);
+      rs.next();
+      checkResultSet ( rs, false, false, false, true, false);  
+      checkValues (rs, "Apple", 100);
+      rs.next();
+      checkResultSet ( rs, false, false, false, false, false);
+      checkValues (rs, "Orange", 200);
+      rs.next();
+      checkResultSet ( rs, false, false, false, false, false);
+      checkValues (rs, "Banana", 300);
+      rs.next();  // to last
+      checkResultSet ( rs, false, false, false, false, true);
+      checkValues (rs, "Kiwi", 400);
+      rs.next();  // after last
+      checkResultSet ( rs, false, false, true, false, false);
+      rs.first();
+      checkResultSet ( rs, false, false, false, true, false);
+      rs.last();
+      checkResultSet ( rs, false, false, false, false, true);
+      rs.afterLast();
+      checkResultSet ( rs, false, false, true, false, false);
+      rs.beforeFirst();
+      checkResultSet ( rs, false, true, false, false, false);
+      rs.close();
+      checkResultSet ( rs, true, false, false, false, false);
+      PreparedStatement stmt = con.prepareStatement("SELECT ?,? FROM dummytable order by ?");
+      stmt.setString(1, "name");
+      stmt.setString(2, "value");
+      stmt.setString(3, "value");
+      rs = stmt.executeQuery();
+      assertTrue ("Executed", rs != null);
+      rs.last();
+      assertEquals( "Enough rows ", 4, rs.getRow());
+
     }
-    Connection con = DriverManager.getConnection("jdbc:sqldroid:cursortest");
 
-    con.createStatement().execute(createTable);
+  public void testExecute () throws Exception {
 
-    for ( String insertSQL : inserts ) {
-      con.createStatement().execute(insertSQL);
+      DriverManager.registerDriver((Driver)(Class.forName(driverName, true, getClass().getClassLoader()).newInstance()));
+
+      File f = new File("cursortest");
+      if ( f.exists() ) {
+        f.delete();
+      }
+      Connection con = DriverManager.getConnection("jdbc:sqldroid:cursortest");
+
+      con.createStatement().execute(createTable);
+
+      for ( String insertSQL : inserts ) {
+        con.createStatement().execute(insertSQL);
+      }
+
+      Statement statement = con.createStatement();
+      boolean hasResultSet = statement.execute("SELECT * FROM dummytable order by value");
+      assertTrue("Should return a result set", hasResultSet);
+      assertNotSame ("Should not be -1 ", -1, statement.getUpdateCount());
+      // second time this will be true.
+      boolean noMoreResults = ((statement.getMoreResults() == false) && (statement.getUpdateCount() == -1));
+      assertTrue("Should  be no more results ", noMoreResults);
+      assertNotNull ("Result Set should be non-null ", statement.getResultSet());
+      statement.close();
+      
+      
+      statement = con.createStatement();
+      hasResultSet = statement.execute("SELECT * FROM dummytable where name = 'fig'");  // no matching result
+      assertFalse("Should return a result set", hasResultSet);
+      assertNull ("Result Set should be null ", statement.getResultSet());
+      assertNotSame ("Should not be -1 ", -1, statement.getUpdateCount());
+      // second time this will be true.
+      noMoreResults = ((statement.getMoreResults() == false) && (statement.getUpdateCount() == -1));
+      assertTrue("Should  be no more results ", noMoreResults);
+      assertNotNull ("Result Set should be non-null ", statement.getResultSet());
+      statement.close();
+
+
+      PreparedStatement stmt = con.prepareStatement("SELECT ?,? FROM dummytable order by ?");
+      stmt.setString(1, "name");
+      stmt.setString(2, "value");
+      stmt.setString(3, "value");
+      hasResultSet = stmt.execute();
+      assertTrue("Should return a result set", hasResultSet);
+      assertNotSame ("Should not be -1 ", -1, stmt.getUpdateCount());
+      // second time this will be true.
+      noMoreResults = ((stmt.getMoreResults() == false) && (stmt.getUpdateCount() == -1));
+      assertTrue("Should  be no more results ", noMoreResults);
+      assertNotNull ("Result Set should be non-null ", stmt.getResultSet());
+      stmt.close();
+      
+      
+      stmt = con.prepareStatement("SELECT * FROM dummytable where name = 'fig'");
+      hasResultSet = stmt.execute();  // no matching result
+      assertFalse("Should return a result set", hasResultSet);
+      assertNull ("Result Set should be null ", stmt.getResultSet());
+      assertNotSame ("Should not be -1 ", -1, stmt.getUpdateCount());
+      // second time this will be true.
+      noMoreResults = ((stmt.getMoreResults() == false) && (stmt.getUpdateCount() == -1));
+      assertTrue("Should  be no more results ", noMoreResults);
+      assertNotNull ("Result Set should be non-null ", stmt.getResultSet());
+      stmt.close();
+
     }
-
-    ResultSet rs = con.createStatement().executeQuery("SELECT * FROM dummytable order by value");
-    checkResultSet ( rs, false, true, false, false, false);
-    rs.next();
-    checkResultSet ( rs, false, false, false, true, false);  
-    checkValues (rs, "Apple", 100);
-    rs.next();
-    checkResultSet ( rs, false, false, false, false, false);
-    checkValues (rs, "Orange", 200);
-    rs.next();
-    checkResultSet ( rs, false, false, false, false, false);
-    checkValues (rs, "Banana", 300);
-    rs.next();  // to last
-    checkResultSet ( rs, false, false, false, false, true);
-    checkValues (rs, "Kiwi", 400);
-    rs.next();  // after last
-    checkResultSet ( rs, false, false, true, false, false);
-    rs.first();
-    checkResultSet ( rs, false, false, false, true, false);
-    rs.last();
-    checkResultSet ( rs, false, false, false, false, true);
-    rs.afterLast();
-    checkResultSet ( rs, false, false, true, false, false);
-    rs.beforeFirst();
-    checkResultSet ( rs, false, true, false, false, false);
-    rs.close();
-    checkResultSet ( rs, true, false, false, false, false);
-    PreparedStatement stmt = con.prepareStatement("SELECT ?,? FROM dummytable order by ?");
-    stmt.setString(1, "name");
-    stmt.setString(2, "value");
-    stmt.setString(3, "value");
-    rs = stmt.executeQuery();
-    assertTrue ("Executed", rs != null);
-    rs.last();
-    assertEquals( "Enough rows ", 4, rs.getRow());
-
-  }
 
   public void checkResultSet ( ResultSet rs, boolean isClosed, boolean isBeforeFirst, boolean isAfterLast,boolean isFirst,boolean isLast) throws Exception {
     assertEquals ("Is Closed", isClosed, rs.isClosed());
