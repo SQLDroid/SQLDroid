@@ -67,12 +67,12 @@ public class SQLDroidDriver implements java.sql.Driver {
 
     @Override
     public int getMajorVersion() {
-        return 0;
+        return 1;
     }
 
     @Override
     public int getMinorVersion() {
-        return 2;
+        return 0;
     }
 
     @Override
