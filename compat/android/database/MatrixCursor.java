@@ -10,21 +10,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MatrixCursor implements Cursor {
-  
+
   /** The list of column names. */
   protected String[] columnNames;
-    
+
   /** The ArrayList of values.  This is populated by the "addRow" method and so is an list of object arrays. */
   List<Object[]> rows;
 
   /** The current position in the cursor. */
   protected int currentPosition;
-  
+
   public MatrixCursor(String[] columnNames, int initialCapacity ) {
     this.columnNames=columnNames;
     rows = new ArrayList<Object[]>(initialCapacity);
     currentPosition = -1;
- }
+  }
+
+  public MatrixCursor(String[] columnNames) {
+    this.columnNames=columnNames;
+    rows = new ArrayList<Object[]>();
+    currentPosition = -1;
+  }
 
   public void addRow(Object[] column) {
     rows.add(column);
@@ -132,7 +138,7 @@ public class MatrixCursor implements Cursor {
 
   @Override
   public void requery() {
-   
+
   }
 
   @Override
@@ -159,7 +165,7 @@ public class MatrixCursor implements Cursor {
   public void moveToPosition(int oldPos) {
     currentPosition = oldPos;    
   }
-  
+
   @Override
   public int getType(int ci) {
     // this should really intelligently determine the type and return a worthwhile value,

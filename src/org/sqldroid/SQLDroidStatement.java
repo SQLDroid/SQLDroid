@@ -387,5 +387,15 @@ public class SQLDroidStatement implements Statement {
         + DebugPrinter.getLineNumber());
 
   }
+  
+  // methods added for JDK7 compilation
 
+  public boolean isCloseOnCompletion() throws SQLException {
+    //TODO auto generated code
+    return false;
+  }
+
+  public void closeOnCompletion() throws SQLException {
+    //TODO auto generated code
+  }
 }

@@ -18,6 +18,7 @@ import java.sql.Statement;
 import java.sql.Struct;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.Executor;
 
 import android.util.Log;
 
@@ -460,4 +461,29 @@ public class SQLDroidConnection implements Connection {
         // TODO Auto-generated method stub
 
     }
+    
+    // methods added for JDK7 compilation
+    
+    public void setNetworkTimeout(Executor executor, int milliseconds) throws SQLException {
+        // TODO Auto-generated method stub
+    }
+
+    public int getNetworkTimeout() throws SQLException {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    public void abort(Executor executor) throws SQLException {
+        // TODO Auto-generated method stub
+    }
+
+    public String getSchema() throws SQLException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public void setSchema(String schema) throws SQLException {
+        // TODO Auto-generated method stub
+    }
+  }
 }

@@ -452,7 +452,6 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
     System.err.println(" ********************* not implemented @ "
         + DebugPrinter.getFileName() + " line "
         + DebugPrinter.getLineNumber());
-
   }
 
   @Override
@@ -460,7 +459,6 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
     System.err.println(" ********************* not implemented @ "
         + DebugPrinter.getFileName() + " line "
         + DebugPrinter.getLineNumber());
-
   }
 
   @Override
@@ -468,7 +466,6 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
     System.err.println(" ********************* not implemented @ "
         + DebugPrinter.getFileName() + " line "
         + DebugPrinter.getLineNumber());
-
   }
 
   @Override
@@ -476,7 +473,6 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
     System.err.println(" ********************* not implemented @ "
         + DebugPrinter.getFileName() + " line "
         + DebugPrinter.getLineNumber());
-
   }
 
   @Override
@@ -484,7 +480,6 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
     System.err.println(" ********************* not implemented @ "
         + DebugPrinter.getFileName() + " line "
         + DebugPrinter.getLineNumber());
-
   }
 
   @Override
@@ -492,7 +487,6 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
     System.err.println(" ********************* not implemented @ "
         + DebugPrinter.getFileName() + " line "
         + DebugPrinter.getLineNumber());
-
   }
 
   @Override
@@ -500,7 +494,6 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
     System.err.println(" ********************* not implemented @ "
         + DebugPrinter.getFileName() + " line "
         + DebugPrinter.getLineNumber());
-
   }
 
   @Override
@@ -508,7 +501,6 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
     System.err.println(" ********************* not implemented @ "
         + DebugPrinter.getFileName() + " line "
         + DebugPrinter.getLineNumber());
-
   }
 
   @Override
@@ -538,7 +530,6 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
     System.err.println(" ********************* not implemented @ "
         + DebugPrinter.getFileName() + " line "
         + DebugPrinter.getLineNumber());
-
   }
 
   @Override
@@ -547,7 +538,6 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
     System.err.println(" ********************* not implemented @ "
         + DebugPrinter.getFileName() + " line "
         + DebugPrinter.getLineNumber());
-
   }
 
   @Override
@@ -556,7 +546,6 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
     System.err.println(" ********************* not implemented @ "
         + DebugPrinter.getFileName() + " line "
         + DebugPrinter.getLineNumber());
-
   }
   /** 
    * Set the parameter from the contents of a binary stream.
@@ -602,27 +591,20 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
 
   @Override
   public void setBlob(int parameterIndex, Blob theBlob) throws SQLException {
-
     ensureCap(parameterIndex);
     setObj(parameterIndex, theBlob.getBytes(1, (int)theBlob.length()));
-
   }
 
   @Override
-  public void setBoolean(int parameterIndex, boolean theBoolean)
-  throws SQLException {
-
+  public void setBoolean(int parameterIndex, boolean theBoolean) throws SQLException {
     ensureCap(parameterIndex);
     setObj(parameterIndex, theBoolean);
-
   }
 
   @Override
   public void setByte(int parameterIndex, byte theByte) throws SQLException {
-
     ensureCap(parameterIndex);
     setObj(parameterIndex, theByte);
-
   }
 
   @Override
@@ -638,7 +620,6 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
     System.err.println(" ********************* not implemented @ "
         + DebugPrinter.getFileName() + " line "
         + DebugPrinter.getLineNumber());
-
   }
 
   @Override
@@ -657,27 +638,22 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
   }
 
   @Override
-  public void setDate(int parameterIndex, Date theDate, Calendar cal)
-  throws SQLException {
+  public void setDate(int parameterIndex, Date theDate, Calendar cal)  throws SQLException {
     System.err.println(" ********************* not implemented @ "
         + DebugPrinter.getFileName() + " line "
         + DebugPrinter.getLineNumber());
-
   }
 
   @Override
-  public void setDouble(int parameterIndex, double theDouble)
-  throws SQLException {
+  public void setDouble(int parameterIndex, double theDouble) throws SQLException {
     ensureCap(parameterIndex);
     setObj(parameterIndex, new Double(theDouble));
   }
 
   @Override
-  public void setFloat(int parameterIndex, float theFloat)
-  throws SQLException {
+  public void setFloat(int parameterIndex, float theFloat) throws SQLException {
     ensureCap(parameterIndex);
     setObj(parameterIndex, new Double(theFloat));
-
 
   }
 
@@ -685,42 +661,30 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
   public void setInt(int parameterIndex, int theInt) throws SQLException {
     ensureCap(parameterIndex);
     setObj(parameterIndex, new Long(theInt));
-
-
-
   }
 
   @Override
   public void setLong(int parameterIndex, long theLong) throws SQLException {
     ensureCap(parameterIndex);
     setObj(parameterIndex, new Long(theLong));
-
-
   }
 
   @Override
   public void setNull(int parameterIndex, int sqlType) throws SQLException {
     ensureCap(parameterIndex);
     setObj(parameterIndex, null);
-
-
   }
 
   @Override
-  public void setNull(int paramIndex, int sqlType, String typeName)
-  throws SQLException {
+  public void setNull(int paramIndex, int sqlType, String typeName) throws SQLException {
     ensureCap(paramIndex);
     setObj(paramIndex, null);
-
   }
 
   @Override
-  public void setObject(int parameterIndex, Object theObject)
-  throws SQLException {
-    System.err.println(" ********************* not implemented @ "
-        + DebugPrinter.getFileName() + " line "
-        + DebugPrinter.getLineNumber());
-
+  public void setObject(int parameterIndex, Object theObject)  throws SQLException {
+    ensureCap(parameterIndex);
+    setObj(parameterIndex, theObject);
   }
 
   @Override
@@ -729,7 +693,6 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
     System.err.println(" ********************* not implemented @ "
         + DebugPrinter.getFileName() + " line "
         + DebugPrinter.getLineNumber());
-
   }
 
   @Override
@@ -738,7 +701,6 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
     System.err.println(" ********************* not implemented @ "
         + DebugPrinter.getFileName() + " line "
         + DebugPrinter.getLineNumber());
-
   }
 
   @Override
@@ -746,7 +708,6 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
     System.err.println(" ********************* not implemented @ "
         + DebugPrinter.getFileName() + " line "
         + DebugPrinter.getLineNumber());
-
   }
 
   @Override
@@ -754,16 +715,12 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
   throws SQLException {
     ensureCap(parameterIndex);
     setObj(parameterIndex, new Long(theShort));
-
-
   }
 
   @Override
   public void setString(int parameterIndex, String theString) {
     ensureCap(parameterIndex);
     setObj(parameterIndex, theString);
-
-
   }
 
   @Override
@@ -771,7 +728,6 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
     System.err.println(" ********************* not implemented @ "
         + DebugPrinter.getFileName() + " line "
         + DebugPrinter.getLineNumber());
-
   }
 
   @Override
@@ -780,7 +736,6 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
     System.err.println(" ********************* not implemented @ "
         + DebugPrinter.getFileName() + " line "
         + DebugPrinter.getLineNumber());
-
   }
 
   @Override
@@ -796,7 +751,6 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
     System.err.println(" ********************* not implemented @ "
         + DebugPrinter.getFileName() + " line "
         + DebugPrinter.getLineNumber());
-
   }
 
   @Override
@@ -804,7 +758,6 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
     System.err.println(" ********************* not implemented @ "
         + DebugPrinter.getFileName() + " line "
         + DebugPrinter.getLineNumber());
-
   }
 
   @Override
@@ -813,7 +766,6 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
     System.err.println(" ********************* not implemented @ "
         + DebugPrinter.getFileName() + " line "
         + DebugPrinter.getLineNumber());
-
   }
 
 
@@ -989,6 +941,17 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
   throws SQLException {
     // TODO Auto-generated method stub
 
+  }
+  
+  // methods added for JDK7 compilation
+
+  public boolean isCloseOnCompletion() throws SQLException {
+      //TODO auto generated code
+      return false;
+  }
+
+  public void closeOnCompletion() throws SQLException {
+      //TODO auto generated code
   }
 
 }
