@@ -222,6 +222,9 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 	            column[4] = java.sql.Types.NULL;
 	          }
 	          int nullable = c.getInt(3);
+	          //public static final int columnNoNulls   0
+	          //public static final int columnNullable  1
+	          //public static final int columnNullableUnknown   2
 	          if ( nullable == 0 ) {
 	            column[10] = new Integer[1];
 	          }

@@ -157,5 +157,12 @@ public class SQLiteDatabase {
   /** For compatibility.  Does nothing. */
   public void setLocale(Locale default1) {
   }
+  
+  /** Returns the number of rows changed associated with the last update or insert. */
+  public int changedRowCount () {
+      return SQLite.sqlite3_changes(pDb);
+  }
+
+
 
 }

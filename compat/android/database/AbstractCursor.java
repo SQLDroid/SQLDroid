@@ -188,5 +188,5 @@ public class AbstractCursor implements Cursor {
     int columnType = SQLite.sqlite3_column_type(pStmt,ci);
     return columnType;
   }
-
+  
 }

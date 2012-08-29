@@ -13,6 +13,7 @@ public class SQLDroidStatement implements Statement {
   private SQLiteDatabase db;
   private SQLDroidConnection sqldroidConnection;
   private SQLDroidResultSet rs = null;
+  
   private Integer maxRows = null;
 
   /** The update count.  We don't know this, but need to respond in such a way that:
@@ -65,15 +66,22 @@ public class SQLDroidStatement implements Statement {
     db = null;
   }
 
+  /** Close the result set (if open) and null the rs variable. */
   public void closeResultSet() throws SQLException {
-    if (rs != null) {
-      rs.close();
+    if (rs != null && !rs.isClosed()) {
+      if (!rs.isClosed()) {
+        rs.close();
+      }
       rs = null;
     }
   }
   @Override
+  /** Execute the SQL statement.  
+   * @return false if there are no result (if the request was not a select or similar) or the result set was empty.  True if a 
+   * non-empty result set is available.  This meets the requirement of java.sql.Statement.
+   */
   public boolean execute(String sql) throws SQLException {
-   updateCount = 0;
+   updateCount = -1;  // default outcome.  If the sql is a query or any other sql fails.
    boolean ok = false;
     closeResultSet();
     boolean isSelect = sql.toUpperCase().matches("(?m)(?s)\\s*SELECT.*");
@@ -88,15 +96,16 @@ public class SQLDroidStatement implements Statement {
     if (isSelect) {
       String limitedSql = sql + (maxRows != null ? " LIMIT " + maxRows : "");
       Cursor c = db.rawQuery(limitedSql, new String[0]);
-      if  ( c.getColumnCount() != 0 ) {
-        rs = new SQLDroidResultSet(c);
+      rs = new SQLDroidResultSet(c);
+      if  ( c.getCount() != 0 ) {
+        ok = true;
       }
     } else {
       db.execSQL(sql);
+      updateCount = db.changedRowCount();
     }
-    ok = true;
 
-    boolean resultSetAvailable = ok && !sql.toUpperCase().startsWith("CREATE") && rs != null && rs.getMetaData().getColumnCount() != 0;
+    boolean resultSetAvailable = ok && !sql.toUpperCase().startsWith("CREATE") && rs != null;
 
 //    if (resultSetAvailable) {
 //      boolean headerDrawn = false;
@@ -165,7 +174,7 @@ public class SQLDroidStatement implements Statement {
   public int executeUpdate(String sql) throws SQLException {
     closeResultSet();
     db.execSQL(sql);
-    return 0;
+    return updateCount;
   }
 
   @Override
@@ -236,7 +245,9 @@ public class SQLDroidStatement implements Statement {
 
   @Override
   public boolean getMoreResults(int current) throws SQLException {
-    closeResultSet();
+    if ( current == CLOSE_CURRENT_RESULT ) {
+      closeResultSet();
+    }
     return false;
   }
 
@@ -275,10 +286,14 @@ public class SQLDroidStatement implements Statement {
 
   @Override
   public int getUpdateCount() throws SQLException {
-    if ( updateCount == -1 ) {
-      return -1;
+    if ( updateCount != -1 ) {  // for any successful update/insert, update count will have been set 
+      // the documenation states that you're only supposed to call this once per result.
+      // on subsequent calls, we'll return -1 (which would appear to be the correct return
+      int tmp = updateCount;
+      updateCount = -1;   
+      return tmp;
     }
-    return updateCount--;
+    return updateCount;  // if the result was a result set, or this is the second call, then this will be -1
   }
 
   @Override

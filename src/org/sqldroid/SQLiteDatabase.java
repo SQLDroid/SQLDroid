@@ -1,11 +1,10 @@
 package org.sqldroid;
 
+import java.lang.reflect.Method;
 import java.sql.SQLException;
-import java.util.Locale;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
-import android.util.Log;
 
 
 /** A  proxy class for the database that allows actions to be retried without forcing every method 
@@ -50,6 +49,9 @@ public class SQLiteDatabase {
 
   /** The name of the database. */
   protected String dbQname;
+  
+  /** The method to invoke to get the changed row count. */
+  protected Method getChangedRowCount;
 
   /** Returns true if the exception is an instance of "SQLiteDatabaseLockedException".  Since this exception does not exist
    * in APIs below 11 this code uses reflection to check the exception type. 
@@ -232,4 +234,32 @@ public class SQLiteDatabase {
     execNoArgVoidMethod(Transaction.close);
   }
 
+  
+  /** The count of changed rows.  On JNA platforms, this is a call to sqlite3_changes
+   * On Android, it's a convoluted call to a package-private method (or, if that fails, the
+   * response is '1'.
+   */
+  public int changedRowCount () {
+    if ( getChangedRowCount == null ) {
+      try {  // JNA/J2SE compatibility method.
+        getChangedRowCount = sqliteDatabase.getClass().getMethod("changedRowCount", (Class<?>[])null);
+      } catch ( Exception any ) {
+        try {
+          // Android
+          getChangedRowCount = sqliteDatabase.getClass().getDeclaredMethod("lastChangeCount", (Class<?>[])null);
+          getChangedRowCount.setAccessible(true);
+        } catch (Exception e) {
+          // ignore
+        } 
+      }
+    }
+    if ( getChangedRowCount != null ) {
+      try {
+        return ((Integer)getChangedRowCount.invoke(sqliteDatabase, (Object[])null)).intValue();
+      } catch (Exception e) {
+        // ignore
+      } 
+    }
+    return 1;  // assume that the insert/update succeeded in changing exactly one row (terrible assumption, but I have nothing better).
+  }
 }

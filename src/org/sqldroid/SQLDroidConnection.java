@@ -46,7 +46,7 @@ public class SQLDroidConnection implements Connection {
      */
     public SQLDroidConnection(String url, Properties info) throws SQLException {
         String note = "new sqlite jdbc from url '" + url + "', " + "'" + info + "'";
-        Log.i("Sqldroid", note);
+        Log.v("Sqldroid", note);
 
         // Make a filename from url
         String dbQname;
@@ -74,7 +74,7 @@ public class SQLDroidConnection implements Connection {
                 Log.e("SQlDRoid", "Error Parsing URL \"" + url + "\" Timeout String \"" + timeoutString + "\" is not a valid long", nfe);
             }
         }
-        Log.i("SQlDRoid", "opening database " + dbQname);
+        Log.v("SQlDRoid", "opening database " + dbQname);
         int flags = android.database.sqlite.SQLiteDatabase.CREATE_IF_NECESSARY | android.database.sqlite.SQLiteDatabase.OPEN_READWRITE;
         if ( info != null ) {
             if ( info.getProperty(SQLDroidDriver.DATABASE_FLAGS) != null ) {
@@ -375,7 +375,7 @@ public class SQLDroidConnection implements Connection {
 
     @Override
     protected void finalize() throws Throwable {
-        Log.i("Sqldroid", " --- Finalize Sqldroid, closing db.");
+        Log.v("Sqldroid", " --- Finalize Sqldroid, closing db.");
         if (sqlitedb != null) {
             sqlitedb.close();
         }

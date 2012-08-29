@@ -64,7 +64,7 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
   public int updateCount = -1;
 
   public SQLDroidPreparedStatement(String sql, SQLDroidConnection sqldroid) {
-    Log.i("SQLDRoid", "new SqlDRoid prepared statement from " + sqldroid);
+    Log.v("SQLDRoid", "new SqlDRoid prepared statement from " + sqldroid);
     this.sqldroidConnection = sqldroid;
     this.db = sqldroid.getDb();
     setSQL(sql);
@@ -185,31 +185,42 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
 
   @Override
   public boolean execute() throws SQLException {
-    updateCount	= 0;
-    if ( rs!= null && !rs.isClosed() ) {
-      rs.close();
-    }
-    rs = null;
+    updateCount	= -1;
+    boolean resultsAvailable = false;
+    closeResultSet();
     if (isSelect) {
       Cursor c = db.rawQuery(sql, makeArgListQueryString());
-      //rs = new SQLDroidResultSet(c);
-      if  ( c.getColumnCount() != 0 ) {
-        rs = new SQLDroidResultSet(c);
+      rs = new SQLDroidResultSet(c);
+      if  ( c.getCount() != 0 ) {
+        resultsAvailable = true;
       }
-      else {
-        if ( c != null ) {
-          c.close();
-        }
-      }
+//      else {  // can't close if we're going to return a result set.
+//        if ( c != null ) {
+//          c.close();
+//        }
+//      }
     }
     else {
       db.execSQL(sql, makeArgListQueryObject());
+      updateCount = db.changedRowCount();
     }
-    return potentialResultSet && rs != null && rs.getMetaData().getColumnCount() != 0;
+    return resultsAvailable;
+  }
+
+  /** Close the result set (if open) and null the rs variable. */
+  public void closeResultSet() throws SQLException {
+    if (rs != null && !rs.isClosed()) {
+      if (!rs.isClosed()) {
+        rs.close();
+      }
+      rs = null;
+    }
   }
 
   @Override
   public ResultSet executeQuery() throws SQLException {
+    updateCount = -1;
+    closeResultSet();
     //Log.d("sqldroid", "executeQuery " + sql);
     // when querying, all ? values must be converted to Strings for some reason
     Cursor c = db.rawQuery(sql, makeArgListQueryString());
@@ -222,7 +233,9 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
   @Override
   public int executeUpdate() throws SQLException {
     // TODO we can't count the actual number of updates .... :S
-    return execute() ? 1 : 0;
+    execute();
+    return updateCount;  
+
   }
 
   @Override
@@ -279,9 +292,8 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
 
   @Override
   public int executeUpdate(String sql) throws SQLException {
-    db.execSQL(sql);
-
-    return 0;
+    setSQL(sql);
+    return executeUpdate();
   }
 
   @Override
@@ -362,19 +374,17 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
 	     // stmt is a Statement object
 	     ((stmt.getMoreResults() == false) && (stmt.getUpdateCount() == -1))*/
   public boolean getMoreResults() throws SQLException {
-    System.err.println(" ********************* not implemented @ "
-        + DebugPrinter.getFileName() + " line "
-        + DebugPrinter.getLineNumber());
-    return false;
+    return getMoreResults(CLOSE_CURRENT_RESULT);
   }
 
   @Override
   public boolean getMoreResults(int current) throws SQLException {
-    System.err.println(" ********************* not implemented @ "
-        + DebugPrinter.getFileName() + " line "
-        + DebugPrinter.getLineNumber());
+    if ( current == CLOSE_CURRENT_RESULT ) {
+      closeResultSet();
+    }
     return false;
   }
+
 
   @Override
   public int getQueryTimeout() throws SQLException {
@@ -413,16 +423,21 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
     return 0;
   }
 
-  @Override
   /**Retrieves the current result as an update count; if the result is a ResultSet object or there are no more results, -1 is returned. This method should be called only once per result.
 	Returns:
 	the current result as an update count; -1 if the current result is a ResultSet object or there are no more results*/	
+  @Override
   public int getUpdateCount() throws SQLException {
-    if ( updateCount == -1 ) {
-      return -1;
+    if ( updateCount != -1 ) {  // for any successful update/insert, update count will have been set 
+      // the documenation states that you're only supposed to call this once per result.
+      // on subsequent calls, we'll return -1 (which would appear to be the correct return
+      int tmp = updateCount;
+      updateCount = -1;   
+      return tmp;
     }
-    return updateCount--;
+    return updateCount;  // if the result was a result set, or this is the second call, then this will be -1
   }
+
 
   @Override
   public SQLWarning getWarnings() throws SQLException {

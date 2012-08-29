@@ -202,25 +202,25 @@ public class DriverUnitTest extends TestCase {
       Statement statement = con.createStatement();
       boolean hasResultSet = statement.execute("SELECT * FROM dummytable order by value");
       assertTrue("Should return a result set", hasResultSet);
-      assertNotSame ("Should not be -1 ", -1, statement.getUpdateCount());
+      assertEquals ("Should be -1 ", -1, statement.getUpdateCount());
+      assertNotNull ("Result Set should be non-null ", statement.getResultSet());
       // second time this will be true.
       boolean noMoreResults = ((statement.getMoreResults() == false) && (statement.getUpdateCount() == -1));
       assertTrue("Should  be no more results ", noMoreResults);
-      assertNotNull ("Result Set should be non-null ", statement.getResultSet());
+      assertNull ("Result Set should be non-null ", statement.getResultSet());
       statement.close();
       
       
       statement = con.createStatement();
       hasResultSet = statement.execute("SELECT * FROM dummytable where name = 'fig'");  // no matching result
-      assertFalse("Should return a result set", hasResultSet);
-      assertNull ("Result Set should be null ", statement.getResultSet());
-      assertNotSame ("Should not be -1 ", -1, statement.getUpdateCount());
+      assertFalse("Should not return a result set", hasResultSet);
+      assertNotNull ("Result Set should not be null ", statement.getResultSet());
+      assertEquals ("Should not be -1 ", -1, statement.getUpdateCount());
       // second time this will be true.
       noMoreResults = ((statement.getMoreResults() == false) && (statement.getUpdateCount() == -1));
       assertTrue("Should  be no more results ", noMoreResults);
-      assertNotNull ("Result Set should be non-null ", statement.getResultSet());
+      assertNull ("Result Set should be null - no results ", statement.getResultSet());
       statement.close();
-
 
       PreparedStatement stmt = con.prepareStatement("SELECT ?,? FROM dummytable order by ?");
       stmt.setString(1, "name");
@@ -228,26 +228,55 @@ public class DriverUnitTest extends TestCase {
       stmt.setString(3, "value");
       hasResultSet = stmt.execute();
       assertTrue("Should return a result set", hasResultSet);
-      assertNotSame ("Should not be -1 ", -1, stmt.getUpdateCount());
+      assertEquals ("Should not be -1 ", -1, stmt.getUpdateCount());
       // second time this will be true.
       noMoreResults = ((stmt.getMoreResults() == false) && (stmt.getUpdateCount() == -1));
       assertTrue("Should  be no more results ", noMoreResults);
-      assertNotNull ("Result Set should be non-null ", stmt.getResultSet());
+      assertNull ("Result Set should be null ", stmt.getResultSet());  // no more results
       stmt.close();
       
       
       stmt = con.prepareStatement("SELECT * FROM dummytable where name = 'fig'");
       hasResultSet = stmt.execute();  // no matching result
       assertFalse("Should return a result set", hasResultSet);
-      assertNull ("Result Set should be null ", stmt.getResultSet());
-      assertNotSame ("Should not be -1 ", -1, stmt.getUpdateCount());
+      assertNotNull ("Result Set should not be null ", stmt.getResultSet());
+      assertEquals ("Should not be -1 ", -1, stmt.getUpdateCount());
       // second time this will be true.
       noMoreResults = ((stmt.getMoreResults() == false) && (stmt.getUpdateCount() == -1));
       assertTrue("Should  be no more results ", noMoreResults);
-      assertNotNull ("Result Set should be non-null ", stmt.getResultSet());
+      assertNull ("Result Set should be null - no results ", stmt.getResultSet());
       stmt.close();
+      
+      stmt = con.prepareStatement("update dummytable set name='Kumquat' where name = 'Orange' OR name = 'Kiwi'");
+      stmt.execute();
+      assertEquals ("To Rows updated ", 2, stmt.getUpdateCount());
+      for ( String insertSQL : inserts ) {
+        Statement s = con.createStatement();
+        s.execute(insertSQL);
+        assertEquals ("To Rows updated ", 1, s.getUpdateCount());
+      }
+      int rows = stmt.executeUpdate();
+      assertEquals ("To Rows updated ", 2, rows);
+      assertEquals ("To Rows updated ", 2, stmt.getUpdateCount());
+      stmt.close();
+      
+      for ( String insertSQL : inserts ) {
+        stmt = con.prepareStatement(insertSQL);
+        stmt.execute();
+        assertEquals ("To Rows updated ", 1, stmt.getUpdateCount());
+      }
 
-    }
+      statement = con.createStatement();
+      hasResultSet = statement.execute("update dummytable set name='Kumquat' where name = 'Orange' OR name = 'Kiwi'");  // no matching result
+      assertFalse("Should not return a result set", hasResultSet);
+      for ( String insertSQL : inserts ) {
+        con.createStatement().execute(insertSQL);
+      }
+      int r1 = statement.executeUpdate("update dummytable set name='Kumquat' where name = 'Orange' OR name = 'Kiwi'");  // no matching result
+      assertEquals ("To Rows updated ", 2, statement.getUpdateCount());
+      assertEquals ("To Rows updated ", 2, r1);
+      statement.close();
+   }
 
   public void checkResultSet ( ResultSet rs, boolean isClosed, boolean isBeforeFirst, boolean isAfterLast,boolean isFirst,boolean isLast) throws Exception {
     assertEquals ("Is Closed", isClosed, rs.isClosed());
@@ -433,6 +462,7 @@ public class DriverUnitTest extends TestCase {
     suite.addTest(new DriverUnitTest("testBlob"));
     suite.addTest(new DriverUnitTest("testMetaData"));
     suite.addTest(new DriverUnitTest("testCursors"));
+    suite.addTest(new DriverUnitTest("testExecute"));
     return  suite;
   }
 

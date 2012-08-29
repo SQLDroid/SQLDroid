@@ -14,6 +14,10 @@ public class Log {
     Logger.getLogger(Log.class).info(string + ":" + sql);    
   }
 
+  public static void v(String string, String sql) {
+    Logger.getLogger(Log.class).debug(string + ":" + sql);    
+  }
+
   public static void e(String string, String sql) {
     Logger.getLogger(Log.class).error(string + ":" + sql);    
   }
