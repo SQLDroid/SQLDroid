@@ -425,14 +425,29 @@ public class SQLDroidResultSet implements ResultSet {
 
   @Override
   public Object getObject(int colID) throws SQLException {
-    //System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return getString(colID);
+    lastColumnRead = colID;
+    int newIndex = ci(colID);
+    switch(c.getType(newIndex)) {
+      case Cursor.FIELD_TYPE_BLOB:
+        //CONVERT TO BYTE[] OBJECT
+        return new SQLDroidBlob(c.getBlob(newIndex));
+      case Cursor.FIELD_TYPE_FLOAT:
+        return new Float(c.getFloat(newIndex));
+      case Cursor.FIELD_TYPE_INTEGER:
+        return new Integer(c.getInt(newIndex));
+      case Cursor.FIELD_TYPE_STRING:
+        return c.getString(newIndex);
+      case Cursor.FIELD_TYPE_NULL:
+        return null;
+      default:
+        return c.getString(newIndex);
+    }
   }
 
   @Override
   public Object getObject(String columnName) throws SQLException {
-    //System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return getString(columnName);
+    int index = c.getColumnIndex(columnName);
+    return getObject(index);
   }
 
   @Override
@@ -447,6 +462,21 @@ public class SQLDroidResultSet implements ResultSet {
   throws SQLException {
     System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
     return null;
+  }
+
+
+  public <T> T getObject(int columnIndex, Class<T> clazz) throws SQLException {
+    // This method is entitled to throw if the conversion is not supported, so, 
+    // since we don't support any conversions we'll throw.
+    // The only problem with this is that we're required to support certain conversion as specified in the docs.
+    throw new SQLException("Conversion not supported.  No conversions are supported.  This method will always throw."); 
+  }
+
+  public <T> T getObject(String columnLabel, Class<T> clazz) throws SQLException {
+    // This method is entitled to throw if the conversion is not supported, so, 
+    // since we don't support any conversions we'll throw.
+    // The only problem with this is that we're required to support certain conversion as specified in the docs.
+    throw new SQLException("Conversion not supported.  No conversions are supported.  This method will always throw."); 
   }
 
   @Override
@@ -568,7 +598,6 @@ public class SQLDroidResultSet implements ResultSet {
           break;
 
       }
-      //System.err.println("SQLDroidResultSet Timestamp:getTimestamp(int) " + md.getColumnType(index) + " Value " + getString(index) + " TimeStamp " +  timestamp);
       return timestamp;
     } catch (android.database.SQLException e) {
       throw SQLDroidConnection.chainException(e);
@@ -638,6 +667,9 @@ public class SQLDroidResultSet implements ResultSet {
 
   @Override
   public boolean isAfterLast() throws SQLException {
+    if ( isClosed() ) {
+      return false;
+    }
     try {
       return c.isAfterLast();
     } catch (android.database.SQLException e) {
@@ -647,6 +679,9 @@ public class SQLDroidResultSet implements ResultSet {
 
   @Override
   public boolean isBeforeFirst() throws SQLException {
+    if ( isClosed() ) {
+      return false;
+    }
     try {
       return c.isBeforeFirst();
     } catch (android.database.SQLException e) {
@@ -656,6 +691,9 @@ public class SQLDroidResultSet implements ResultSet {
 
   @Override
   public boolean isFirst() throws SQLException {
+    if ( isClosed() ) {
+      return false;
+    }
     try {
       return c.isFirst();
     } catch (android.database.SQLException e) {
@@ -665,6 +703,9 @@ public class SQLDroidResultSet implements ResultSet {
 
   @Override
   public boolean isLast() throws SQLException {
+    if ( isClosed() ) {
+      return false;
+    }
     try {
       return c.isLast();
     } catch (android.database.SQLException e) {

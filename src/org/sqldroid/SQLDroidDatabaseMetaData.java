@@ -2,7 +2,6 @@ package org.sqldroid;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.RowIdLifetime;
 import java.sql.SQLException;
@@ -13,7 +12,6 @@ import java.util.List;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.database.MergeCursor;
-//import android.database.sqlite.SQLiteDatabase;
 
 public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 
@@ -202,7 +200,7 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 	          column[2] = tableName;
 	          column[3] = c.getString(1);
 	          String type = c.getString(2);
-              column[5] = type;
+	          column[5] = type;
 	          type = type.toUpperCase();
 	          // types are (as far as I can tell, the pragma document is not specific):
 	          if ( type.equals("TEXT" ) || type.startsWith("CHAR") ) {
@@ -224,6 +222,9 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 	            column[4] = java.sql.Types.NULL;
 	          }
 	          int nullable = c.getInt(3);
+	          //public static final int columnNoNulls   0
+	          //public static final int columnNullable  1
+	          //public static final int columnNullableUnknown   2
 	          if ( nullable == 0 ) {
 	            column[10] = new Integer[1];
 	          }
@@ -568,12 +569,25 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 	}
 
 	@Override
-	public ResultSet getPrimaryKeys(String catalog, String schema, String table)
-			throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return null;
+	public ResultSet getPrimaryKeys(String catalog, String schema, String table) throws SQLException {
+
+	  final String[] columnNames = new String [] {"TABLE_CAT", "TABLE_SCHEM", "TABLE_NAME", "COLUMN_NAME", "KEY_SEQ", "PK_NAME"};
+	  final Object[] columnValues = new Object[] {null, null, null, null, null, null};
+	  SQLiteDatabase db = con.getDb();
+
+	  Cursor c = db.rawQuery("pragma table_info('" + table + "')", new String[] {});
+	  MatrixCursor mc = new MatrixCursor(columnNames);
+	  while (c.moveToNext()) {
+	    if(c.getInt(5) > 0) {
+	      Object[] column = columnValues.clone();
+	      column[2] = table;
+	      column[3] = c.getString(1);
+	      mc.addRow(column);
+	    }
+	  }
+	  // The matrix cursor should be sorted by column name, but isn't
+	  c.close();
+	  return new SQLDroidResultSet(mc);
 	}
 
 	@Override
@@ -1625,5 +1639,18 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 		// TODO Auto-generated method stub
 		return false;
 	}
+	
+  // methods added for JDK7 compilation
+
+  public boolean generatedKeyAlwaysReturned() throws SQLException {
+      // TODO Auto-generated method stub
+      return false;
+  }
+
+  public ResultSet getPseudoColumns(String catalog, String schemaPattern, String tableNamePattern, String columnNamePattern) throws SQLException {
+      // TODO Auto-generated method stub
+      return null;
+  }
+
 
 }

@@ -12,16 +12,17 @@ public class SQLDroidResultSetMetaData implements ResultSetMetaData {
 	private final Cursor cursor;
     private Method getType;
     
-	public SQLDroidResultSetMetaData(Cursor cursor) {
-     if (cursor == null) {
-            throw new NullPointerException("Cursor required to be not null.");
-        }		this.cursor = cursor;
-	    try {
-          getType = Cursor.class.getMethod("getType", Integer.class);
+    public SQLDroidResultSetMetaData(Cursor cursor) {
+      if (cursor == null) {
+          throw new NullPointerException("Cursor required to be not null.");
+      }		
+      this.cursor = cursor;
+      try {
+         getType = Cursor.class.getMethod("getType", new Class[] {int.class});
       } catch (Exception e) {
           getType = null;
       }
-  }
+    }
 
   private int getType(Cursor cursor, int column) {
       try {

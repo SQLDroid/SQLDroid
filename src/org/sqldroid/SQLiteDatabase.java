@@ -1,10 +1,10 @@
 package org.sqldroid;
 
+import java.lang.reflect.Method;
 import java.sql.SQLException;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
-
 
 /** A  proxy class for the database that allows actions to be retried without forcing every method 
  * through the reflection process.  This was originally implemented as an interface and a Proxy.
@@ -48,6 +48,9 @@ public class SQLiteDatabase {
 
   /** The name of the database. */
   protected String dbQname;
+  
+  /** The method to invoke to get the changed row count. */
+  protected Method getChangedRowCount;
 
   /** Returns true if the exception is an instance of "SQLiteDatabaseLockedException".  Since this exception does not exist
    * in APIs below 11 this code uses reflection to check the exception type. 
@@ -69,7 +72,7 @@ public class SQLiteDatabase {
    * @throws SQLException thrown if the attempt to connect to the database throws an exception 
    * other than a locked exception or throws a locked exception after the timeout has expired.
    */
-  public SQLiteDatabase(String dbQname, long timeout) throws SQLException {
+  public SQLiteDatabase(String dbQname, long timeout, int flags) throws SQLException {
     super();
     this.dbQname = dbQname;
     this.timeout = timeout;
@@ -77,7 +80,8 @@ public class SQLiteDatabase {
     long delta = 0;
     do {
       try {
-        sqliteDatabase = android.database.sqlite.SQLiteDatabase.openDatabase(dbQname, null, android.database.sqlite.SQLiteDatabase.CREATE_IF_NECESSARY | android.database.sqlite.SQLiteDatabase.OPEN_READWRITE);
+        sqliteDatabase = android.database.sqlite.SQLiteDatabase.openDatabase(dbQname, null, flags );
+        // android.database.sqlite.SQLiteDatabase.CREATE_IF_NECESSARY | android.database.sqlite.SQLiteDatabase.OPEN_READWRITE | android.database.sqlite.SQLiteDatabase.NO_LOCALIZED_COLLATORS);
       } catch (SQLiteException e) {
         if ( isLockedException(e) ) {
           try {
@@ -95,6 +99,11 @@ public class SQLiteDatabase {
         }
       }
     } while (sqliteDatabase == null && delta < timeout);
+//    try {
+//      sqliteDatabase.setLocale(Locale.getDefault());
+//    } catch ( Exception any ) {
+//      Log.e("Sqldroid","Exception Setting Locale to \"" + Locale.getDefault() + "\" the collator LOCALIZED may not be available" + any.getLocalizedMessage());
+//    }
   }
 
   /** Proxy for the "rawQuery" command. 
@@ -222,6 +231,35 @@ public class SQLiteDatabase {
    * @throws SQLException */
   public void close() throws SQLException {    
     execNoArgVoidMethod(Transaction.close);
+  }
+
+  
+  /** The count of changed rows.  On JNA platforms, this is a call to sqlite3_changes
+   * On Android, it's a convoluted call to a package-private method (or, if that fails, the
+   * response is '1'.
+   */
+  public int changedRowCount () {
+    if ( getChangedRowCount == null ) {
+      try {  // JNA/J2SE compatibility method.
+        getChangedRowCount = sqliteDatabase.getClass().getMethod("changedRowCount", (Class<?>[])null);
+      } catch ( Exception any ) {
+        try {
+          // Android
+          getChangedRowCount = sqliteDatabase.getClass().getDeclaredMethod("lastChangeCount", (Class<?>[])null);
+          getChangedRowCount.setAccessible(true);
+        } catch (Exception e) {
+          // ignore
+        } 
+      }
+    }
+    if ( getChangedRowCount != null ) {
+      try {
+        return ((Integer)getChangedRowCount.invoke(sqliteDatabase, (Object[])null)).intValue();
+      } catch (Exception e) {
+        // ignore
+      } 
+    }
+    return 1;  // assume that the insert/update succeeded in changing exactly one row (terrible assumption, but I have nothing better).
   }
 
 }

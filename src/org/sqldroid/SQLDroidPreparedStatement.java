@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import android.content.ContentValues;
 import android.database.Cursor;
 import android.util.Log;
 
@@ -37,7 +36,6 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
   protected SQLDroidConnection sqldroidConnection;
   protected SQLDroidResultSet rs = null;	
   protected String sql;
-  protected ContentValues cv = new ContentValues();
   protected ArrayList<Object> l = new ArrayList<Object>();
 
   /** True if the sql statement is a select. */
@@ -64,7 +62,7 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
   public int updateCount = -1;
 
   public SQLDroidPreparedStatement(String sql, SQLDroidConnection sqldroid) {
-    Log.i("SQLDRoid", "new SqlDRoid prepared statement from " + sqldroid);
+    Log.v("SQLDRoid", "new SqlDRoid prepared statement from " + sqldroid);
     this.sqldroidConnection = sqldroid;
     this.db = sqldroid.getDb();
     setSQL(sql);
@@ -85,15 +83,15 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
 
 
     int additions = n - l.size() + 1;
-    System.out.println("adding " + additions + " elements");
+    //System.out.println("adding " + additions + " elements");
     for(int i = 0 ; i < additions ; i++) {
-      System.out.println("ADD NULL");
+     // System.out.println("ADD NULL");
       l.add(null);
     }
 
-    System.out.println("n = " + n + " size now " + l.size() + " we @ " + n);
+    //System.out.println("n = " + n + " size now " + l.size() + " we @ " + n);
     l.set(n, obj);
-    System.out.println("POST set n = " + n + " size now " + l.size() + " we @ " + n);
+    //System.out.println("POST set n = " + n + " size now " + l.size() + " we @ " + n);
   }
 
 
@@ -124,6 +122,7 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
     this.sql = sql;
     isSelect = sql.toUpperCase().matches("(?m)(?s)\\s*SELECT.*");
     potentialResultSet = true;
+    // examples of a failure on the next line (so isSelect is false and potentialResultSet remains true, are PRAGMA and INSERT (why INSERT?)
     if (!isSelect && (sql.toUpperCase().matches("(?m)(?s)\\s*CREATE.*") || sql.toUpperCase().matches("(?m)(?s)\\s*DROP.*")) ) {
       potentialResultSet = false;
     }
@@ -184,28 +183,42 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
 
   @Override
   public boolean execute() throws SQLException {
-    updateCount	= 0;
-    rs = null;
+    updateCount	= -1;
+    boolean resultsAvailable = false;
+    closeResultSet();
     if (isSelect) {
       Cursor c = db.rawQuery(sql, makeArgListQueryString());
       rs = new SQLDroidResultSet(c);
-      if  ( rs.getMetaData().getColumnCount() != 0 ) {
-        rs = new SQLDroidResultSet(c);
+      if  ( c.getCount() != 0 ) {
+        resultsAvailable = true;
       }
-      else {
-        if ( c != null ) {
-          c.close();
-        }
-      }
+//      else {  // can't close if we're going to return a result set.
+//        if ( c != null ) {
+//          c.close();
+//        }
+//      }
     }
     else {
       db.execSQL(sql, makeArgListQueryObject());
+      updateCount = db.changedRowCount();
     }
-    return potentialResultSet && rs != null && rs.getMetaData().getColumnCount() != 0;
+    return resultsAvailable;
+  }
+
+  /** Close the result set (if open) and null the rs variable. */
+  public void closeResultSet() throws SQLException {
+    if (rs != null && !rs.isClosed()) {
+      if (!rs.isClosed()) {
+        rs.close();
+      }
+      rs = null;
+    }
   }
 
   @Override
   public ResultSet executeQuery() throws SQLException {
+    updateCount = -1;
+    closeResultSet();
     //Log.d("sqldroid", "executeQuery " + sql);
     // when querying, all ? values must be converted to Strings for some reason
     Cursor c = db.rawQuery(sql, makeArgListQueryString());
@@ -218,7 +231,8 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
   @Override
   public int executeUpdate() throws SQLException {
     // TODO we can't count the actual number of updates .... :S
-    return execute() ? 1 : 0;
+    execute();
+    return updateCount;  
   }
 
   @Override
@@ -275,9 +289,8 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
 
   @Override
   public int executeUpdate(String sql) throws SQLException {
-    db.execSQL(sql);
-
-    return 0;
+    setSQL(sql);
+    return executeUpdate();
   }
 
   @Override
@@ -358,17 +371,14 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
 	     // stmt is a Statement object
 	     ((stmt.getMoreResults() == false) && (stmt.getUpdateCount() == -1))*/
   public boolean getMoreResults() throws SQLException {
-    System.err.println(" ********************* not implemented @ "
-        + DebugPrinter.getFileName() + " line "
-        + DebugPrinter.getLineNumber());
-    return false;
+    return getMoreResults(CLOSE_CURRENT_RESULT);
   }
 
   @Override
   public boolean getMoreResults(int current) throws SQLException {
-    System.err.println(" ********************* not implemented @ "
-        + DebugPrinter.getFileName() + " line "
-        + DebugPrinter.getLineNumber());
+    if ( current == CLOSE_CURRENT_RESULT ) {
+      closeResultSet();
+    }
     return false;
   }
 
@@ -409,19 +419,21 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
     return 0;
   }
 
-  @Override
   /**Retrieves the current result as an update count; if the result is a ResultSet object or there are no more results, -1 is returned. This method should be called only once per result.
 	Returns:
 	the current result as an update count; -1 if the current result is a ResultSet object or there are no more results*/	
+  @Override
   public int getUpdateCount() throws SQLException {
-    System.err.println(" ********************* not (fully) implemented @ "
-        + DebugPrinter.getFileName() + " line "
-        + DebugPrinter.getLineNumber());
-    if ( updateCount == -1 ) {
-      return -1;
+    if ( updateCount != -1 ) {  // for any successful update/insert, update count will have been set 
+      // the documenation states that you're only supposed to call this once per result.
+      // on subsequent calls, we'll return -1 (which would appear to be the correct return
+      int tmp = updateCount;
+      updateCount = -1;   
+      return tmp;
     }
-    return updateCount--;
+    return updateCount;  // if the result was a result set, or this is the second call, then this will be -1
   }
+
 
   @Override
   public SQLWarning getWarnings() throws SQLException {
@@ -436,7 +448,6 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
     System.err.println(" ********************* not implemented @ "
         + DebugPrinter.getFileName() + " line "
         + DebugPrinter.getLineNumber());
-
   }
 
   @Override
@@ -444,7 +455,6 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
     System.err.println(" ********************* not implemented @ "
         + DebugPrinter.getFileName() + " line "
         + DebugPrinter.getLineNumber());
-
   }
 
   @Override
@@ -452,7 +462,6 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
     System.err.println(" ********************* not implemented @ "
         + DebugPrinter.getFileName() + " line "
         + DebugPrinter.getLineNumber());
-
   }
 
   @Override
@@ -460,7 +469,6 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
     System.err.println(" ********************* not implemented @ "
         + DebugPrinter.getFileName() + " line "
         + DebugPrinter.getLineNumber());
-
   }
 
   @Override
@@ -468,7 +476,6 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
     System.err.println(" ********************* not implemented @ "
         + DebugPrinter.getFileName() + " line "
         + DebugPrinter.getLineNumber());
-
   }
 
   @Override
@@ -476,7 +483,6 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
     System.err.println(" ********************* not implemented @ "
         + DebugPrinter.getFileName() + " line "
         + DebugPrinter.getLineNumber());
-
   }
 
   @Override
@@ -484,7 +490,6 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
     System.err.println(" ********************* not implemented @ "
         + DebugPrinter.getFileName() + " line "
         + DebugPrinter.getLineNumber());
-
   }
 
   @Override
@@ -492,7 +497,6 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
     System.err.println(" ********************* not implemented @ "
         + DebugPrinter.getFileName() + " line "
         + DebugPrinter.getLineNumber());
-
   }
 
   @Override
@@ -522,7 +526,6 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
     System.err.println(" ********************* not implemented @ "
         + DebugPrinter.getFileName() + " line "
         + DebugPrinter.getLineNumber());
-
   }
 
   @Override
@@ -531,7 +534,6 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
     System.err.println(" ********************* not implemented @ "
         + DebugPrinter.getFileName() + " line "
         + DebugPrinter.getLineNumber());
-
   }
 
   @Override
@@ -540,7 +542,6 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
     System.err.println(" ********************* not implemented @ "
         + DebugPrinter.getFileName() + " line "
         + DebugPrinter.getLineNumber());
-
   }
   /** 
    * Set the parameter from the contents of a binary stream.
@@ -586,16 +587,12 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
 
   @Override
   public void setBlob(int parameterIndex, Blob theBlob) throws SQLException {
-
     ensureCap(parameterIndex);
-    setObj(parameterIndex, theBlob.getBytes(0, (int)theBlob.length()));
-
+    setObj(parameterIndex, theBlob.getBytes(1, (int)theBlob.length()));
   }
 
   @Override
-  public void setBoolean(int parameterIndex, boolean theBoolean)
-  throws SQLException {
-
+  public void setBoolean(int parameterIndex, boolean theBoolean) throws SQLException {
     ensureCap(parameterIndex);
     setObj(parameterIndex, theBoolean);
 
@@ -603,10 +600,8 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
 
   @Override
   public void setByte(int parameterIndex, byte theByte) throws SQLException {
-
     ensureCap(parameterIndex);
     setObj(parameterIndex, theByte);
-
   }
 
   @Override
@@ -622,7 +617,6 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
     System.err.println(" ********************* not implemented @ "
         + DebugPrinter.getFileName() + " line "
         + DebugPrinter.getLineNumber());
-
   }
 
   @Override
@@ -641,70 +635,53 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
   }
 
   @Override
-  public void setDate(int parameterIndex, Date theDate, Calendar cal)
-  throws SQLException {
+  public void setDate(int parameterIndex, Date theDate, Calendar cal)  throws SQLException {
     System.err.println(" ********************* not implemented @ "
         + DebugPrinter.getFileName() + " line "
         + DebugPrinter.getLineNumber());
-
   }
 
   @Override
-  public void setDouble(int parameterIndex, double theDouble)
-  throws SQLException {
+  public void setDouble(int parameterIndex, double theDouble) throws SQLException {
+
     ensureCap(parameterIndex);
     setObj(parameterIndex, new Double(theDouble));
   }
 
   @Override
-  public void setFloat(int parameterIndex, float theFloat)
-  throws SQLException {
+  public void setFloat(int parameterIndex, float theFloat) throws SQLException {
     ensureCap(parameterIndex);
     setObj(parameterIndex, new Double(theFloat));
-
-
   }
 
   @Override
   public void setInt(int parameterIndex, int theInt) throws SQLException {
     ensureCap(parameterIndex);
     setObj(parameterIndex, new Long(theInt));
-
-
-
   }
 
   @Override
   public void setLong(int parameterIndex, long theLong) throws SQLException {
     ensureCap(parameterIndex);
     setObj(parameterIndex, new Long(theLong));
-
-
   }
 
   @Override
   public void setNull(int parameterIndex, int sqlType) throws SQLException {
     ensureCap(parameterIndex);
     setObj(parameterIndex, null);
-
-
   }
 
   @Override
-  public void setNull(int paramIndex, int sqlType, String typeName)
-  throws SQLException {
+  public void setNull(int paramIndex, int sqlType, String typeName) throws SQLException {
     ensureCap(paramIndex);
     setObj(paramIndex, null);
-
   }
 
   @Override
-  public void setObject(int parameterIndex, Object theObject)
-  throws SQLException {
-    System.err.println(" ********************* not implemented @ "
-        + DebugPrinter.getFileName() + " line "
-        + DebugPrinter.getLineNumber());
-
+  public void setObject(int parameterIndex, Object theObject)  throws SQLException {
+    ensureCap(parameterIndex);
+    setObj(parameterIndex, theObject);
   }
 
   @Override
@@ -713,7 +690,6 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
     System.err.println(" ********************* not implemented @ "
         + DebugPrinter.getFileName() + " line "
         + DebugPrinter.getLineNumber());
-
   }
 
   @Override
@@ -722,7 +698,6 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
     System.err.println(" ********************* not implemented @ "
         + DebugPrinter.getFileName() + " line "
         + DebugPrinter.getLineNumber());
-
   }
 
   @Override
@@ -730,7 +705,6 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
     System.err.println(" ********************* not implemented @ "
         + DebugPrinter.getFileName() + " line "
         + DebugPrinter.getLineNumber());
-
   }
 
   @Override
@@ -738,16 +712,12 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
   throws SQLException {
     ensureCap(parameterIndex);
     setObj(parameterIndex, new Long(theShort));
-
-
   }
 
   @Override
   public void setString(int parameterIndex, String theString) {
     ensureCap(parameterIndex);
     setObj(parameterIndex, theString);
-
-
   }
 
   @Override
@@ -755,7 +725,6 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
     System.err.println(" ********************* not implemented @ "
         + DebugPrinter.getFileName() + " line "
         + DebugPrinter.getLineNumber());
-
   }
 
   @Override
@@ -764,7 +733,6 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
     System.err.println(" ********************* not implemented @ "
         + DebugPrinter.getFileName() + " line "
         + DebugPrinter.getLineNumber());
-
   }
 
   @Override
@@ -780,7 +748,6 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
     System.err.println(" ********************* not implemented @ "
         + DebugPrinter.getFileName() + " line "
         + DebugPrinter.getLineNumber());
-
   }
 
   @Override
@@ -788,7 +755,6 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
     System.err.println(" ********************* not implemented @ "
         + DebugPrinter.getFileName() + " line "
         + DebugPrinter.getLineNumber());
-
   }
 
   @Override
@@ -797,7 +763,6 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
     System.err.println(" ********************* not implemented @ "
         + DebugPrinter.getFileName() + " line "
         + DebugPrinter.getLineNumber());
-
   }
 
 
@@ -974,5 +939,17 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
     // TODO Auto-generated method stub
 
   }
+  
+  // methods added for JDK7 compilation
+
+  public boolean isCloseOnCompletion() throws SQLException {
+      //TODO auto generated code
+      return false;
+  }
+
+  public void closeOnCompletion() throws SQLException {
+      //TODO auto generated code
+  }
+
 
 }
