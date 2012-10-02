@@ -178,8 +178,8 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 	      "NULLABLE", "REMARKS","COLUMN_DEF", "SQL_DATA_TYPE", "SQL_DATETIME_SUB", "CHAR_OCTET_LENGTH", 
 	      "ORDINAL_POSITION", "IS_NULLABLE", "SCOPE_CATLOG", "SCOPE_SCHEMA", "SCOPE_TABLE", "SOURCE_DATA_TYPE", 
 	  "IS_AUTOINCREMENT"};
-	  final Object[] columnValues = new Object[] {null, null, null, null, null, null, null, null, null, new Integer(10), 
-	      new Integer(2) /* columnNullableUnknown */, null, null, null, null, new Integer(-1), new Integer(-1), "",
+	  final Object[] columnValues = new Object[] {null, null, null, null, null, null, null, null, null, Integer.valueOf(10), 
+	          Integer.valueOf(2) /* columnNullableUnknown */, null, null, null, null, Integer.valueOf(-1), Integer.valueOf(-1), "",
 	      null, null, null, null, ""};
 
 	  SQLiteDatabase db = con.getDb();

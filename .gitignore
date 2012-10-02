@@ -1,5 +1,7 @@
 *~
 .DS_Store
-bin
-pkg
-lib/sqldroid/sqldroid-*.jar
+/.idea
+/bin
+/gen
+/pkg
+/lib/sqldroid/sqldroid-*.jar
