@@ -37,7 +37,15 @@ file GEM_FILE_PKG => JAR_IN_GEM do
   FileUtils.mv GEM_FILE, GEM_FILE_PKG
 end
 
+desc 'Tag the project and push the tag to GitHub'
+task :tag do
+  output = `git status --porcelain`
+  raise "Workspace not clean!\n#{output}" unless output.empty?
+  sh "git tag #{SQLDroid::VERSION}"
+  sh "git push --tags"
+end
+
 desc 'Release SQLDroid as a Ruby gem to rubygems.org'
-task :release => GEM_FILE_PKG do
+task :release => [:tag, GEM_FILE_PKG] do
   sh "gem push #{GEM_FILE_PKG}"
 end

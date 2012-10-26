@@ -1,0 +1,14 @@
+PATH
+  remote: .
+  specs:
+    sqldroid (1.0.0.RC2)
+
+GEM
+  remote: http://rubygems.org/
+  specs:
+
+PLATFORMS
+  java
+
+DEPENDENCIES
+  sqldroid!
