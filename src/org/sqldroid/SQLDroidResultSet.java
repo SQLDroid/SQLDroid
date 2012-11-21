@@ -43,7 +43,7 @@ public class SQLDroidResultSet implements ResultSet {
     return colID - 1;
   }
 
-     @Override
+  @Override
   public boolean absolute(int row) throws SQLException {
     System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
     return false;
@@ -105,7 +105,7 @@ public class SQLDroidResultSet implements ResultSet {
     }
   }
 
-    @Override
+  @Override
   public boolean first() throws SQLException {
     try {
       return c.moveToFirst();
@@ -114,7 +114,7 @@ public class SQLDroidResultSet implements ResultSet {
     }
   }
 
-      @Override
+  @Override
   public Array getArray(int colID) throws SQLException {
     System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
     return null;
