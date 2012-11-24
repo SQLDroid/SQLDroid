@@ -292,8 +292,7 @@ public class SQLDroidConnection implements Connection {
 
     @Override
     public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
-        System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-        return null;
+        return prepareStatement (sql );
     }
 
     @Override

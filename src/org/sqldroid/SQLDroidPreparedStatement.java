@@ -37,6 +37,7 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
   protected SQLDroidResultSet rs = null;	
   protected String sql;
   protected ArrayList<Object> l = new ArrayList<Object>();
+  private Integer maxRows = null;
 
   /** True if the sql statement is a select. */
   protected boolean isSelect;
@@ -184,13 +185,18 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
   @Override
   public boolean execute() throws SQLException {
     updateCount	= -1;
-    boolean resultsAvailable = false;
+    boolean ok = false;
     closeResultSet();
+    // problem, a PRAGMA statement (and maybe others) should also cause a result set
+    if ( !isSelect && sql.toUpperCase().matches("(?m)(?s)\\s*PRAGMA.*") ) {  
+      isSelect = true;
+    }
     if (isSelect) {
-      Cursor c = db.rawQuery(sql, makeArgListQueryString());
+      String limitedSql = sql + (maxRows != null ? " LIMIT " + maxRows : "");  
+      Cursor c = db.rawQuery(limitedSql, makeArgListQueryString());
       rs = new SQLDroidResultSet(c);
       if  ( c.getCount() != 0 ) {
-        resultsAvailable = true;
+        ok = true;
       }
 //      else {  // can't close if we're going to return a result set.
 //        if ( c != null ) {
@@ -202,7 +208,10 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
       db.execSQL(sql, makeArgListQueryObject());
       updateCount = db.changedRowCount();
     }
-    return resultsAvailable;
+    
+    boolean resultSetAvailable = ok && !sql.toUpperCase().startsWith("CREATE") && rs != null;
+    
+    return resultSetAvailable;
   }
 
   /** Close the result set (if open) and null the rs variable. */
@@ -359,10 +368,7 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
 
   @Override
   public int getMaxRows() throws SQLException {
-    System.err.println(" ********************* not implemented @ "
-        + DebugPrinter.getFileName() + " line "
-        + DebugPrinter.getLineNumber());
-    return 0;
+    return maxRows;
   }
 
   @Override
@@ -480,9 +486,15 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
 
   @Override
   public void setMaxRows(int max) throws SQLException {
-    System.err.println(" ********************* not implemented @ "
-        + DebugPrinter.getFileName() + " line "
-        + DebugPrinter.getLineNumber());
+      if (isClosed()) {
+          throw new SQLException("Statement is closed.");
+        } else if (max < 0) {
+          throw new SQLException("Max rows must be zero or positive. Got " + max);
+        } else if (max == 0) {
+          maxRows = null;
+        } else {
+          maxRows = max;
+        }
   }
 
   @Override
