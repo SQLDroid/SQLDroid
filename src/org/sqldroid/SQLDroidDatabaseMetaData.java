@@ -1069,10 +1069,7 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 
 	@Override
 	public boolean supportsBatchUpdates() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return false;
+		return true;
 	}
 
 	@Override

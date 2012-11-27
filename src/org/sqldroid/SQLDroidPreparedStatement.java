@@ -37,6 +37,7 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
   protected SQLDroidResultSet rs = null;	
   protected String sql;
   protected ArrayList<Object> l = new ArrayList<Object>();
+  protected ArrayList<ArrayList<Object>> lBatch = new ArrayList<ArrayList<Object>>();
   private Integer maxRows = null;
 
   /** True if the sql statement is a select. */
@@ -66,7 +67,7 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
     Log.v("SQLDRoid", "new SqlDRoid prepared statement from " + sqldroid);
     this.sqldroidConnection = sqldroid;
     this.db = sqldroid.getDb();
-    setSQL(sql);
+    setSQL(sql); 
   }
 
 
@@ -95,17 +96,10 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
     //System.out.println("POST set n = " + n + " size now " + l.size() + " we @ " + n);
   }
 
-
-
-
-
-
   @Override
   public void addBatch(String sql) throws SQLException {
-    System.err.println(" ********************* not implemented @ "
-        + DebugPrinter.getFileName() + " line "
-        + DebugPrinter.getLineNumber());
-
+    //sql must be a static sql 
+    setSQL(getSQL() + sql);  
   }
 
   /**
@@ -140,10 +134,8 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
 
   @Override
   public void clearBatch() throws SQLException {
-    System.err.println(" ********************* not implemented @ "
-        + DebugPrinter.getFileName() + " line "
-        + DebugPrinter.getLineNumber());
-
+    sql = "";
+    lBatch = new ArrayList<ArrayList<Object>>();
   }
 
   @Override
@@ -282,11 +274,16 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
   }
 
   @Override
-  public int[] executeBatch() throws SQLException {
-    System.err.println(" ********************* not implemented @ "
-        + DebugPrinter.getFileName() + " line "
-        + DebugPrinter.getLineNumber());
-    return null;
+  public int[] executeBatch() throws SQLException { 
+    int[] results = new int[lBatch.size()];
+    for(int i=0; i < lBatch.size(); i++) {
+      updateCount = -1;  
+      results[i] = EXECUTE_FAILED; 
+      db.execSQL(sql, lBatch.get(i).toArray());
+      results[i] = db.changedRowCount();
+      updateCount = results[i];
+    }    
+    return results;
   }
 
   @Override
@@ -506,9 +503,10 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
 
   @Override
   public void addBatch() throws SQLException {
-    System.err.println(" ********************* not implemented @ "
-        + DebugPrinter.getFileName() + " line "
-        + DebugPrinter.getLineNumber());
+    int n = lBatch.size();
+    lBatch.add(null);
+    lBatch.set(n, l);
+    clearParameters();
   }
 
   @Override
