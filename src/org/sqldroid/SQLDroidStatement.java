@@ -13,7 +13,7 @@ public class SQLDroidStatement implements Statement {
   private SQLiteDatabase db;
   private SQLDroidConnection sqldroidConnection;
   private SQLDroidResultSet rs = null;
-  
+  protected StringBuffer sqlBatch = new StringBuffer();
   private Integer maxRows = null;
 
   /** The update count.  We don't know this, but need to respond in such a way that:
@@ -39,7 +39,8 @@ public class SQLDroidStatement implements Statement {
 
   @Override
   public void addBatch(String sql) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+    //sql must be a static sql  
+    this.sqlBatch.append(sql);
   }
 
   @Override
@@ -48,9 +49,8 @@ public class SQLDroidStatement implements Statement {
   }
 
   @Override
-  public void clearBatch() throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-
+  public void clearBatch() throws SQLException {    
+    sqlBatch = new StringBuffer();
   }
 
   @Override
@@ -156,10 +156,14 @@ public class SQLDroidStatement implements Statement {
   }
 
   @Override
-  public int[] executeBatch() throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "
-        + DebugPrinter.getLineNumber());
-    return null;
+  public int[] executeBatch() throws SQLException {     
+    updateCount = -1;
+    int[] results = new int[1];
+    results[0] = EXECUTE_FAILED;
+    db.execSQL(sqlBatch.toString());
+    results[0] = db.changedRowCount();
+    updateCount = results[0];
+    return results;
   }
 
   @Override
