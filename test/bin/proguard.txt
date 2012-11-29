@@ -1,0 +1,3 @@
+# view AndroidManifest.xml #generated:15
+-keep class org.ruboto.test.InstrumentationTestRunner { <init>(...); }
+
