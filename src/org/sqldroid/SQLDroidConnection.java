@@ -67,7 +67,7 @@ public class SQLDroidConnection implements Connection {
             String options = dbQname.substring(queryPart);
             dbQname = dbQname.substring(0, queryPart);
             // if there's a query part, the only thing we're currently accepting is "timeout=xxx"
-            int equals = options.indexOf('=', queryPart);
+            int equals = options.indexOf('=');
             // should probably check that the word "timeout" appears between the querypart and the equals, but I won't
             String timeoutString = options.substring(equals+1).trim();
             try {
