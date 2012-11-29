@@ -1,5 +1,6 @@
 require 'fileutils'
 require 'lib/sqldroid/version'
+require 'rake/clean'
 
 ANDROID_SDK_HOME = File.dirname(File.dirname(`which dx`))
 PKG_DIR          = File.expand_path "pkg"
@@ -11,6 +12,8 @@ GEM_FILE         = "sqldroid-#{SQLDroid::VERSION}.gem"
 GEM_FILE_PKG     = "#{PKG_DIR}/#{GEM_FILE}"
 JAVA_SRC_FILES   = Dir[File.expand_path 'src/**/*.java']
 
+CLEAN.include('pkg')
+CLOBBER.include('pkg')
 
 desc 'Generate the binary and source jars'
 task :jar => JAR_IN_PKG

@@ -46,8 +46,8 @@ public class SQLDroidConnection implements Connection {
      * @param info currently not used
      */
     public SQLDroidConnection(String url, Properties info) throws SQLException {
-        String note = "new sqlite jdbc from url '" + url + "', " + "'" + info + "'";
-        Log.v("Sqldroid", note);
+        String note = "New sqlite jdbc from url '" + url + "', " + "'" + info + "'";
+        Log.v("SQLDroid", note);
 
         // Make a filename from url
         String dbQname;
@@ -64,15 +64,18 @@ public class SQLDroidConnection implements Connection {
         long timeout = 0;  // default to no retries to be consistent with other JDBC implemenations.
         int queryPart = dbQname.indexOf('?');
         if ( queryPart > 0 ) {
+            String options = dbQname.substring(queryPart);
+            dbQname = dbQname.substring(0, queryPart);
             // if there's a query part, the only thing we're currently accepting is "timeout=xxx"
-            int equals = dbQname.indexOf('=', queryPart);
+            int equals = options.indexOf('=', queryPart);
             // should probably check that the word "timeout" appears between the querypart and the equals, but I won't
-            String timeoutString = dbQname.substring(equals+1).trim();
+            String timeoutString = options.substring(equals+1).trim();
             try {
                 timeout = Long.parseLong(timeoutString);
+                Log.v("SQLDroid", "Timeout: " + timeout);
             } catch ( NumberFormatException nfe ) {
                 // print and ignore
-                Log.e("SQlDRoid", "Error Parsing URL \"" + url + "\" Timeout String \"" + timeoutString + "\" is not a valid long", nfe);
+                Log.e("SQLDRoid", "Error Parsing URL \"" + url + "\" Timeout String \"" + timeoutString + "\" is not a valid long", nfe);
             }
         }
         Log.v("SQlDRoid", "opening database " + dbQname);
