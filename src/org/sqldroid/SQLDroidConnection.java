@@ -187,7 +187,6 @@ public class SQLDroidConnection implements Connection {
     public String getCatalog() throws SQLException {
         System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "
                 + DebugPrinter.getLineNumber());
-
         return null;
     }
 
@@ -195,13 +194,11 @@ public class SQLDroidConnection implements Connection {
     public int getHoldability() throws SQLException {
         System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "
                 + DebugPrinter.getLineNumber());
-
         return 0;
     }
 
     @Override
     public DatabaseMetaData getMetaData() throws SQLException {
-
         return new SQLDroidDatabaseMetaData(this);
     }
 
@@ -209,7 +206,6 @@ public class SQLDroidConnection implements Connection {
     public int getTransactionIsolation() throws SQLException {
         System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "
                 + DebugPrinter.getLineNumber());
-
         return 0;
     }
 
@@ -217,7 +213,6 @@ public class SQLDroidConnection implements Connection {
     public Map<String, Class<?>> getTypeMap() throws SQLException {
         System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "
                 + DebugPrinter.getLineNumber());
-
         return null;
     }
 
@@ -225,7 +220,6 @@ public class SQLDroidConnection implements Connection {
     public SQLWarning getWarnings() throws SQLException {
         System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "
                 + DebugPrinter.getLineNumber());
-
         return null;
     }
 

@@ -68,44 +68,37 @@ public class SQLDroidStatement implements Statement {
 
   /** Close the result set (if open) and null the rs variable. */
   public void closeResultSet() throws SQLException {
-    if (rs != null && !rs.isClosed()) {
+    if (rs != null) {
       if (!rs.isClosed()) {
         rs.close();
       }
       rs = null;
     }
   }
+
   @Override
   /** Execute the SQL statement.  
-   * @return false if there are no result (if the request was not a select or similar) or the result set was empty.  True if a 
-   * non-empty result set is available.  This meets the requirement of java.sql.Statement.
+   * @return false if there are no result (if the request was not a select or similar).  True if a
+   * result set is available.  This meets the requirement of java.sql.Statement.
    */
   public boolean execute(String sql) throws SQLException {
-   updateCount = -1;  // default outcome.  If the sql is a query or any other sql fails.
-   boolean ok = false;
+    updateCount = -1;  // default outcome.  If the sql is a query or any other sql fails.
     closeResultSet();
-    boolean isSelect = sql.toUpperCase().matches("(?m)(?s)\\s*SELECT.*");
-    // problem, a PRAGMA statement (and maybe others) should also cause a result set
-    if ( !isSelect && sql.toUpperCase().matches("(?m)(?s)\\s*PRAGMA.*") ) {
-      isSelect = true;
-    }
-    if ( rs!= null && !rs.isClosed() ) {
+    boolean isSelect = sql.toUpperCase().matches("(?m)(?s)\\s*(SELECT|PRAGMA).*");
+    if ( rs != null && !rs.isClosed() ) {
       rs.close();
     }
-    rs = null;
     if (isSelect) {
       String limitedSql = sql + (maxRows != null ? " LIMIT " + maxRows : "");
       Cursor c = db.rawQuery(limitedSql, new String[0]);
       rs = new SQLDroidResultSet(c);
-      if  ( c.getCount() != 0 ) {
-        ok = true;
-      }
     } else {
       db.execSQL(sql);
+      rs = null;
       updateCount = db.changedRowCount();
     }
 
-    boolean resultSetAvailable = ok && !sql.toUpperCase().startsWith("CREATE") && rs != null;
+    boolean resultSetAvailable = (rs != null);
 
 //    if (resultSetAvailable) {
 //      boolean headerDrawn = false;
