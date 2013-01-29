@@ -428,16 +428,16 @@ public class SQLDroidResultSet implements ResultSet {
         lastColumnRead = colID;
         int newIndex = ci(colID);
         switch(SQLDroidResultSetMetaData.getType(c, newIndex)) {
-            case Cursor.FIELD_TYPE_BLOB:
+            case 4: // Cursor.FIELD_TYPE_BLOB:
                 //CONVERT TO BYTE[] OBJECT
                 return new SQLDroidBlob(c.getBlob(newIndex));
-            case Cursor.FIELD_TYPE_FLOAT:
+            case 2: // Cursor.FIELD_TYPE_FLOAT:
                 return new Float(c.getFloat(newIndex));
-            case Cursor.FIELD_TYPE_INTEGER:
+            case 1: // Cursor.FIELD_TYPE_INTEGER:
                 return new Integer(c.getInt(newIndex));
-            case Cursor.FIELD_TYPE_STRING:
+            case 3: // Cursor.FIELD_TYPE_STRING:
                 return c.getString(newIndex);
-            case Cursor.FIELD_TYPE_NULL:
+            case 0: // Cursor.FIELD_TYPE_NULL:
                 return null;
             default:
                 return c.getString(newIndex);

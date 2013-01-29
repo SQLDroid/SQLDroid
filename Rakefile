@@ -11,6 +11,7 @@ JAR_IN_GEM       = "#{LIB_DIR}/#{JAR}"
 GEM_FILE         = "sqldroid-#{SQLDroid::VERSION}.gem"
 GEM_FILE_PKG     = "#{PKG_DIR}/#{GEM_FILE}"
 JAVA_SRC_FILES   = Dir[File.expand_path 'src/**/*.java']
+ANDROID_TARGET   = File.read('project.properties').slice(/^target=.*$/)[7..-1]
 
 CLEAN.include('pkg')
 CLOBBER.include('pkg')
@@ -20,7 +21,7 @@ task :jar => JAR_IN_PKG
 
 file JAR_IN_PKG => JAVA_SRC_FILES do
   FileUtils.mkdir_p 'bin'
-  sh "javac -source 1.6 -target 1.6 -bootclasspath #{ANDROID_SDK_HOME}/platforms/android-11/android.jar -d bin -sourcepath src src/*/*/*.java"
+  sh "javac -source 1.6 -target 1.6 -bootclasspath #{ANDROID_SDK_HOME}/platforms/#{ANDROID_TARGET}/android.jar -d bin -sourcepath src src/*/*/*.java"
   FileUtils.mkdir_p PKG_DIR
   Dir.chdir 'bin' do
     sh "jar cf #{PKG_DIR}/#{JAR} org"

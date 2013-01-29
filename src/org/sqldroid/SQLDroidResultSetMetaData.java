@@ -84,19 +84,19 @@ public class SQLDroidResultSetMetaData implements ResultSetMetaData {
         int nativeType = getType(cursor, column - 1);
         int type;
         switch (nativeType) {
-        case Cursor.FIELD_TYPE_NULL:
+        case 0: // Cursor.FIELD_TYPE_NULL:
             type = Types.NULL;
             break;
-        case Cursor.FIELD_TYPE_INTEGER:
+        case 1: // Cursor.FIELD_TYPE_INTEGER:
             type = Types.INTEGER;
             break;
-        case Cursor.FIELD_TYPE_FLOAT:
+        case 2: // Cursor.FIELD_TYPE_FLOAT:
             type = Types.FLOAT;
             break;
-        case Cursor.FIELD_TYPE_STRING:
+        case 3: // Cursor.FIELD_TYPE_STRING:
             type = Types.VARCHAR;
             break;
-        case Cursor.FIELD_TYPE_BLOB:
+        case 4: // Cursor.FIELD_TYPE_BLOB:
             type = Types.BLOB;
             break;
         default:
