@@ -174,37 +174,24 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
     return l.toArray();
   }
 
-  @Override
-  public boolean execute() throws SQLException {
-    updateCount	= -1;
-    boolean ok = false;
-    closeResultSet();
-    // problem, a PRAGMA statement (and maybe others) should also cause a result set
-    if ( !isSelect && sql.toUpperCase().matches("(?m)(?s)\\s*PRAGMA.*") ) {  
-      isSelect = true;
+    @Override
+    public boolean execute() throws SQLException {
+        updateCount	= -1;
+        closeResultSet();
+        // problem, a PRAGMA statement (and maybe others) should also cause a result set
+        if ( !isSelect && sql.toUpperCase().matches("(?m)(?s)\\s*PRAGMA.*") ) {
+            isSelect = true;
+        }
+        if (isSelect) {
+            String limitedSql = sql + (maxRows != null ? " LIMIT " + maxRows : "");
+            Cursor c = db.rawQuery(limitedSql, makeArgListQueryString());
+            rs = new SQLDroidResultSet(c);
+        } else {
+            db.execSQL(sql, makeArgListQueryObject());
+            updateCount = db.changedRowCount();
+        }
+        return isSelect;
     }
-    if (isSelect) {
-      String limitedSql = sql + (maxRows != null ? " LIMIT " + maxRows : "");  
-      Cursor c = db.rawQuery(limitedSql, makeArgListQueryString());
-      rs = new SQLDroidResultSet(c);
-      if  ( c.getCount() != 0 ) {
-        ok = true;
-      }
-//      else {  // can't close if we're going to return a result set.
-//        if ( c != null ) {
-//          c.close();
-//        }
-//      }
-    }
-    else {
-      db.execSQL(sql, makeArgListQueryObject());
-      updateCount = db.changedRowCount();
-    }
-    
-    boolean resultSetAvailable = ok && !sql.toUpperCase().startsWith("CREATE") && rs != null;
-    
-    return resultSetAvailable;
-  }
 
   /** Close the result set (if open) and null the rs variable. */
   public void closeResultSet() throws SQLException {

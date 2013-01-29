@@ -9,7 +9,8 @@ Gem::Specification.new do |s|
   s.email       = ["uwe@kubosch.no"]
   s.homepage    = "http://sqldroid.org/"
   s.summary     = %q{SQLDroid is a JDBC driver for Android's sqlite database (android.database.sqlite.SQLiteDatabase).}
-  s.description = %q{SQLDroid is a JDBC driver for Android's sqlite database (android.database.sqlite.SQLiteDatabase).}
+  s.description = %q{SQLDroid is a JDBC driver for Android's sqlite database (android.database.sqlite.SQLiteDatabase).
+This gem makes the JAR available to your JRuby app.}
 
   # s.rubyforge_project = "sqldroid"
 
