@@ -427,24 +427,20 @@ public class SQLDroidResultSet implements ResultSet {
     public Object getObject(int colID) throws SQLException {
         lastColumnRead = colID;
         int newIndex = ci(colID);
-        try {
-            switch(c.getType(newIndex)) {
-                case Cursor.FIELD_TYPE_BLOB:
-                    //CONVERT TO BYTE[] OBJECT
-                    return new SQLDroidBlob(c.getBlob(newIndex));
-                case Cursor.FIELD_TYPE_FLOAT:
-                    return new Float(c.getFloat(newIndex));
-                case Cursor.FIELD_TYPE_INTEGER:
-                    return new Integer(c.getInt(newIndex));
-                case Cursor.FIELD_TYPE_STRING:
-                    return c.getString(newIndex);
-                case Cursor.FIELD_TYPE_NULL:
-                    return null;
-                default:
-                    return c.getString(newIndex);
-            }
-        } catch (NoSuchMethodError e) {
-            return c.getString(newIndex);
+        switch(SQLDroidResultSetMetaData.getType(c, newIndex)) {
+            case Cursor.FIELD_TYPE_BLOB:
+                //CONVERT TO BYTE[] OBJECT
+                return new SQLDroidBlob(c.getBlob(newIndex));
+            case Cursor.FIELD_TYPE_FLOAT:
+                return new Float(c.getFloat(newIndex));
+            case Cursor.FIELD_TYPE_INTEGER:
+                return new Integer(c.getInt(newIndex));
+            case Cursor.FIELD_TYPE_STRING:
+                return c.getString(newIndex);
+            case Cursor.FIELD_TYPE_NULL:
+                return null;
+            default:
+                return c.getString(newIndex);
         }
     }
 

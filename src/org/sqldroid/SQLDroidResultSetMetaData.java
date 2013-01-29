@@ -10,27 +10,30 @@ import android.database.Cursor;
 public class SQLDroidResultSetMetaData implements ResultSetMetaData {
 
 	private final Cursor cursor;
-    private Method getType;
-    
+    private static Method getType;
+    static {
+        try {
+            getType = Cursor.class.getMethod("getType", new Class[] {int.class});
+        } catch (Exception e) {
+            getType = null;
+        }
+    }
+
     public SQLDroidResultSetMetaData(Cursor cursor) {
       if (cursor == null) {
           throw new NullPointerException("Cursor required to be not null.");
       }		
       this.cursor = cursor;
-      try {
-         getType = Cursor.class.getMethod("getType", new Class[] {int.class});
-      } catch (Exception e) {
-          getType = null;
-      }
     }
 
-  private int getType(Cursor cursor, int column) {
-      try {
-          return (Integer) getType.invoke(cursor, column);
-      } catch (Exception e) {
-          return Types.OTHER; // return something that can be used to understand that the type is unknown.
-      }
-  }
+    static int getType(Cursor cursor, int column) {
+        if (getType != null) {
+            try {
+                return (Integer) getType.invoke(cursor, column);
+            } catch (Exception e) {}
+        }
+        return Types.OTHER; // return something that can be used to understand that the type is unknown.
+    }
 
 	@Override
 	public String getCatalogName(int column) throws SQLException {
