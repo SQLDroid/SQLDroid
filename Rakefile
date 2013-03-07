@@ -3,7 +3,7 @@ require 'lib/sqldroid/version'
 require 'rake/clean'
 
 ANDROID_SDK_HOME = File.dirname(File.dirname(`which dx`))
-PKG_DIR          = File.expand_path "pkg"
+PKG_DIR          = File.expand_path 'pkg'
 JAR              = "sqldroid-#{SQLDroid::VERSION}.jar"
 JAR_IN_PKG       = "#{PKG_DIR}/#{JAR}"
 LIB_DIR          = File.expand_path 'lib/sqldroid'
@@ -46,7 +46,7 @@ task :tag do
   output = `git status --porcelain`
   raise "Workspace not clean!\n#{output}" unless output.empty?
   sh "git tag #{SQLDroid::VERSION}"
-  sh "git push --tags"
+  sh 'git push --tags'
 end
 
 desc 'Release SQLDroid as a Ruby gem to rubygems.org'
