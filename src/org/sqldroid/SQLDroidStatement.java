@@ -216,9 +216,8 @@ public class SQLDroidStatement implements Statement {
 
   @Override
   public ResultSet getGeneratedKeys() throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "
-        + DebugPrinter.getLineNumber());
-    return null;
+    execute("SELECT last_insert_rowid()");
+    return rs;
   }
 
   @Override

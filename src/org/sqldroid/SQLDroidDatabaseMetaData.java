@@ -125,7 +125,6 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 	public ResultSet getColumns(String catalog, String schemaPattern,
 	    String tableNamePattern, String columnNamePattern) throws SQLException {
 
-
 	  // get the list of tables matching the pattern (getTables)
 	  // create a Matrix Cursor for each of the tables
 	  // create a merge cursor from all the Matrix Cursors
@@ -260,11 +259,9 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 
 	  if ( cursors.length == 0 ) {
 	    resultSet = new SQLDroidResultSet(new MatrixCursor(columnNames,0));
-	  }
-	  else if ( cursors.length == 1 ) {
+	  } else if ( cursors.length == 1 ) {
 	    resultSet = new SQLDroidResultSet(cursors[0]);
-	  }
-	  else {
+	  } else {
 	    resultSet = new SQLDroidResultSet(new MergeCursor( cursors )); 
 	  }
 	  return resultSet;
@@ -1205,7 +1202,7 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 
 	@Override
 	public boolean supportsGetGeneratedKeys() throws SQLException {
-		return false;
+		return true;
 	}
 
 	@Override
