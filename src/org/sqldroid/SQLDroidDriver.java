@@ -61,7 +61,6 @@ public class SQLDroidDriver implements java.sql.Driver {
 
     @Override
     public Connection connect(String url, Properties info) throws SQLException {
-
         return new SQLDroidConnection(url, info);
     }
 

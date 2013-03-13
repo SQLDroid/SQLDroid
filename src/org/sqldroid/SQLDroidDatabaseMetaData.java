@@ -567,7 +567,6 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 
 	@Override
 	public ResultSet getPrimaryKeys(String catalog, String schema, String table) throws SQLException {
-
 	  final String[] columnNames = new String [] {"TABLE_CAT", "TABLE_SCHEM", "TABLE_NAME", "COLUMN_NAME", "KEY_SEQ", "PK_NAME"};
 	  final Object[] columnValues = new Object[] {null, null, null, null, null, null};
 	  SQLiteDatabase db = con.getDb();

@@ -91,11 +91,10 @@ public class SQLiteDatabase {
           }
           delta = System.currentTimeMillis() - timeNow;
           if ( delta >= timeout ) {
-            throw SQLDroidConnection.chainException (e); 
+            throw SQLDroidConnection.chainException(e);
           }
-        }
-        else {
-          throw SQLDroidConnection.chainException (e);
+        } else {
+          throw SQLDroidConnection.chainException(e);
         }
       }
     } while (sqliteDatabase == null && delta < timeout);
@@ -119,7 +118,7 @@ public class SQLiteDatabase {
         if ( isLockedException(e) ) {
           delta = System.currentTimeMillis() - timeNow;
         } else {
-          throw SQLDroidConnection.chainException (e);
+          throw SQLDroidConnection.chainException(e);
         }
       }
     } while (delta < timeout);
@@ -140,7 +139,7 @@ public class SQLiteDatabase {
         if ( isLockedException(e) ) {
           delta = System.currentTimeMillis() - timeNow;
         } else {
-          throw SQLDroidConnection.chainException (e);
+          throw SQLDroidConnection.chainException(e);
         }
       }
     } while (delta < timeout);
@@ -161,7 +160,7 @@ public class SQLiteDatabase {
         if ( isLockedException(e) ) {
           delta = System.currentTimeMillis() - timeNow;
         } else {
-          throw SQLDroidConnection.chainException (e);
+          throw SQLDroidConnection.chainException(e);
         }
       }
     } while (delta < timeout);
@@ -202,7 +201,7 @@ public class SQLiteDatabase {
         if ( isLockedException(e) ) {
           delta = System.currentTimeMillis() - timeNow;
         } else {
-          throw SQLDroidConnection.chainException (e);
+          throw SQLDroidConnection.chainException(e);
         }
       }
     } while (delta < timeout);

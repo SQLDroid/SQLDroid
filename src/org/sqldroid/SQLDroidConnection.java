@@ -112,7 +112,7 @@ public class SQLDroidConnection implements Connection {
     /** This will create and return an exception.  For API levels less than 9 this will return
      * a SQLDroidSQLException, for later APIs it will return a SQLException. 
      */
-    public static SQLException chainException (android.database.SQLException sqlException)  {
+    public static SQLException chainException(android.database.SQLException sqlException) {
         if ( sqlThrowable < 0 || sqlThrowable >= 9 ) {
             try {
                 sqlThrowable = 9;
