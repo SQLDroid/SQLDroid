@@ -1,3 +1,3 @@
 module SQLDroid
-  VERSION = '1.0.0.RC7'
+  VERSION = '1.0.0.RC8'
 end

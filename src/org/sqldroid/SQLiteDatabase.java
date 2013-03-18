@@ -37,7 +37,6 @@ public class SQLiteDatabase {
     setTransactionSuccessful,endTransaction,close,beginTransaction
   }
 
-
   /** The actual android database. */
   protected android.database.sqlite.SQLiteDatabase sqliteDatabase;
 
@@ -45,6 +44,11 @@ public class SQLiteDatabase {
    * Any other value allows an action to be retried until success or the timeout has expired.
    */
   protected long timeout;
+
+  /** The delay in milliseconds between retries when timeout is given.
+   * The value is ignored if timeout is not given.
+   */
+  protected long retryInterval;
 
   /** The name of the database. */
   protected String dbQname;
@@ -69,23 +73,24 @@ public class SQLiteDatabase {
   /** 
    * @param dbQname
    * @param timeout
-   * @throws SQLException thrown if the attempt to connect to the database throws an exception 
+   * @param retryInterval
+   * @throws SQLException thrown if the attempt to connect to the database throws an exception
    * other than a locked exception or throws a locked exception after the timeout has expired.
    */
-  public SQLiteDatabase(String dbQname, long timeout, int flags) throws SQLException {
+  public SQLiteDatabase(String dbQname, long timeout, long retryInterval, int flags) throws SQLException {
     super();
     this.dbQname = dbQname;
     this.timeout = timeout;
+    this.retryInterval = retryInterval;
     long timeNow = System.currentTimeMillis();
     long delta = 0;
-    do {
+    while (sqliteDatabase == null) {
       try {
         sqliteDatabase = android.database.sqlite.SQLiteDatabase.openDatabase(dbQname, null, flags );
-        // android.database.sqlite.SQLiteDatabase.CREATE_IF_NECESSARY | android.database.sqlite.SQLiteDatabase.OPEN_READWRITE | android.database.sqlite.SQLiteDatabase.NO_LOCALIZED_COLLATORS);
       } catch (SQLiteException e) {
         if ( isLockedException(e) ) {
           try {
-            Thread.sleep(50);  // this was 1000 in the original code.  1 second is too long for each loop.
+            Thread.sleep(retryInterval);
           } catch (InterruptedException e1) {
             // ignore
           }
@@ -97,23 +102,21 @@ public class SQLiteDatabase {
           throw SQLDroidConnection.chainException(e);
         }
       }
-    } while (sqliteDatabase == null && delta < timeout);
-//    try {
-//      sqliteDatabase.setLocale(Locale.getDefault());
-//    } catch ( Exception any ) {
-//      Log.e("Sqldroid","Exception Setting Locale to \"" + Locale.getDefault() + "\" the collator LOCALIZED may not be available" + any.getLocalizedMessage());
-//    }
+    }
   }
 
   /** Proxy for the "rawQuery" command. 
    * @throws SQLException 
    */
   public Cursor rawQuery(String sql, String[] makeArgListQueryString) throws SQLException {
+    Log.v("SQLiteDatabase rawQuery: " + Thread.currentThread().getId() + " \"" + Thread.currentThread().getName() + "\" " + sql);
     long timeNow = System.currentTimeMillis();
     long delta = 0;
     do {
       try {
-        return sqliteDatabase.rawQuery(sql, makeArgListQueryString);
+        Cursor cursor = sqliteDatabase.rawQuery(sql, makeArgListQueryString);
+        Log.v("SQLiteDatabase rawQuery OK: " + Thread.currentThread().getId() + " \"" + Thread.currentThread().getName() + "\" " + sql);
+        return cursor;
       } catch (SQLiteException e) {
         if ( isLockedException(e) ) {
           delta = System.currentTimeMillis() - timeNow;
@@ -129,11 +132,13 @@ public class SQLiteDatabase {
    * @throws SQLException 
    */
   public void execSQL(String sql, Object[] makeArgListQueryObject) throws SQLException {
+    Log.v("SQLiteDatabase execSQL: " + Thread.currentThread().getId() + " \"" + Thread.currentThread().getName() + "\" " + sql);
     long timeNow = System.currentTimeMillis();
     long delta = 0;
     do {
       try {
         sqliteDatabase.execSQL(sql, makeArgListQueryObject);
+        Log.v("SQLiteDatabase execSQL OK: " + Thread.currentThread().getId() + " \"" + Thread.currentThread().getName() + "\" " + sql);
         return;
       } catch (SQLiteException e) {
         if ( isLockedException(e) ) {
@@ -150,11 +155,13 @@ public class SQLiteDatabase {
    * @throws SQLException 
    */
   public void execSQL(String sql) throws SQLException {
+    Log.v("SQLiteDatabase execSQL: " + Thread.currentThread().getId() + " \"" + Thread.currentThread().getName() + "\" " + sql);
     long timeNow = System.currentTimeMillis();
     long delta = 0;
     do {
       try {
         sqliteDatabase.execSQL(sql);
+        Log.v("SQLiteDatabase execSQL OK: " + Thread.currentThread().getId() + " \"" + Thread.currentThread().getName() + "\" " + sql);
         return;
       } catch (SQLiteException e) {
         if ( isLockedException(e) ) {
