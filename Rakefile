@@ -1,5 +1,5 @@
 require 'fileutils'
-require 'lib/sqldroid/version'
+require File.expand_path 'lib/sqldroid/version', File.dirname(__FILE__)
 require 'rake/clean'
 
 ANDROID_SDK_HOME = File.dirname(File.dirname(`which dx`))

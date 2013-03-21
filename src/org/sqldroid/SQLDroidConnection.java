@@ -1,6 +1,5 @@
 package org.sqldroid;
 
-import java.util.concurrent.ConcurrentHashMap;
 import java.lang.reflect.Constructor;
 import java.sql.Array;
 import java.sql.Blob;
@@ -17,6 +16,7 @@ import java.sql.SQLXML;
 import java.sql.Savepoint;
 import java.sql.Statement;
 import java.sql.Struct;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executor;
@@ -26,14 +26,14 @@ public class SQLDroidConnection implements Connection {
     * A map to a single instance of a SQLiteDatabase per DB.
     */
     private static final Map<String, SQLiteDatabase> dbMap =
-            new ConcurrentHashMap<String, SQLiteDatabase>();
+            new HashMap<String, SQLiteDatabase>();
 
     /**
     * A map from a connection to a SQLiteDatabase instance.
     * Used to track the use of each instance, and close the database when last conneciton is closed.
     */
     private static final Map<SQLDroidConnection, SQLiteDatabase> clientMap =
-            new ConcurrentHashMap<SQLDroidConnection, SQLiteDatabase>();
+            new HashMap<SQLDroidConnection, SQLiteDatabase>();
 
     /** The Android sqlitedb. */
     private SQLiteDatabase sqlitedb;
@@ -130,6 +130,7 @@ public class SQLDroidConnection implements Connection {
                 Log.i("SQLDroidConnection: " + Thread.currentThread().getId() + " \"" + Thread.currentThread().getName() + "\" " + this + " Opening new database: " + dbQname);
                 sqlitedb = new SQLiteDatabase(dbQname, timeout, retryInterval, flags);
                 dbMap.put(dbQname, sqlitedb);
+                clientMap.put(this, sqlitedb);
             }
         }
     }
