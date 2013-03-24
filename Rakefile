@@ -2,7 +2,13 @@ require 'fileutils'
 require File.expand_path 'lib/sqldroid/version', File.dirname(__FILE__)
 require 'rake/clean'
 
-ANDROID_SDK_HOME = File.dirname(File.dirname(`which dx`))
+if ENV['ANDROID_HOME']
+  ANDROID_SDK_HOME = ENV['ANDROID_HOME']
+else
+  dx_location = `which dx`
+  raise 'Unable to find ANDROID_HOME environment variable or the "dx" command.' unless $? == 0
+  ANDROID_SDK_HOME = File.dirname(File.dirname(dx_location))
+end
 PKG_DIR          = File.expand_path 'pkg'
 JAR              = "sqldroid-#{SQLDroid::VERSION}.jar"
 JAR_IN_PKG       = "#{PKG_DIR}/#{JAR}"
@@ -21,7 +27,9 @@ task :jar => JAR_IN_PKG
 
 file JAR_IN_PKG => JAVA_SRC_FILES do
   FileUtils.mkdir_p 'bin'
-  sh "javac -source 1.6 -target 1.6 -bootclasspath #{ANDROID_SDK_HOME}/platforms/#{ANDROID_TARGET}/android.jar -d bin -sourcepath src src/*/*/*.java"
+  jar = "#{ANDROID_SDK_HOME}/platforms/#{ANDROID_TARGET}/android.jar"
+  raise "Expected '#{jar}' file missing." unless File.exists?(jar)
+  sh "javac -source 1.6 -target 1.6 -bootclasspath #{jar} -d bin -sourcepath src src/*/*/*.java"
   FileUtils.mkdir_p PKG_DIR
   Dir.chdir 'bin' do
     sh "jar cf #{PKG_DIR}/#{JAR} org"

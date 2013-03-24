@@ -273,7 +273,8 @@ public class SQLDroidConnection implements Connection {
     @Override
     public boolean isClosed() throws SQLException {
         // assuming that "isOpen" doesn't throw a locked exception..
-        return sqlitedb.getSqliteDatabase() == null || !sqlitedb.getSqliteDatabase().isOpen();
+        return sqlitedb == null || sqlitedb.getSqliteDatabase() == null ||
+                !sqlitedb.getSqliteDatabase().isOpen();
     }
 
     @Override
