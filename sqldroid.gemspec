@@ -18,4 +18,5 @@ This gem makes the JAR available to your JRuby app.}
   s.test_files    = []
   s.executables   = []
   s.require_paths = %w(lib)
+  s.platform = 'java'
 end

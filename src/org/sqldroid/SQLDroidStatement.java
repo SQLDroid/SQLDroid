@@ -84,7 +84,7 @@ public class SQLDroidStatement implements Statement {
   public boolean execute(String sql) throws SQLException {
     updateCount = -1;  // default outcome.  If the sql is a query or any other sql fails.
     closeResultSet();
-    boolean isSelect = sql.toUpperCase().matches("(?m)(?s)\\s*(SELECT|PRAGMA).*");
+    boolean isSelect = sql.toUpperCase().matches("(?m)(?s)\\s*(SELECT|PRAGMA|EXPLAIN QUERY PLAN).*");
     if ( rs != null && !rs.isClosed() ) {
       rs.close();
     }

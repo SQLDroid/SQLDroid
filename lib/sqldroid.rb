@@ -1,4 +1,4 @@
-require "sqldroid/version"
+require 'sqldroid/version'
 require "sqldroid/sqldroid-#{SQLDroid::VERSION}.jar"
 
 module SQLDroid

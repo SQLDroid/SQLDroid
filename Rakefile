@@ -14,7 +14,7 @@ JAR              = "sqldroid-#{SQLDroid::VERSION}.jar"
 JAR_IN_PKG       = "#{PKG_DIR}/#{JAR}"
 LIB_DIR          = File.expand_path 'lib/sqldroid'
 JAR_IN_GEM       = "#{LIB_DIR}/#{JAR}"
-GEM_FILE         = "sqldroid-#{SQLDroid::VERSION}.gem"
+GEM_FILE         = "sqldroid-#{SQLDroid::VERSION}-java.gem"
 GEM_FILE_PKG     = "#{PKG_DIR}/#{GEM_FILE}"
 JAVA_SRC_FILES   = Dir[File.expand_path 'src/**/*.java']
 ANDROID_TARGET   = File.read('project.properties').slice(/^target=.*$/)[7..-1]
