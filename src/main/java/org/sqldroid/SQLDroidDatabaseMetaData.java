@@ -185,7 +185,7 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 	      null, null, null, null, ""};
 
 	  SQLiteDatabase db = con.getDb();
-	  final String[] types = new String[] {"table","view"};
+	  final String[] types = new String[] {TABLE_TYPE, VIEW_TYPE};
 	  ResultSet rs = null;
 	  List<Cursor> cursorList = new ArrayList<Cursor>();
 	  try {
