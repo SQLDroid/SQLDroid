@@ -7,7 +7,7 @@ if ENV['ANDROID_HOME']
 else
   dx_location = `which dx`
   raise 'Unable to find ANDROID_HOME environment variable or the "dx" command.' unless $? == 0
-  ANDROID_SDK_HOME = File.dirname(File.dirname(dx_location))
+  ANDROID_SDK_HOME = File.dirname(File.dirname(File.dirname(dx_location)))
 end
 PKG_DIR          = File.expand_path 'pkg'
 JAR              = "sqldroid-#{SQLDroid::VERSION}.jar"
