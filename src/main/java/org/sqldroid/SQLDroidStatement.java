@@ -171,6 +171,7 @@ public class SQLDroidStatement implements Statement {
   public int executeUpdate(String sql) throws SQLException {
     closeResultSet();
     db.execSQL(sql);
+    updateCount = db.changedRowCount();
     return updateCount;
   }
 

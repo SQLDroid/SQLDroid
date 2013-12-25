@@ -15,6 +15,9 @@ import android.database.MergeCursor;
 
 public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 
+	private static final String VIEW_TYPE = "VIEW";
+	private static final String TABLE_TYPE = "TABLE";
+	
 	SQLDroidConnection con;
     
 	public SQLDroidDatabaseMetaData(SQLDroidConnection con) {
@@ -182,7 +185,7 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 	      null, null, null, null, ""};
 
 	  SQLiteDatabase db = con.getDb();
-	  final String[] types = new String[] {"table","view"};
+	  final String[] types = new String[] {TABLE_TYPE, VIEW_TYPE};
 	  ResultSet rs = null;
 	  List<Cursor> cursorList = new ArrayList<Cursor>();
 	  try {
@@ -225,10 +228,9 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 	          //public static final int columnNullable  1
 	          //public static final int columnNullableUnknown   2
 	          if ( nullable == 0 ) {
-	            column[10] = new Integer[1];
-	          }
-	          else if ( nullable == 1 ) {
-	            column[10] = new Integer[0];
+	            column[10] = Integer.valueOf(1);
+	          } else if ( nullable == 1 ) {
+	            column[10] = Integer.valueOf(0);
 	          }
 	          column[12] = c.getString(4);  // we should check the type for this, but I'm not going to.
 	          mc.addRow(column);
@@ -717,7 +719,7 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 			String tableNamePattern, String[] types) throws SQLException {
 
 	  if ( types == null ) {
-	    types = new String[] {"table"};
+	    types = new String[] {TABLE_TYPE};
 	  }
 		//		.tables command from here:
 		//			http://www.sqlite.org/sqlite.html		
@@ -739,10 +741,10 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 		// substituted by hand (that is, I don't think a ? option could be used - but I could be wrong about that.
 		final String selectStringStart = "SELECT null AS TABLE_CAT,null AS TABLE_SCHEM, tbl_name as TABLE_NAME, '";
 		final String selectStringMiddle = "' as TABLE_TYPE, 'No Comment' as REMARKS, null as TYPE_CAT, null as TYPE_SCHEM, null as TYPE_NAME, null as SELF_REFERENCING_COL_NAME, null as REF_GENERATION" +
-		" FROM sqlite_master WHERE tbl_name LIKE ? AND name NOT LIKE 'sqlite_%' AND name NOT LIKE 'android_metadata' AND type = ?" +
+		" FROM sqlite_master WHERE tbl_name LIKE ? AND name NOT LIKE 'sqlite_%' AND name NOT LIKE 'android_metadata' AND upper(type) = ?" +
 		" UNION ALL SELECT null AS TABLE_CAT,null AS TABLE_SCHEM, tbl_name as TABLE_NAME, '";
 		final String selectStringEnd = "' as TABLE_TYPE, 'No Comment' as REMARKS, null as TYPE_CAT, null as TYPE_SCHEM, null as TYPE_NAME, null as SELF_REFERENCING_COL_NAME, null as REF_GENERATION" +
-		" FROM sqlite_temp_master WHERE tbl_name LIKE ? AND name NOT LIKE 'android_metadata' AND type = ? ORDER BY 3";
+		" FROM sqlite_temp_master WHERE tbl_name LIKE ? AND name NOT LIKE 'android_metadata' AND upper(type) = ? ORDER BY 3";
 
 		SQLiteDatabase db = con.getDb();
 		List<Cursor> cursorList = new ArrayList<Cursor>();
@@ -753,7 +755,9 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 			selectString.append(selectStringMiddle);
 			selectString.append(tableType);
 			selectString.append(selectStringEnd);
-			Cursor c = db.rawQuery(selectString.toString(), new String[] {tableNamePattern,tableType,tableNamePattern,tableType});
+			Cursor c = db.rawQuery(selectString.toString(), new String[] {
+					tableNamePattern, tableType.toUpperCase(),
+					tableNamePattern, tableType.toUpperCase() });
 			cursorList.add(c);
 		}
 		SQLDroidResultSet resultSet;

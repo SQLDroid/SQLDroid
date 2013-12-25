@@ -1,8 +1,7 @@
 *~
-.DS_Store
-/.idea
-/bin
-/gen
-/pkg
+.*
+bin
+gen
+target
 /lib/sqldroid/sqldroid-*.jar
 sources_list.txt
