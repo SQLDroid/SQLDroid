@@ -1,1 +1,10 @@
-<manifest package="org.sqldroid"></manifest>
+<manifest package='org.sqldroid' android:versionCode='1' android:versionName='1.0' xmlns:android='http://schemas.android.com/apk/res/android'>
+    <application android:icon='@drawable/ic_launcher' android:label='@string/app_name'>
+        <activity android:exported='false' android:name='org.ruboto.RubotoActivity'/>
+        <activity android:configChanges='orientation' android:exported='false' android:name='org.ruboto.SplashActivity' android:noHistory='true'/>
+        <activity android:exported='false' android:name='org.ruboto.RubotoDialog' android:theme='@android:style/Theme.Dialog'/>
+        <service android:exported='false' android:name='org.ruboto.RubotoService'/>
+        <activity android:name='TestActivity'/>
+    </application>
+    <uses-sdk android:minSdkVersion='10' android:targetSdkVersion='10'/>
+</manifest>

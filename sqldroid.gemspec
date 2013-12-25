@@ -20,4 +20,6 @@ This gem makes the JAR available to your JRuby app.}
   s.require_paths = %w(lib)
   s.platform = 'java'
   s.licenses = ['MIT']
+
+  s.add_development_dependency 'rake'
 end

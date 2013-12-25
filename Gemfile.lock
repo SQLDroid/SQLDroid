@@ -1,14 +1,17 @@
 PATH
   remote: .
   specs:
-    sqldroid (1.0.0.RC4)
+    sqldroid (1.0.0-java)
 
 GEM
   remote: http://rubygems.org/
   specs:
+    rake (10.1.1)
 
 PLATFORMS
   java
+  ruby
 
 DEPENDENCIES
+  rake
   sqldroid!
