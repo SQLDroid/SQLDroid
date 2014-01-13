@@ -14,8 +14,8 @@ JAR              = "sqldroid-#{SQLDroid::VERSION}.jar"
 JAR_IN_PKG       = "#{PKG_DIR}/#{JAR}"
 LIB_DIR          = File.expand_path 'lib/sqldroid'
 JAR_IN_GEM       = "#{LIB_DIR}/#{JAR}"
-GEM_FILE         = "sqldroid-#{SQLDroid::VERSION}-java.gem"
-GEM_FILE_PKG     = "#{PKG_DIR}/#{GEM_FILE}"
+GEM_BASE_FILE    = "sqldroid-#{SQLDroid::VERSION}-java.gem"
+GEM_FILE_PKG     = "#{PKG_DIR}/#{GEM_BASE_FILE}"
 JAVA_SRC_FILES   = Dir[File.expand_path 'src/**/*.java']
 ANDROID_TARGET   = File.read('project.properties').slice(/^target=.*$/)[7..-1]
 
@@ -46,7 +46,7 @@ task :gem => GEM_FILE_PKG
   
 file GEM_FILE_PKG => JAR_IN_GEM do
   sh 'gem build sqldroid.gemspec'
-  FileUtils.mv GEM_FILE, GEM_FILE_PKG
+  FileUtils.mv GEM_BASE_FILE, GEM_FILE_PKG
 end
 
 desc 'Tag the project and push the tag to GitHub'
