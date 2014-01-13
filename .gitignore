@@ -1,7 +1,8 @@
 *~
-.*
-bin
-gen
-target
+/.idea
+/bin
+/gen
+/pkg
+/target
 /lib/sqldroid/sqldroid-*.jar
-sources_list.txt
+/sources_list.txt

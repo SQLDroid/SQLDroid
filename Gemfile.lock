@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    sqldroid (1.0.0.RC4)
+    sqldroid (1.0.1.dev-java)
 
 GEM
   remote: http://rubygems.org/
