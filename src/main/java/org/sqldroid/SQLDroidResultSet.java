@@ -29,14 +29,14 @@ import android.database.Cursor;
 public class SQLDroidResultSet implements ResultSet {
   
     private final Cursor c;
-    private int lastColumnRead;
+    private int lastColumnRead; // JDBC style column index starting from 1
 
     public SQLDroidResultSet(Cursor c) {
         this.c = c;
     }
 
   /**
-   * convert JDBC columns index count (from one) to sqlite (from zero)
+   * convert JDBC column index (one-based) to sqlite column index (zero-based)
    * @param colID
    */
   private int ci(int colID) {
@@ -99,7 +99,8 @@ public class SQLDroidResultSet implements ResultSet {
   @Override
   public int findColumn(String columnName) throws SQLException {
     try {
-      return c.getColumnIndex(columnName);
+      // JDBC style column index starts from 1; Android database cursor has zero-based index
+      return (c.getColumnIndexOrThrow(columnName) + 1);  
     } catch (android.database.SQLException e) {
       throw SQLDroidConnection.chainException(e);
     }
@@ -190,13 +191,8 @@ public class SQLDroidResultSet implements ResultSet {
 
   @Override
   public Blob getBlob(String columnName) throws SQLException {
-    try {
-      int index = c.getColumnIndex(columnName);
-      lastColumnRead = index;
-      return new SQLDroidBlob(c.getBlob(index));
-    } catch (android.database.SQLException e) {
-      throw SQLDroidConnection.chainException(e);
-    }
+    int index = findColumn(columnName);
+    return getBlob(index);
   }
 
   @Override
@@ -211,13 +207,8 @@ public class SQLDroidResultSet implements ResultSet {
 
   @Override
   public boolean getBoolean(String columnName) throws SQLException {
-    try {
-      int index = c.getColumnIndex(columnName);
-      lastColumnRead = index;
-      return c.getInt(index) != 0;
-    } catch (android.database.SQLException e) {
-      throw SQLDroidConnection.chainException(e);
-    }
+    int index = findColumn(columnName);
+    return getBoolean(index);
   }
 
   @Override
@@ -232,13 +223,8 @@ public class SQLDroidResultSet implements ResultSet {
 
   @Override
   public byte getByte(String columnName) throws SQLException {
-    try {
-      int index = c.getColumnIndex(columnName);
-      lastColumnRead = index;
-      return (byte)c.getShort(index);
-    } catch (android.database.SQLException e) {
-      throw SQLDroidConnection.chainException(e);
-    }
+    int index = findColumn(columnName);
+    return getByte(index);
   }
 
   @Override
@@ -253,13 +239,8 @@ public class SQLDroidResultSet implements ResultSet {
 
   @Override
   public byte[] getBytes(String columnName) throws SQLException {
-    try {
-      int index = c.getColumnIndex(columnName);
-      lastColumnRead = index;
-      return c.getBlob(index);
-    } catch (android.database.SQLException e) {
-      throw SQLDroidConnection.chainException(e);
-    }
+    int index = findColumn(columnName);
+    return getBytes(index);
   }
 
   @Override
@@ -334,13 +315,8 @@ public class SQLDroidResultSet implements ResultSet {
 
   @Override
   public double getDouble(String columnName) throws SQLException {
-    try {
-      int index = c.getColumnIndex(columnName);
-      lastColumnRead = index;
-      return c.getDouble(index);
-    } catch (android.database.SQLException e) {
-      throw SQLDroidConnection.chainException(e);
-    }
+    int index = findColumn(columnName);
+    return getDouble(index);
   }
 
   @Override
@@ -367,13 +343,8 @@ public class SQLDroidResultSet implements ResultSet {
 
   @Override
   public float getFloat(String columnName) throws SQLException {
-    try {
-      int index = c.getColumnIndex(columnName);
-      lastColumnRead = index;
-      return c.getFloat(index);
-    } catch (android.database.SQLException e) {
-      throw SQLDroidConnection.chainException(e);
-    }
+    int index = findColumn(columnName);
+    return getFloat(index);
   }
 
   @Override
@@ -388,13 +359,8 @@ public class SQLDroidResultSet implements ResultSet {
 
   @Override
   public int getInt(String columnName) throws SQLException {
-    try {
-      int index = c.getColumnIndex(columnName);
-      lastColumnRead = index;
-      return c.getInt(index);
-    } catch (android.database.SQLException e) {
-      throw SQLDroidConnection.chainException(e);
-    }
+    int index = findColumn(columnName);
+    return getInt(index);
   }
 
   @Override
@@ -409,13 +375,8 @@ public class SQLDroidResultSet implements ResultSet {
 
   @Override
   public long getLong(String columnName) throws SQLException {
-    try {
-      int index = c.getColumnIndex(columnName);
-      lastColumnRead = index;
-      return c.getLong(index);
-    } catch (android.database.SQLException e) {
-      throw SQLDroidConnection.chainException(e);
-    }
+    int index = findColumn(columnName);
+    return getLong(index);
   }
 
   @Override
@@ -446,7 +407,7 @@ public class SQLDroidResultSet implements ResultSet {
 
   @Override
   public Object getObject(String columnName) throws SQLException {
-    int index = c.getColumnIndex(columnName);
+    int index = findColumn(columnName);
     return getObject(index);
   }
 
@@ -463,7 +424,6 @@ public class SQLDroidResultSet implements ResultSet {
     System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
     return null;
   }
-
 
   public <T> T getObject(int columnIndex, Class<T> clazz) throws SQLException {
     // This method is entitled to throw if the conversion is not supported, so, 
@@ -513,13 +473,8 @@ public class SQLDroidResultSet implements ResultSet {
 
   @Override
   public short getShort(String columnName) throws SQLException {
-    try {
-      int index = c.getColumnIndex(columnName);
-      lastColumnRead = index;
-      return c.getShort(index);
-    } catch (android.database.SQLException e) {
-      throw SQLDroidConnection.chainException(e);
-    }
+    int index = findColumn(columnName);
+    return getShort(index);
   }
 
   @Override
@@ -540,13 +495,8 @@ public class SQLDroidResultSet implements ResultSet {
 
   @Override
   public String getString(String columnName) throws SQLException {
-    try {
-      int index = c.getColumnIndex(columnName);
-      lastColumnRead = index;
-      return c.getString(index);
-    } catch (android.database.SQLException e) {
-      throw SQLDroidConnection.chainException(e);
-    }
+    int index = findColumn(columnName);
+    return getString(index);
   }
 
   @Override
@@ -606,7 +556,7 @@ public class SQLDroidResultSet implements ResultSet {
 
   @Override
   public Timestamp getTimestamp(String columnName) throws SQLException {
-    int index = findColumn(columnName) +1;
+    int index = findColumn(columnName);
     return getTimestamp(index);
   }
 
@@ -1177,10 +1127,10 @@ public class SQLDroidResultSet implements ResultSet {
     return null;
   }
 
-    @Override
-    public boolean isClosed() throws SQLException {
-        return c.isClosed();
-    }
+  @Override
+  public boolean isClosed() throws SQLException {
+    return c.isClosed();
+  }
 
   @Override
   public void updateAsciiStream(int columnIndex, InputStream x)
