@@ -21,23 +21,33 @@ import junit.framework.TestSuite;
 
 public class DriverUnitTest extends TestCase {
 
-  /** This is the name of the database connection. */
-
-  /** Going to use SQLDroid */
+  /** Going to use SQLDroid JDBC Driver */
   protected String driverName = "org.sqldroid.SQLDroidDriver";
+  
+  /** Common prefix for creating JDBC URL */ 
+  protected String JDBC_URL_PREFIX = "jdbc:sqlite:";
+  
+  /** Package name of this app */
+  protected String packageName = "org.sqldroid";
+  
+  /** Database file directory for this app on Android */
+  protected String DB_DIRECTORY = "/data/data/" + packageName + "/databases/";
+  
+  /** Name of an in-memory database */
+  protected String dummyDatabase = "dummydatabase.db";
 
-  /** The URL to an in-memory database. */
-  protected String databaseURL = "jdbc:sqlite:dummydatabase.db";
+  /** The URL to the in-memory database. */
+  protected String databaseURL = JDBC_URL_PREFIX + dummyDatabase;
 
   /** The table create statement. */
-  protected String createTable = "CREATE TABLE dummytable (  name VARCHAR(254), value int)";
+  protected String createTable = "CREATE TABLE dummytable (name VARCHAR(254), value int)";
 
   /** Some data for the table. */
   protected String[] inserts = {
       "INSERT INTO dummytable(name,value) VALUES('Apple', 100)",
       "INSERT INTO dummytable(name,value) VALUES('Orange', 200)",
       "INSERT INTO dummytable(name,value) VALUES('Banana', 300)",
-  "INSERT INTO dummytable(name,value) VALUES('Kiwi', 400)"};
+      "INSERT INTO dummytable(name,value) VALUES('Kiwi', 400)"};
 
   /** A select statement. */
   protected String select = "SELECT * FROM dummytable WHERE value < 250";
@@ -47,7 +57,26 @@ public class DriverUnitTest extends TestCase {
     super(name);
   }
   
-  public Blob selectBlob (Connection con, int key ) throws Exception {
+  /**
+   * Creates the directory structure for the database file and loads the JDBC driver.
+   * @param dbFile the database file name
+   * @throws Exception
+   */
+  protected void setupDatabaseFileAndJDBCDriver(String dbFile) throws Exception {
+	 // If the database file already exists, delete it, else create the parent directory for it.    
+	 File f = new File(dbFile);
+	 if ( f.exists() ) {
+	   f.delete();
+	 } else {
+		 if (null != f.getParent()) {
+	       f.getParentFile().mkdirs();
+		 }
+	 }    
+	 // Loads and registers the JDBC driver
+	 DriverManager.registerDriver((Driver)(Class.forName(driverName, true, getClass().getClassLoader()).newInstance()));
+  }
+  
+  public Blob selectBlob (Connection con, int key) throws Exception {
     PreparedStatement stmt = con.prepareStatement("SELECT value,key FROM blobtest where key = ?");
     stmt.setInt(1, key);
     ResultSet rs = stmt.executeQuery();
@@ -61,14 +90,11 @@ public class DriverUnitTest extends TestCase {
 
   /** Test the serialization of the various value objects. */
   public void testBlob () throws Exception {
-
-    DriverManager.registerDriver((Driver)(Class.forName(driverName, true, getClass().getClassLoader()).newInstance()));
-
-    File f = new File("blobtest");
-    if ( f.exists() ) {
-      f.delete();
-    }
-    Connection con = DriverManager.getConnection("jdbc:sqldroid:blobtest");
+    String dbName = "bolbtest.db";
+    String dbFile = DB_DIRECTORY + dbName;
+    setupDatabaseFileAndJDBCDriver(dbFile);
+    
+    Connection con = DriverManager.getConnection(JDBC_URL_PREFIX + dbFile);
 
     con.createStatement().execute("create table blobtest (key int, value blob)");
 
@@ -90,11 +116,12 @@ public class DriverUnitTest extends TestCase {
         "INSERT INTO blobtest(key,value) VALUES (101, '"+stringBlob+"')",
         "INSERT INTO blobtest(key,value) VALUES (?, ?)",
         "INSERT INTO blobtest(key,value) VALUES (?, ?)",
-    "INSERT INTO blobtest(key,value) VALUES (401, ?)"};
+        "INSERT INTO blobtest(key,value) VALUES (401, ?)"};
 
+    System.out.println("Insert statement is:" + blobInserts[0]);
     con.createStatement().execute(blobInserts[0]);
     Blob b = selectBlob(con, 101);
-    assertEquals ("String blob", stringBlob, new String(b.getBytes(0, (int)b.length())));
+    assertEquals ("String blob", stringBlob, new String(b.getBytes(1, (int)b.length())));
 
     PreparedStatement stmt = con.prepareStatement(blobInserts[1]);
     stmt.setInt(1, blobSize);
@@ -131,67 +158,310 @@ public class DriverUnitTest extends TestCase {
   }
 
   public void testCursors () throws Exception {
+	  String dbName = "cursortest.db";
+	  String dbFile = DB_DIRECTORY + dbName;
+	  setupDatabaseFileAndJDBCDriver(dbFile);
 
-      DriverManager.registerDriver((Driver)(Class.forName(driverName, true, getClass().getClassLoader()).newInstance()));
+	  Connection con = DriverManager.getConnection(JDBC_URL_PREFIX + dbFile);
 
-      File f = new File("cursortest");
-      if ( f.exists() ) {
-        f.delete();
-      }
-      Connection con = DriverManager.getConnection("jdbc:sqldroid:cursortest");
+	  con.createStatement().execute(createTable);
 
-      con.createStatement().execute(createTable);
+	  for ( String insertSQL : inserts ) {
+		  con.createStatement().execute(insertSQL);
+	  }
 
-      for ( String insertSQL : inserts ) {
-        con.createStatement().execute(insertSQL);
-      }
+	  ResultSet rs = con.createStatement().executeQuery("SELECT * FROM dummytable order by value");
+	  checkResultSet ( rs, false, true, false, false, false);
+	  rs.next();
+	  checkResultSet ( rs, false, false, false, true, false);  
+	  checkValues (rs, "Apple", 100);
+	  rs.next();
+	  checkResultSet ( rs, false, false, false, false, false);
+	  checkValues (rs, "Orange", 200);
+	  rs.next();
+	  checkResultSet ( rs, false, false, false, false, false);
+	  checkValues (rs, "Banana", 300);
+	  rs.next();  // to last
+	  checkResultSet ( rs, false, false, false, false, true);
+	  checkValues (rs, "Kiwi", 400);
+	  rs.next();  // after last
+	  checkResultSet ( rs, false, false, true, false, false);
+	  rs.first();
+	  checkResultSet ( rs, false, false, false, true, false);
+	  rs.last();
+	  checkResultSet ( rs, false, false, false, false, true);
+	  rs.afterLast();
+	  checkResultSet ( rs, false, false, true, false, false);
+	  rs.beforeFirst();
+	  checkResultSet ( rs, false, true, false, false, false);
+	  rs.close();
+	  checkResultSet ( rs, true, false, false, false, false);
+	  PreparedStatement stmt = con.prepareStatement("SELECT ?,? FROM dummytable order by ?");
+	  stmt.setString(1, "name");
+	  stmt.setString(2, "value");
+	  stmt.setString(3, "value");
+	  rs = stmt.executeQuery();
+	  assertTrue ("Executed", rs != null);
+	  rs.last();
+	  assertEquals("Enough rows ", 4, rs.getRow());
+	  rs.close();
 
-      ResultSet rs = con.createStatement().executeQuery("SELECT * FROM dummytable order by value");
-      checkResultSet ( rs, false, true, false, false, false);
-      rs.next();
-      checkResultSet ( rs, false, false, false, true, false);  
-      checkValues (rs, "Apple", 100);
-      rs.next();
-      checkResultSet ( rs, false, false, false, false, false);
-      checkValues (rs, "Orange", 200);
-      rs.next();
-      checkResultSet ( rs, false, false, false, false, false);
-      checkValues (rs, "Banana", 300);
-      rs.next();  // to last
-      checkResultSet ( rs, false, false, false, false, true);
-      checkValues (rs, "Kiwi", 400);
-      rs.next();  // after last
-      checkResultSet ( rs, false, false, true, false, false);
-      rs.first();
-      checkResultSet ( rs, false, false, false, true, false);
-      rs.last();
-      checkResultSet ( rs, false, false, false, false, true);
-      rs.afterLast();
-      checkResultSet ( rs, false, false, true, false, false);
-      rs.beforeFirst();
-      checkResultSet ( rs, false, true, false, false, false);
-      rs.close();
-      checkResultSet ( rs, true, false, false, false, false);
-      PreparedStatement stmt = con.prepareStatement("SELECT ?,? FROM dummytable order by ?");
-      stmt.setString(1, "name");
-      stmt.setString(2, "value");
-      stmt.setString(3, "value");
-      rs = stmt.executeQuery();
-      assertTrue ("Executed", rs != null);
-      rs.last();
-      assertEquals( "Enough rows ", 4, rs.getRow());
+	  // Add a null value for name
+	  con.createStatement().execute("INSERT INTO dummytable(name, value) VALUES(null, 500)");
 
-    }
+	  rs = con.createStatement().executeQuery("SELECT name, value FROM dummytable order by value");
+	  assertEquals("Name column position", 1, rs.findColumn("name"));
+	  assertEquals("Value column position", 2, rs.findColumn("value"));
+
+	  // In the first row, name is Apple and value is 100.
+	  assertTrue("Cursor on the first row", rs.first());
+	  assertEquals("Name in the first row using column name", "Apple", rs.getString("name"));
+	  assertFalse("Current name is null", rs.wasNull());
+	  assertEquals("Value in the first row using column name", 100, rs.getInt("value"));
+	  assertFalse("Current value is null", rs.wasNull());
+	  assertEquals("Name in the first row using column number", "Apple", rs.getString(1));
+	  assertEquals("Value in the first row using column number", 100, rs.getInt(2));
+	  assertFalse("Current value for Apple is null", rs.wasNull());
+
+	  // In the second row, name is Orange and value is 200.
+	  rs.next();
+	  assertEquals("Name in the second row using column name", "Orange", rs.getString("name"));
+	  assertEquals("Value in the second row using column name", 200, rs.getInt("value"));
+	  assertFalse("Current value for Banana is null", rs.wasNull());
+	  assertEquals("Name in the second row using column number", "Orange", rs.getString(1));
+	  assertEquals("Value in the second row using column number", 200, rs.getInt(2));
+	  assertFalse("Current value for Banana is null", rs.wasNull());
+
+	  // In the last row, name is null and value is 500.
+	  rs.last();
+	  assertEquals("Name in the last row using column name", null, rs.getString("name"));
+	  assertTrue("Current name is not null", rs.wasNull());
+	  assertEquals("Value in the last row using column name", 500, rs.getInt("value"));
+	  assertFalse("Current value is null", rs.wasNull());
+	  assertEquals("Name in the last row using column number", null, rs.getString(1));
+	  assertTrue("Current name is not null", rs.wasNull());
+	  assertEquals("Value in the last row using column number", 500, rs.getInt(2));
+	  assertFalse("Current value is null", rs.wasNull());
+
+	  rs.close();
+  }
+  
+  public void testResultSets() throws Exception {
+		String dbName = "resultsetstest.db";
+		String dbFile = DB_DIRECTORY + dbName;
+		setupDatabaseFileAndJDBCDriver(dbFile);
+	
+		Connection con = DriverManager.getConnection(JDBC_URL_PREFIX + dbFile);
+	
+		String createTableStatement = "CREATE TABLE dummytable (id int, aString VARCHAR(254), aByte byte, "
+				+ "aShort short, anInt int, aLong long, aBool boolean, aFloat float, aDouble, double, aText text)";
+		
+		final String[] insertStatements = {
+				"INSERT INTO dummytable(id, aString, aByte, aShort, anInt, aLong, aBool, aFloat, aDouble, aText) VALUES "
+						             + "(1, 'string1', 1,     1,      10,    100,   0,    1.0,    10.0,   'text1')",
+				"INSERT INTO dummytable(id, aString, aByte, aShort, anInt, aLong, aBool, aFloat, aDouble, aText) VALUES "
+						             + "(2, 'string2', 2,     2,     20,    200,   1,    2.0,    20.0,   'text2')",
+				"INSERT INTO dummytable(id, aString, aByte, aShort, anInt, aLong, aBool, aFloat, aDouble, aText) VALUES "
+						             + "(3, null,    null,   null,   30,    300,   0,    3.0,     30.0,   null)",
+				"INSERT INTO dummytable(id, aString, aByte, aShort, anInt, aLong, aBool, aFloat, aDouble, aText) VALUES "
+						             + "(4, 'string4', 4,     4,     null,  null,  null,   4.0,    40.0,  'text4')",
+				"INSERT INTO dummytable(id, aString, aByte, aShort, anInt, aLong, aBool, aFloat, aDouble, aText) VALUES "
+						             + "(5, 'string5', 5,     5,     50,    500,   1,     null,    null, 'text5')" };
+	
+		con.createStatement().execute(createTableStatement);
+		for (String insertSQL : insertStatements) {
+			con.createStatement().execute(insertSQL);
+		}
+	
+		ResultSet rs = con.createStatement().executeQuery(
+						"SELECT id, aString, aByte, aShort, anInt, aLong, aBool, aFloat, aDouble, aText FROM dummytable order by id");
+	
+		rs.first();
+		try {
+			rs.findColumn("blahblah");
+			fail("Should have thrown an IllegalArgumentException because of an non-existent column name blahblah");
+		} catch (IllegalArgumentException ex1) {
+			// OK
+		} catch (Exception e) {
+			fail("Only IllegalArgumentException expected for a non-existent column name blahblah");
+		}
+		
+		try {
+			rs.getString("blahblah");
+			fail("Should have thrown an IllegalArgumentException because of an non-existent column name blahblah");
+		} catch (IllegalArgumentException ex2) {
+			// OK
+		} catch (Exception e) {
+			fail("Only IllegalArgumentException expected for a non-existent column name blahblah");
+		}
+		
+		try {
+			rs.getByte("blahblah");
+			fail("Should have thrown an IllegalArgumentException because of an non-existent column name blahblah");
+		} catch (IllegalArgumentException ex2) {
+			// OK
+		} catch (Exception e) {
+			fail("Only IllegalArgumentException expected for a non-existent column name blahblah");
+		}
+		
+		try {
+			rs.getShort("blahblah");
+			fail("Should have thrown an IllegalArgumentException because of an non-existent column name blahblah");
+		} catch (IllegalArgumentException ex3) {
+			// OK
+		} catch (Exception e) {
+			fail("Only IllegalArgumentException expected for a non-existent column name blahblah");
+		}
+		
+		try {
+			rs.getInt("blahblah");
+			fail("Should have thrown an IllegalArgumentException because of an non-existent column name blahblah");
+		} catch (IllegalArgumentException ex4) {
+			// OK
+		} catch (Exception e) {
+			fail("Only IllegalArgumentException expected for a non-existent column name blahblah");
+		}
+		
+		try {
+			rs.getLong("blahblah");
+			fail("Should have thrown an IllegalArgumentException because of an non-existent column name blahblah");
+		} catch (IllegalArgumentException ex5) {
+			// OK
+		} catch (Exception e) {
+			fail("Only IllegalArgumentException expected for a non-existent column name blahblah");
+		}
+		
+		try {
+			rs.getBoolean("blahblah");
+			fail("Should have thrown an IllegalArgumentException because of an non-existent column name blahblah");
+		} catch (IllegalArgumentException ex6) {
+			// OK
+		} catch (Exception e) {
+			fail("Only IllegalArgumentException expected for a non-existent column name blahblah");
+		}
+		
+		try {
+			rs.getFloat("blahblah");
+			fail("Should have thrown an IllegalArgumentException because of an non-existent column name blahblah");
+		} catch (IllegalArgumentException ex7) {
+			// OK
+		} catch (Exception e) {
+			fail("Only IllegalArgumentException expected for a non-existent column name blahblah");
+		}
+		
+		try {
+			rs.getDouble("blahblah");
+			fail("Should have thrown an IllegalArgumentException because of an non-existent column name blahblah");
+		} catch (IllegalArgumentException ex8) {
+			// OK
+		} catch (Exception e) {
+			fail("Only IllegalArgumentException expected for a non-existent column name blahblah");
+		}
+		
+		try {
+			rs.getBlob("blahblah");
+			fail("Should have thrown an IllegalArgumentException because of an non-existent column name blahblah");
+		} catch (IllegalArgumentException ex9) {
+			// OK
+		} catch (Exception e) {
+			fail("Only IllegalArgumentException expected for a non-existent column name blahblah");
+		}
+		
+		try {
+			rs.getObject("blahblah");
+			fail("Should have thrown an IllegalArgumentException because of an non-existent column name blahblah");
+		} catch (IllegalArgumentException ex10) {
+			// OK
+		} catch (Exception e) {
+			fail("Only IllegalArgumentException expected for a non-existent column name blahblah");
+		}
+			
+		assertEquals("Value for id", 1, rs.getInt("id"));
+		assertEquals("Value for aString", "string1", rs.getString("aString"));
+		assertEquals("Value for aByte", 1, rs.getByte("aByte"));
+		assertEquals("Value for aShort", 1, rs.getShort("aShort"));
+		assertEquals("Value for anInt", 10, rs.getInt("anInt"));
+		assertEquals("Value for aLong", 100, rs.getLong("aLong"));
+		assertEquals("Value for aBool", false, rs.getBoolean("aBool"));
+	
+		// Compare strings to avoid Float precision problems
+		assertEquals("Value for aFloat", "1.0",
+				Float.valueOf(rs.getFloat("aFloat")).toString());
+		assertFalse("Current value for aFloat is null", rs.wasNull());
+	
+		assertEquals("Value for aDouble", 10.0, rs.getDouble("aDouble"));
+		assertFalse("Current value for aDouble is null", rs.wasNull());
+		assertEquals("Value for aText", "text1", rs.getString("aText"));
+	
+		rs.next(); // 2nd Row
+		// No values should be null in this row
+		assertEquals("Value for id", 2, rs.getInt(1));
+		assertEquals("Value for aString", "string2", rs.getString(2));
+		assertEquals("Value for aByte", 2, rs.getByte(3));
+		assertEquals("Value for aShort", 2, rs.getShort(4));
+		assertEquals("Value for anInt", 20, rs.getInt(5));
+		assertEquals("Value for aLong", 200, rs.getLong(6));
+		assertEquals("Value for aBool", true, rs.getBoolean(7));
+	
+		// Compare strings to avoid Float precision problems
+		assertEquals("Value for aFloat", "2.0",
+				Float.valueOf(rs.getFloat(8)).toString());
+		assertFalse("Current value for aFloat is null", rs.wasNull());
+	
+		assertEquals("Value for aDouble", 20.0, rs.getDouble(9));
+		assertFalse("Current value for aDouble is null", rs.wasNull());
+		assertEquals("Value for aText", "text2", rs.getString(10));
+		
+		rs.next(); // 3rd row
+		// Values for aString, aByte, aShort and aText should be null in this row 
+		assertEquals("Value for id", 3, rs.getInt(1));
+		assertEquals("Value for aString", null, rs.getString(2));
+		assertTrue("Current value for aStrnig is not null", rs.wasNull());
+		assertEquals("Value for aByte", null, rs.getString(3));
+		assertTrue("Current value for aByte is not null", rs.wasNull());
+		assertEquals("Value for aShort", null, rs.getString("aShort"));
+		assertTrue("Current value for aShort is not null", rs.wasNull());
+		assertEquals("Value for aText", null, rs.getString("aText"));
+		assertTrue("Current value for aText is not null", rs.wasNull());	
+	
+		rs.last(); // 5th row
+		// Values for aFloat and aDouble columns should be null in this row
+		assertEquals("Value for id", 5, rs.getInt(1));
+		assertEquals("Value for aString", "string5", rs.getString(2));
+		assertFalse("Current value is null", rs.wasNull());
+		assertEquals("Value for aBool", true, rs.getBoolean("aBool"));
+		assertFalse("Current value is null", rs.wasNull());
+	
+		// Compare strings to avoid Float precision problems
+		assertEquals("Value for aFloat", "0.0",
+				Float.valueOf(rs.getFloat("aFloat")).toString()); // a null float column value is returned as 0.0
+		
+		assertTrue("Current value for aFloat is not null", rs.wasNull());
+	
+		assertEquals("Value for aDouble", 0.0, rs.getDouble("aDouble")); // a null double column value is returned as 0.0
+		assertTrue("Current value for aDouble is not null", rs.wasNull());
+	
+		assertEquals("Enough rows ", insertStatements.length, rs.getRow());
+	
+		rs.previous(); // 4th row
+		// Values for anInt, aLong and aBool columns should be null in this row
+		assertEquals("Value for id", 4, rs.getInt(1));
+		rs.getInt("anInt");
+		assertTrue("Current value for anInt is not null", rs.wasNull());
+		rs.getLong("aLong");
+		assertTrue("Current value for aLong is not null", rs.wasNull());
+		rs.getBoolean("aBool");
+		assertTrue("Current value for aBool is not null", rs.wasNull());
+	
+		rs.close();
+  }
 
   public void testExecute () throws Exception {
-
-      DriverManager.registerDriver((Driver)(Class.forName(driverName, true, getClass().getClassLoader()).newInstance()));
-
-      File f = new File("cursortest");
-      if ( f.exists() ) {
-        f.delete();
-      }
-      Connection con = DriverManager.getConnection("jdbc:sqldroid:cursortest");
+	  String dbName = "executetest.db";
+	  String dbFile = DB_DIRECTORY + dbName;
+ 	  setupDatabaseFileAndJDBCDriver(dbFile);
+	    
+	  Connection con = DriverManager.getConnection(JDBC_URL_PREFIX + dbFile);
 
       con.createStatement().execute(createTable);
 
@@ -208,8 +478,7 @@ public class DriverUnitTest extends TestCase {
       boolean noMoreResults = ((statement.getMoreResults() == false) && (statement.getUpdateCount() == -1));
       assertTrue("Should  be no more results ", noMoreResults);
       assertNull ("Result Set should be non-null ", statement.getResultSet());
-      statement.close();
-      
+      statement.close();      
       
       statement = con.createStatement();
       hasResultSet = statement.execute("SELECT * FROM dummytable where name = 'fig'");  // no matching result
@@ -292,14 +561,11 @@ public class DriverUnitTest extends TestCase {
   }
 
   public void testMetaData () throws Exception {
-    // register the driver.
-    DriverManager.registerDriver((Driver)(Class.forName(driverName, true, getClass().getClassLoader()).newInstance()));
-
-    File f = new File("schematest");
-    if ( f.exists() ) {
-      f.delete();
-    }
-    Connection con = DriverManager.getConnection("jdbc:sqldroid:schematest");
+	  String dbName = "schematest.db";
+	  String dbFile = DB_DIRECTORY + dbName;
+ 	  setupDatabaseFileAndJDBCDriver(dbFile);
+	    
+	  Connection con = DriverManager.getConnection(JDBC_URL_PREFIX + dbFile);
 
     // drop the tables - database is new so this isn't necessary
     //    con.createStatement().execute("DROP TABLE PASTIMES");
@@ -398,19 +664,15 @@ public class DriverUnitTest extends TestCase {
     }
 
     rs.close();
-
-
   }
 
-  public void testAutoCommit() throws Exception {
-        String databasePath = "autocommit.db";
-                   
-        String jdbcURL = "jdbc:sqldroid:" + databasePath;           
-        Class.forName("org.sqldroid.SQLDroidDriver");
-        
-        // String jdbcURL = "jdbc:sqlite:" + databasePath;           
-        // Class.forName("SQLite.JDBCDriver");
-
+  public void testAutoCommit() throws Exception {  
+	    String dbName = "autocommittest.db";
+	    String dbFile = DB_DIRECTORY + dbName;
+ 	    setupDatabaseFileAndJDBCDriver(dbFile);
+	                   
+        String jdbcURL = JDBC_URL_PREFIX + dbFile;               
+ 
         Properties removeLocale = new Properties();
         removeLocale.put(SQLDroidDriver.ADDITONAL_DATABASE_FLAGS, android.database.sqlite.SQLiteDatabase.NO_LOCALIZED_COLLATORS);
         Connection conn1 = DriverManager.getConnection(jdbcURL,removeLocale);
@@ -454,14 +716,13 @@ public class DriverUnitTest extends TestCase {
         conn3.close();
 }
 
-
-
   public static Test suite () {
     TestSuite suite =  new TestSuite("SQLDroid Tests");
     suite.addTest(new DriverUnitTest("testAutoCommit"));
     suite.addTest(new DriverUnitTest("testBlob"));
     suite.addTest(new DriverUnitTest("testMetaData"));
     suite.addTest(new DriverUnitTest("testCursors"));
+    suite.addTest(new DriverUnitTest("testResultSets"));
     suite.addTest(new DriverUnitTest("testExecute"));
     return  suite;
   }
@@ -469,7 +730,7 @@ public class DriverUnitTest extends TestCase {
 
   /** Run the test cases by hand. */
   @SuppressWarnings({ "rawtypes", "unchecked" })
-public static void main(String[] argv) {
+  public static void main(String[] argv) {
       //junit.textui.TestRunner.run(DriverUnitTest.suite());
       try {
           Class clz = Class.forName("junit.textui.TestRunner");
