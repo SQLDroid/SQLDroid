@@ -1,30 +1,15 @@
 package org.sqldroid;
 
+import android.database.Cursor;
+
 import java.io.InputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
 import java.net.URL;
-import java.sql.Array;
-import java.sql.Blob;
-import java.sql.Clob;
-import java.sql.Date;
-import java.sql.NClob;
-import java.sql.Ref;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.RowId;
-import java.sql.SQLException;
-import java.sql.SQLWarning;
-import java.sql.SQLXML;
-import java.sql.Statement;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.sql.Types;
+import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Map;
-
-import android.database.Cursor;
 
 public class SQLDroidResultSet implements ResultSet {
   
@@ -45,8 +30,7 @@ public class SQLDroidResultSet implements ResultSet {
 
   @Override
   public boolean absolute(int row) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return false;
+      throw new UnsupportedOperationException();
   }
 
   @Override
@@ -71,13 +55,12 @@ public class SQLDroidResultSet implements ResultSet {
 
   @Override
   public void cancelRowUpdates() throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public void clearWarnings() throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-
+      throw new UnsupportedOperationException();
   }
 
   @Override
@@ -93,7 +76,7 @@ public class SQLDroidResultSet implements ResultSet {
 
   @Override
   public void deleteRow() throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+      throw new UnsupportedOperationException();
   }
 
   @Override
@@ -117,65 +100,55 @@ public class SQLDroidResultSet implements ResultSet {
 
   @Override
   public Array getArray(int colID) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return null;
+      throw new UnsupportedOperationException();
   }
 
 
   @Override
   public Array getArray(String colName) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return null;
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public InputStream getAsciiStream(int colID) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return null;
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public InputStream getAsciiStream(String columnName) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return null;
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public BigDecimal getBigDecimal(int colID) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return null;
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public BigDecimal getBigDecimal(String columnName) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public BigDecimal getBigDecimal(int colID, int scale)
   throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return null;
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public BigDecimal getBigDecimal(String columnName, int scale)
   throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return null;
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public InputStream getBinaryStream(int colID) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return null;
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public InputStream getBinaryStream(String columnName) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return null;
+      throw new UnsupportedOperationException();
   }
 
   @Override
@@ -245,62 +218,52 @@ public class SQLDroidResultSet implements ResultSet {
 
   @Override
   public Reader getCharacterStream(int colID) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return null;
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public Reader getCharacterStream(String columnName) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return null;
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public Clob getClob(int colID) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return null;
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public Clob getClob(String colName) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return null;
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public int getConcurrency() throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return 0;
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public String getCursorName() throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return null;
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public Date getDate(int colID) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return null;
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public Date getDate(String columnName) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return null;
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public Date getDate(int colID, Calendar cal) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return null;
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public Date getDate(String columnName, Calendar cal) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return null;
+      throw new UnsupportedOperationException();
   }
 
   @Override
@@ -321,14 +284,12 @@ public class SQLDroidResultSet implements ResultSet {
 
   @Override
   public int getFetchDirection() throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return 0;
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public int getFetchSize() throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return 0;
+      throw new UnsupportedOperationException();
   }
 
   @Override
@@ -414,41 +375,37 @@ public class SQLDroidResultSet implements ResultSet {
   @Override
   public Object getObject(int arg0, Map<String, Class<?>> arg1)
   throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return null;
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public Object getObject(String arg0, Map<String, Class<?>> arg1)
   throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return null;
+      throw new UnsupportedOperationException();
   }
 
   public <T> T getObject(int columnIndex, Class<T> clazz) throws SQLException {
-    // This method is entitled to throw if the conversion is not supported, so, 
+    // This method is entitled to throw if the conversion is not supported, so,
     // since we don't support any conversions we'll throw.
     // The only problem with this is that we're required to support certain conversion as specified in the docs.
-    throw new SQLException("Conversion not supported.  No conversions are supported.  This method will always throw."); 
+    throw new SQLException("Conversion not supported.  No conversions are supported.  This method will always throw.");
   }
 
   public <T> T getObject(String columnLabel, Class<T> clazz) throws SQLException {
-    // This method is entitled to throw if the conversion is not supported, so, 
+    // This method is entitled to throw if the conversion is not supported, so,
     // since we don't support any conversions we'll throw.
     // The only problem with this is that we're required to support certain conversion as specified in the docs.
-    throw new SQLException("Conversion not supported.  No conversions are supported.  This method will always throw."); 
+    throw new SQLException("Conversion not supported.  No conversions are supported.  This method will always throw.");
   }
 
   @Override
   public Ref getRef(int colID) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return null;
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public Ref getRef(String colName) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return null;
+      throw new UnsupportedOperationException();
   }
 
   @Override
@@ -479,8 +436,7 @@ public class SQLDroidResultSet implements ResultSet {
 
   @Override
   public Statement getStatement() throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return null;
+      throw new UnsupportedOperationException();
   }
 
   @Override
@@ -501,26 +457,22 @@ public class SQLDroidResultSet implements ResultSet {
 
   @Override
   public Time getTime(int colID) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return null;
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public Time getTime(String columnName) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return null;
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public Time getTime(int colID, Calendar cal) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return null;
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public Time getTime(String columnName, Calendar cal) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return null;
+      throw new UnsupportedOperationException();
   }
 
   @Override
@@ -563,14 +515,14 @@ public class SQLDroidResultSet implements ResultSet {
   @Override
   public Timestamp getTimestamp(int colID, Calendar cal)
   throws SQLException {
-    System.err.println(" ********************* not implemented correctly - Calendar is ignored. @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+    System.err.println(" ********************* SQLDroidResultSet.getTimestamp() not implemented correctly - Calendar is ignored.");
     return getTimestamp(colID);
   }
 
   @Override
   public Timestamp getTimestamp(String columnName, Calendar cal)
   throws SQLException {
-    System.err.println(" ********************* not implemented correctly - Calendar is ignored. @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+      System.err.println(" ********************* SQLDroidResultSet.getTimestamp() not implemented correctly - Calendar is ignored.");
     return getTimestamp(columnName);
   }
 
@@ -581,38 +533,32 @@ public class SQLDroidResultSet implements ResultSet {
 
   @Override
   public URL getURL(int colID) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return null;
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public URL getURL(String columnName) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return null;
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public InputStream getUnicodeStream(int colID) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return null;
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public InputStream getUnicodeStream(String columnName) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return null;
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public SQLWarning getWarnings() throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return null;
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public void insertRow() throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-
+      throw new UnsupportedOperationException();
   }
 
   @Override
@@ -674,14 +620,12 @@ public class SQLDroidResultSet implements ResultSet {
 
   @Override
   public void moveToCurrentRow() throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public void moveToInsertRow() throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-
+      throw new UnsupportedOperationException();
   }
 
   @Override
@@ -713,331 +657,301 @@ public class SQLDroidResultSet implements ResultSet {
 
   @Override
   public boolean relative(int rows) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return false;
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public boolean rowDeleted() throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return false;
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public boolean rowInserted() throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return false;
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public boolean rowUpdated() throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return false;
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public void setFetchDirection(int direction) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public void setFetchSize(int rows) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public void updateArray(int colID, Array x) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public void updateArray(String columnName, Array x) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public void updateAsciiStream(int colID, InputStream x, int length)
   throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public void updateAsciiStream(String columnName, InputStream x, int length)
   throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public void updateBigDecimal(int colID, BigDecimal x)
   throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public void updateBigDecimal(String columnName, BigDecimal x)
   throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public void updateBinaryStream(int colID, InputStream x, int length)
   throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public void updateBinaryStream(String columnName, InputStream x, int length)
   throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public void updateBlob(int colID, Blob x) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public void updateBlob(String columnName, Blob x) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public void updateBoolean(int colID, boolean x) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public void updateBoolean(String columnName, boolean x) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public void updateByte(int colID, byte x) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public void updateByte(String columnName, byte x) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public void updateBytes(int colID, byte[] x) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public void updateBytes(String columnName, byte[] x) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public void updateCharacterStream(int colID, Reader x, int length)
   throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public void updateCharacterStream(String columnName, Reader reader,
       int length) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public void updateClob(int colID, Clob x) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public void updateClob(String columnName, Clob x) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public void updateDate(int colID, Date x) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public void updateDate(String columnName, Date x) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public void updateDouble(int colID, double x) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public void updateDouble(String columnName, double x) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-
+      throw new UnsupportedOperationException();
   }
 
   @Override
   public void updateFloat(int colID, float x) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+    throw new UnsupportedOperationException();
 
   }
 
   @Override
   public void updateFloat(String columnName, float x) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+    throw new UnsupportedOperationException();
 
   }
 
   @Override
   public void updateInt(int colID, int x) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+    throw new UnsupportedOperationException();
 
   }
 
   @Override
   public void updateInt(String columnName, int x) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+    throw new UnsupportedOperationException();
 
   }
 
   @Override
   public void updateLong(int colID, long x) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+    throw new UnsupportedOperationException();
 
   }
 
   @Override
   public void updateLong(String columnName, long x) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+    throw new UnsupportedOperationException();
 
   }
 
   @Override
   public void updateNull(int colID) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+    throw new UnsupportedOperationException();
 
   }
 
   @Override
   public void updateNull(String columnName) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+    throw new UnsupportedOperationException();
 
   }
 
   @Override
   public void updateObject(int colID, Object x) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+    throw new UnsupportedOperationException();
 
   }
 
   @Override
   public void updateObject(String columnName, Object x) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+    throw new UnsupportedOperationException();
 
   }
 
   @Override
   public void updateObject(int colID, Object x, int scale)
   throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+    throw new UnsupportedOperationException();
 
   }
 
   @Override
   public void updateObject(String columnName, Object x, int scale)
   throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+    throw new UnsupportedOperationException();
 
   }
 
   @Override
   public void updateRef(int colID, Ref x) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+    throw new UnsupportedOperationException();
 
   }
 
   @Override
   public void updateRef(String columnName, Ref x) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+    throw new UnsupportedOperationException();
 
   }
 
   @Override
   public void updateRow() throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+    throw new UnsupportedOperationException();
 
   }
 
   @Override
   public void updateShort(int colID, short x) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+    throw new UnsupportedOperationException();
 
   }
 
   @Override
   public void updateShort(String columnName, short x) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+    throw new UnsupportedOperationException();
 
   }
 
   @Override
   public void updateString(int colID, String x) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+    throw new UnsupportedOperationException();
 
   }
 
   @Override
   public void updateString(String columnName, String x) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+    throw new UnsupportedOperationException();
 
   }
 
   @Override
   public void updateTime(int colID, Time x) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+    throw new UnsupportedOperationException();
 
   }
 
   @Override
   public void updateTime(String columnName, Time x) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+    throw new UnsupportedOperationException();
 
   }
 
   @Override
   public void updateTimestamp(int colID, Timestamp x)
   throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+    throw new UnsupportedOperationException();
 
   }
 
   @Override
   public void updateTimestamp(String columnName, Timestamp x)
   throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+    throw new UnsupportedOperationException();
   }
 
   @Override
@@ -1051,80 +965,67 @@ public class SQLDroidResultSet implements ResultSet {
 
   @Override
   public boolean isWrapperFor(Class<?> arg0) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return false;
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public <T> T unwrap(Class<T> arg0) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public int getHoldability() throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return 0;
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public Reader getNCharacterStream(int columnIndex) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public Reader getNCharacterStream(String columnLabel) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public NClob getNClob(int columnIndex) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public NClob getNClob(String columnLabel) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public String getNString(int columnIndex) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public String getNString(String columnLabel) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public RowId getRowId(int columnIndex) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public RowId getRowId(String columnLabel) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public SQLXML getSQLXML(int columnIndex) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public SQLXML getSQLXML(String columnLabel) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   @Override
@@ -1135,146 +1036,146 @@ public class SQLDroidResultSet implements ResultSet {
   @Override
   public void updateAsciiStream(int columnIndex, InputStream x)
   throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+    throw new UnsupportedOperationException();
 
   }
 
   @Override
   public void updateAsciiStream(String columnLabel, InputStream x)
   throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+    throw new UnsupportedOperationException();
 
   }
 
   @Override
   public void updateAsciiStream(int columnIndex, InputStream x, long length)
   throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+    throw new UnsupportedOperationException();
 
   }
 
   @Override
   public void updateAsciiStream(String columnLabel, InputStream x, long length)
   throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+    throw new UnsupportedOperationException();
 
   }
 
   @Override
   public void updateBinaryStream(int columnIndex, InputStream x)
   throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+    throw new UnsupportedOperationException();
 
   }
 
   @Override
   public void updateBinaryStream(String columnLabel, InputStream x)
   throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+    throw new UnsupportedOperationException();
 
   }
 
   @Override
   public void updateBinaryStream(int columnIndex, InputStream x, long length)
   throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+    throw new UnsupportedOperationException();
 
   }
 
   @Override
   public void updateBinaryStream(String columnLabel, InputStream x,
       long length) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+    throw new UnsupportedOperationException();
 
   }
 
   @Override
   public void updateBlob(int columnIndex, InputStream inputStream)
   throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+    throw new UnsupportedOperationException();
 
   }
 
   @Override
   public void updateBlob(String columnLabel, InputStream inputStream)
   throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+    throw new UnsupportedOperationException();
 
   }
 
   @Override
   public void updateBlob(int columnIndex, InputStream inputStream, long length)
   throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+    throw new UnsupportedOperationException();
 
   }
 
   @Override
   public void updateBlob(String columnLabel, InputStream inputStream,
       long length) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+    throw new UnsupportedOperationException();
 
   }
 
   @Override
   public void updateCharacterStream(int columnIndex, Reader x)
   throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+    throw new UnsupportedOperationException();
 
   }
 
   @Override
   public void updateCharacterStream(String columnLabel, Reader reader)
   throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+    throw new UnsupportedOperationException();
 
   }
 
   @Override
   public void updateCharacterStream(int columnIndex, Reader x, long length)
   throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+    throw new UnsupportedOperationException();
 
   }
 
   @Override
   public void updateCharacterStream(String columnLabel, Reader reader,
       long length) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+    throw new UnsupportedOperationException();
 
   }
 
   @Override
   public void updateClob(int columnIndex, Reader reader) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+    throw new UnsupportedOperationException();
 
   }
 
   @Override
   public void updateClob(String columnLabel, Reader reader)
   throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+    throw new UnsupportedOperationException();
 
   }
 
   @Override
   public void updateClob(int columnIndex, Reader reader, long length)
   throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+    throw new UnsupportedOperationException();
 
   }
 
   @Override
   public void updateClob(String columnLabel, Reader reader, long length)
   throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+    throw new UnsupportedOperationException();
 
   }
 
   @Override
   public void updateNCharacterStream(int columnIndex, Reader x)
   throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+    throw new UnsupportedOperationException();
 
   }
 

@@ -1,5 +1,6 @@
 package org.sqldroid;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.sql.Blob;
@@ -7,77 +8,65 @@ import java.sql.SQLException;
 
 public class SQLDroidBlob implements Blob {
 
-	byte [] b;
-	
-	public SQLDroidBlob(byte [] b) {
-		this.b = b;
+	private final byte[] bytes;
+
+	public SQLDroidBlob(byte [] bytes) {
+		this.bytes = bytes;
 	}
 	
 	@Override
 	public InputStream getBinaryStream() throws SQLException {
-		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-		return null;
+        return new ByteArrayInputStream(bytes);
 	}
 
 	@Override
 	public byte[] getBytes(long pos, int length) throws SQLException {
-		return b;
+		return bytes;
 	}
 
 	@Override
 	public long length() throws SQLException {
-		
-		return b.length;
+		return bytes.length;
 	}
 
 	@Override
 	public long position(Blob pattern, long start) throws SQLException {
-		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-		return 0;
+        throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public long position(byte[] pattern, long start) throws SQLException {
-		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-		return 0;
+        throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public OutputStream setBinaryStream(long pos) throws SQLException {
-		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-		return null;
+        throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public int setBytes(long pos, byte[] theBytes) throws SQLException {
-		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-		return 0;
+        throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public int setBytes(long pos, byte[] theBytes, int offset, int len)
-			throws SQLException {
-		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-		return 0;
+	public int setBytes(long pos, byte[] theBytes, int offset, int len) throws SQLException {
+        throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public void truncate(long len) throws SQLException {
-		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-
+        throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public void free() throws SQLException {
-		// TODO Auto-generated method stub
-		
+        throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public InputStream getBinaryStream(long pos, long length)
-			throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+	public InputStream getBinaryStream(long pos, long length) throws SQLException {
+        throw new UnsupportedOperationException();
 	}
 
   /** Print the length of the blob along with the first 10 characters.
@@ -86,7 +75,7 @@ public class SQLDroidBlob implements Blob {
   @Override
   public String toString() {
     StringBuffer sb = new StringBuffer();
-    if ( b == null ) {
+    if ( bytes == null ) {
       sb.append("Null Blob");
     }
     sb.append ("Blob length ");
@@ -103,12 +92,12 @@ public class SQLDroidBlob implements Blob {
     }
     for ( int counter = 0 ; counter < length ; counter++ ) {
       sb.append ("0x");
-      sb.append (Integer.toHexString(b[counter]));
+      sb.append (Integer.toHexString(bytes[counter]));
       sb.append(" ");
     }
     sb.append("(");
     for ( int counter = 0 ; counter < length ; counter++ ) {
-      sb.append (Character.toString((char)b[counter]));
+      sb.append (Character.toString((char) bytes[counter]));
       if ( counter == length-1 ) {
         sb.append(")");
       } else {
