@@ -6,3 +6,4 @@
 /target
 /lib/sqldroid/sqldroid-*.jar
 /sources_list.txt
+/*.iml
