@@ -4,6 +4,7 @@
     <artifactId>sqldroid</artifactId>
     <version>1.0.3-SNAPSHOT</version>
     <packaging>jar</packaging>
+    <name>sqldroid</name>
     <description>SQLite JDBC driver for Android &amp; now also for non-Android platforms</description>
     <url>https://github.com/SQLDroid/SQLDroid</url>
     <licenses>
