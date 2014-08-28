@@ -44,12 +44,12 @@ public class SQLDroidConnection implements Connection {
      * SQLException(Throwable theCause) otherwise false.
      * API levels 9 or greater have this constructor.
      * If the value is positive and less than 9 then the SQLException does not have the constructor.
-     * If the value is < 0 then the capabilities of SQLException have not been determined.
+     * If the value is &lt; 0 then the capabilities of SQLException have not been determined.
      */
     protected static int sqlThrowable = -1;
 
     /** Connect to the database with the given url and properties.
-     * 
+     *
      * @param url the URL string, typically something like
      * "jdbc:sqlite:/data/data/your-package/databasefilename" so for example:
      *  "jdbc:sqlite:/data/data/org.sqldroid.examples/databases/sqlite.db"
@@ -145,7 +145,7 @@ public class SQLDroidConnection implements Connection {
     }
 
     /** This will create and return an exception.  For API levels less than 9 this will return
-     * a SQLDroidSQLException, for later APIs it will return a SQLException. 
+     * a SQLDroidSQLException, for later APIs it will return a SQLException.
      */
     public static SQLException chainException(android.database.SQLException sqlException) {
         if ( sqlThrowable < 0 || sqlThrowable >= 9 ) {

@@ -1,5 +1,8 @@
 package org.sqldroid;
 
+import android.database.Cursor;
+import android.util.Log;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,14 +30,11 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import android.database.Cursor;
-import android.util.Log;
-
 public class SQLDroidPreparedStatement implements PreparedStatement {
 
   protected SQLiteDatabase db;
   protected SQLDroidConnection sqldroidConnection;
-  protected SQLDroidResultSet rs = null;	
+  protected SQLDroidResultSet rs = null;
   protected String sql;
   protected ArrayList<Object> l = new ArrayList<Object>();
   protected ArrayList<ArrayList<Object>> lBatch = new ArrayList<ArrayList<Object>>();
@@ -43,18 +43,18 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
   /** True if the sql statement is a select. */
   protected boolean isSelect;
 
-  /** True if the sql statement MAY produce a result set.  For example, "create" and "drop" command will 
+  /** True if the sql statement MAY produce a result set.  For example, "create" and "drop" command will
    * produce a "false" value for this. */
   protected boolean potentialResultSet;
 
   /** The update count.  We don't know this, but need to respond in such a way that:
    * (from getMoreResults) There are no more results when the following is true:
-   * 
+   *
    *      // stmt is a Statement object
-   *      ((stmt.getMoreResults() == false) && (stmt.getUpdateCount() == -1))
+   *      ((stmt.getMoreResults() == false) &amp;&amp; (stmt.getUpdateCount() == -1))
 
    * This is used by <code>getUpdateCount()</code>.  If there is a resultSet
-   * then getUpdateCount will return -1.  If there is no result set, then, presumably, 
+   * then getUpdateCount will return -1.  If there is no result set, then, presumably,
    * <code>execute()</code> was called and we have one result and so can return something
    * other than -1 on the first call to getUpdateCount.   In this case, the second call to getUpdateCount
    * we should return -1;
@@ -67,7 +67,7 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
     Log.v("SQLDRoid", "new SqlDRoid prepared statement from " + sqldroid);
     this.sqldroidConnection = sqldroid;
     this.db = sqldroid.getDb();
-    setSQL(sql); 
+    setSQL(sql);
   }
 
 
@@ -98,8 +98,8 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
 
   @Override
   public void addBatch(String sql) throws SQLException {
-    //sql must be a static sql 
-    setSQL(getSQL() + sql);  
+    //sql must be a static sql
+    setSQL(getSQL() + sql);
   }
 
   /**
@@ -220,7 +220,7 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
   public int executeUpdate() throws SQLException {
     // TODO we can't count the actual number of updates .... :S
     execute();
-    return updateCount;  
+    return updateCount;
   }
 
   @Override
@@ -261,15 +261,15 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
   }
 
   @Override
-  public int[] executeBatch() throws SQLException { 
+  public int[] executeBatch() throws SQLException {
     int[] results = new int[lBatch.size()];
     for(int i=0; i < lBatch.size(); i++) {
-      updateCount = -1;  
-      results[i] = EXECUTE_FAILED; 
+      updateCount = -1;
+      results[i] = EXECUTE_FAILED;
       db.execSQL(sql, lBatch.get(i).toArray());
       results[i] = db.changedRowCount();
       updateCount = results[i];
-    }    
+    }
     return results;
   }
 
@@ -411,14 +411,14 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
 
   /**Retrieves the current result as an update count; if the result is a ResultSet object or there are no more results, -1 is returned. This method should be called only once per result.
 	Returns:
-	the current result as an update count; -1 if the current result is a ResultSet object or there are no more results*/	
+	the current result as an update count; -1 if the current result is a ResultSet object or there are no more results*/
   @Override
   public int getUpdateCount() throws SQLException {
-    if ( updateCount != -1 ) {  // for any successful update/insert, update count will have been set 
+    if ( updateCount != -1 ) {  // for any successful update/insert, update count will have been set
       // the documenation states that you're only supposed to call this once per result.
       // on subsequent calls, we'll return -1 (which would appear to be the correct return
       int tmp = updateCount;
-      updateCount = -1;   
+      updateCount = -1;
       return tmp;
     }
     return updateCount;  // if the result was a result set, or this is the second call, then this will be -1
@@ -540,46 +540,46 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
         + DebugPrinter.getFileName() + " line "
         + DebugPrinter.getLineNumber());
   }
-  /** 
+  /**
    * Set the parameter from the contents of a binary stream.
    * @param parameterIndex the index of the parameter to set
    * @param inputStream the input stream from which a byte array will be read and set as the value.  If inputStream is null
    * this method will throw a SQLException
    * @param length a positive non-zero length values
-   * @exception SQLException thrown if the length is <= 0, the inputStream is null,
+   * @exception SQLException thrown if the length is &lt;= 0, the inputStream is null,
    * there is an IOException reading the inputStream or if "setBytes" throws a SQLException
    */
   @Override
    public void setBinaryStream(int parameterIndex, InputStream inputStream, int length) throws SQLException {
     if (length <= 0) {
-      throw new SQLException ("Invalid length " + length);    
+      throw new SQLException ("Invalid length " + length);
     }
     if (inputStream == null ) {
-      throw new SQLException ("Input Stream cannot be null");    
+      throw new SQLException ("Input Stream cannot be null");
     }
     final int bufferSize = 8192;
     byte[] buffer = new byte[bufferSize];
-    ByteArrayOutputStream outputStream = null;    
+    ByteArrayOutputStream outputStream = null;
     try {
       outputStream = new ByteArrayOutputStream();
       int bytesRemaining = length;
       int bytesRead;
       int maxReadSize;
       while (bytesRemaining > 0) {
-        maxReadSize = (bytesRemaining > bufferSize) ? bufferSize : bytesRemaining;            
+        maxReadSize = (bytesRemaining > bufferSize) ? bufferSize : bytesRemaining;
         bytesRead = inputStream.read(buffer, 0, maxReadSize);
         if (bytesRead == -1) { // inputStream exhausted
           break;
         }
         outputStream.write(buffer, 0, bytesRead);
-        bytesRemaining = bytesRemaining - bytesRead; 
+        bytesRemaining = bytesRemaining - bytesRead;
       }
       setBytes(parameterIndex, outputStream.toByteArray());
       outputStream.close();
     } catch (IOException e) {
       e.printStackTrace();
       throw new SQLException(e.getMessage());
-    } 
+    }
   }
 
   @Override
@@ -813,13 +813,13 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
 
   }
 
-  /** Read the byte stream and set the object as a byte[].  This is a pass through to 
+  /** Read the byte stream and set the object as a byte[].  This is a pass through to
    *     <code>setBinaryStream(parameterIndex, inputStream, Integer.MAX_VALUE);</code>
    * @see #setBinaryStream(int, InputStream, int)
    */
   @Override
   public void setBinaryStream(int parameterIndex, InputStream inputStream) throws SQLException {
-     setBinaryStream(parameterIndex, inputStream, Integer.MAX_VALUE); 
+     setBinaryStream(parameterIndex, inputStream, Integer.MAX_VALUE);
   }
 
 
@@ -936,7 +936,7 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
     // TODO Auto-generated method stub
 
   }
-  
+
   // methods added for JDK7 compilation
 
   public boolean isCloseOnCompletion() throws SQLException {

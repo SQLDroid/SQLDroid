@@ -1,12 +1,12 @@
 package org.sqldroid;
 
+import android.database.Cursor;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Statement;
-
-import android.database.Cursor;
 
 public class SQLDroidStatement implements Statement {
 
@@ -18,12 +18,12 @@ public class SQLDroidStatement implements Statement {
 
   /** The update count.  We don't know this, but need to respond in such a way that:
    * (from getMoreResults) There are no more results when the following is true:
-   * 
+   *
    *      // stmt is a Statement object
-   *      ((stmt.getMoreResults() == false) && (stmt.getUpdateCount() == -1))
+   *      ((stmt.getMoreResults() == false) &amp;&amp; (stmt.getUpdateCount() == -1))
 
    * This is used by <code>getUpdateCount()</code>.  If there is a resultSet
-   * then getUpdateCount will return -1.  If there is no result set, then, presumably, 
+   * then getUpdateCount will return -1.  If there is no result set, then, presumably,
    * <code>execute()</code> was called and we have one result and so can return something
    * other than -1 on the first call to getUpdateCount.   In this case, the second call to getUpdateCount
    * we should return -1;
@@ -39,7 +39,7 @@ public class SQLDroidStatement implements Statement {
 
   @Override
   public void addBatch(String sql) throws SQLException {
-    //sql must be a static sql  
+    //sql must be a static sql
     this.sqlBatch.append(sql);
   }
 
@@ -49,7 +49,7 @@ public class SQLDroidStatement implements Statement {
   }
 
   @Override
-  public void clearBatch() throws SQLException {    
+  public void clearBatch() throws SQLException {
     sqlBatch = new StringBuffer();
   }
 
@@ -77,7 +77,7 @@ public class SQLDroidStatement implements Statement {
   }
 
   @Override
-  /** Execute the SQL statement.  
+  /** Execute the SQL statement.
    * @return false if there are no result (if the request was not a select or similar).  True if a
    * result set is available.  This meets the requirement of java.sql.Statement.
    */
@@ -149,7 +149,7 @@ public class SQLDroidStatement implements Statement {
   }
 
   @Override
-  public int[] executeBatch() throws SQLException {     
+  public int[] executeBatch() throws SQLException {
     updateCount = -1;
     int[] results = new int[1];
     results[0] = EXECUTE_FAILED;
@@ -283,11 +283,11 @@ public class SQLDroidStatement implements Statement {
 
   @Override
   public int getUpdateCount() throws SQLException {
-    if ( updateCount != -1 ) {  // for any successful update/insert, update count will have been set 
+    if ( updateCount != -1 ) {  // for any successful update/insert, update count will have been set
       // the documenation states that you're only supposed to call this once per result.
       // on subsequent calls, we'll return -1 (which would appear to be the correct return
       int tmp = updateCount;
-      updateCount = -1;   
+      updateCount = -1;
       return tmp;
     }
     return updateCount;  // if the result was a result set, or this is the second call, then this will be -1
@@ -384,7 +384,7 @@ public class SQLDroidStatement implements Statement {
         + DebugPrinter.getLineNumber());
 
   }
-  
+
   // methods added for JDK7 compilation
 
   public boolean isCloseOnCompletion() throws SQLException {
