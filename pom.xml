@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.sqldroid</groupId>
     <artifactId>sqldroid</artifactId>
-    <version>1.0.4-SNAPSHOT</version>
+    <version>1.0.3-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>sqldroid</name>
     <description>SQLite JDBC driver for Android &amp; now also for non-Android platforms</description>
