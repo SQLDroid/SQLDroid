@@ -17,9 +17,23 @@ The SQLDroid JAR with the JDBC driver for Android is 33KB.  We also offer a Ruby
 
 ## Download
 
-A prebuilt JAR is available at
+You can use SQLDroid in you maven project by declaring this dependency:
 
-https://github.com/SQLDroid/SQLDroid/downloads
+```xml
+<dependency>
+    <groupId>org.sqldroid</groupId>
+    <artifactId>sqldroid</artifactId>
+    <version>1.0.3</version>
+</dependency>
+```
+
+Or if you're using gradle:
+
+```groovy
+compile 'org.sqldroid:sqldroid:1.0.3'
+```
+
+Binary distributions are available for download from the Maven Central Repository: http://search.maven.org/#search%7Cga%7C1%7Csqldroid
 
 ## Usage
 
