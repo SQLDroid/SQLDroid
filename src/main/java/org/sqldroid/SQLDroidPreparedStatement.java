@@ -134,7 +134,6 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
 
   @Override
   public void clearBatch() throws SQLException {
-    sql = "";
     lBatch = new ArrayList<ArrayList<Object>>();
   }
 
@@ -618,10 +617,8 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
 
   @Override
   public void setClob(int parameterIndex, Clob theClob) throws SQLException {
-    System.err.println(" ********************* not implemented @ "
-        + DebugPrinter.getFileName() + " line "
-        + DebugPrinter.getLineNumber());
-
+	  ensureCap(parameterIndex);
+	  setString(parameterIndex, theClob.getSubString(1L, (int)theClob.length()));
   }
 
   @Override
@@ -742,9 +739,7 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
   @Override
   public void setTimestamp(int parameterIndex, Timestamp theTimestamp, Calendar cal)
   throws SQLException {
-    System.err.println(" ********************* not implemented @ "
-        + DebugPrinter.getFileName() + " line "
-        + DebugPrinter.getLineNumber());
+    setTimestamp(parameterIndex, theTimestamp);
   }
 
   @Override
