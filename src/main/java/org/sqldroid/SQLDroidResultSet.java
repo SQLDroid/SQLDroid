@@ -1,5 +1,6 @@
 package org.sqldroid;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
@@ -257,14 +258,17 @@ public class SQLDroidResultSet implements ResultSet {
 
   @Override
   public Clob getClob(int colID) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return null;
+    String clobString = getString(colID);
+    if(clobString == null){
+    	return null;
+    }
+		return new SQLDroidClob(clobString);
   }
 
   @Override
   public Clob getClob(String colName) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return null;
+  	int index = findColumn(colName);
+  	return getClob(index);
   }
 
   @Override

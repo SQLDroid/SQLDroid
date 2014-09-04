@@ -2,12 +2,19 @@ package org.sqldroid;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.RowIdLifetime;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import android.database.Cursor;
 import android.database.MatrixCursor;
@@ -15,8 +22,17 @@ import android.database.MergeCursor;
 
 public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 
+	private static final int SQLITE_DONE       =  101;
 	private static final String VIEW_TYPE = "VIEW";
 	private static final String TABLE_TYPE = "TABLE";
+	
+	private PreparedStatement
+	getTableTypes        = null,   getCatalogs          = null,
+	getUDTs              = null,   getSuperTypes        = null,
+	getTablePrivileges   = null,   getProcedures        = null,
+	getProcedureColumns   = null,   getAttributes        = null,
+	getBestRowIdentifier  = null,   getVersionColumns    = null,
+	getColumnPrivileges   = null;
 	
 	SQLDroidConnection con;
     
@@ -26,49 +42,31 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 	
 	@Override
 	public boolean allProceduresAreCallable() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
 		return false;
 	}
 
 	@Override
 	public boolean allTablesAreSelectable() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return false;
+		return true;
 	}
 
 	@Override
 	public boolean dataDefinitionCausesTransactionCommit() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
 		return false;
 	}
 
 	@Override
 	public boolean dataDefinitionIgnoredInTransactions() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
 		return false;
 	}
 
 	@Override
 	public boolean deletesAreDetected(int type) throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
 		return false;
 	}
 
 	@Override
 	public boolean doesMaxRowSizeIncludeBlobs() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
 		return false;
 	}
 
@@ -76,52 +74,59 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 	public ResultSet getAttributes(String catalog, String schemaPattern,
 			String typeNamePattern, String attributeNamePattern)
 			throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return null;
+		if (getAttributes == null) {
+			getAttributes = con.prepareStatement("select null as TYPE_CAT, null as TYPE_SCHEM, " +
+					"null as TYPE_NAME, null as ATTR_NAME, null as DATA_TYPE, " +
+					"null as ATTR_TYPE_NAME, null as ATTR_SIZE, null as DECIMAL_DIGITS, " +
+					"null as NUM_PREC_RADIX, null as NULLABLE, null as REMARKS, null as ATTR_DEF, " +
+					"null as SQL_DATA_TYPE, null as SQL_DATETIME_SUB, null as CHAR_OCTET_LENGTH, " +
+					"null as ORDINAL_POSITION, null as IS_NULLABLE, null as SCOPE_CATALOG, " +
+					"null as SCOPE_SCHEMA, null as SCOPE_TABLE, null as SOURCE_DATA_TYPE limit 0;");
+		}
+
+		return getAttributes.executeQuery();
 	}
 
 	@Override
 	public ResultSet getBestRowIdentifier(String catalog, String schema,
 			String table, int scope, boolean nullable) throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return null;
+		if (getBestRowIdentifier == null) {
+			getBestRowIdentifier = con.prepareStatement("select null as SCOPE, null as COLUMN_NAME, " +
+					"null as DATA_TYPE, null as TYPE_NAME, null as COLUMN_SIZE, " +
+					"null as BUFFER_LENGTH, null as DECIMAL_DIGITS, null as PSEUDO_COLUMN limit 0;");
+		}
+
+		return getBestRowIdentifier.executeQuery();
 	}
 
 	@Override
 	public String getCatalogSeparator() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return null;
+		return ".";
 	}
 
 	@Override
-	public String getCatalogTerm() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return null;
+	public String getCatalogTerm() {
+		return "catalog";
 	}
 
 	@Override
 	public ResultSet getCatalogs() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return null;
+		if (getCatalogs == null) {
+			getCatalogs = con.prepareStatement("select null as TABLE_CAT limit 0;");
+		}
+
+		return getCatalogs.executeQuery();
 	}
 
 	@Override
-	public ResultSet getColumnPrivileges(String catalog, String schema,
-			String table, String columnNamePattern) throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return null;
+	public ResultSet getColumnPrivileges(String c, String s, String t, String colPat) throws SQLException {
+		if (getColumnPrivileges == null) {
+			getColumnPrivileges = con.prepareStatement("select null as TABLE_CAT, null as TABLE_SCHEM, " +
+					"null as TABLE_NAME, null as COLUMN_NAME, null as GRANTOR, null as GRANTEE, " +
+					"null as PRIVILEGE, null as IS_GRANTABLE limit 0;");
+		}
+
+		return getColumnPrivileges.executeQuery();
 	}
 
 	@Override
@@ -271,22 +276,29 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 
 	@Override
 	public Connection getConnection() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return null;
+		return con;
 	}
 
 	@Override
-	public ResultSet getCrossReference(String primaryCatalog,
-			String primarySchema, String primaryTable, String foreignCatalog,
-			String foreignSchema, String foreignTable) throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return null;
-	}
+	public ResultSet getCrossReference(String pc, String ps, String pt, String fc, String fs, String ft) throws SQLException {
+		if (pt == null) {
+			return getExportedKeys(fc, fs, ft);
+		}
 
+		if (ft == null) {
+			return getImportedKeys(pc, ps, pt);
+		}
+
+		StringBuilder query = new StringBuilder();
+		query.append("select ").append(quote(pc)).append(" as PKTABLE_CAT, ")
+		.append(quote(ps)).append(" as PKTABLE_SCHEM, ").append(quote(pt)).append(" as PKTABLE_NAME, ")
+		.append("'' as PKCOLUMN_NAME, ").append(quote(fc)).append(" as FKTABLE_CAT, ")
+		.append(quote(fs)).append(" as FKTABLE_SCHEM, ").append(quote(ft)).append(" as FKTABLE_NAME, ")
+		.append("'' as FKCOLUMN_NAME, -1 as KEY_SEQ, 3 as UPDATE_RULE, 3 as DELETE_RULE, '' as FK_NAME, '' as PK_NAME, ")
+		.append(Integer.toString(importedKeyInitiallyDeferred)).append(" as DEFERRABILITY limit 0 ");
+
+		return con.createStatement().executeQuery(query.toString());
+	}
 	@Override
 	public int getDatabaseMajorVersion() throws SQLException {
 		return con.getDb().getSqliteDatabase().getVersion();
@@ -294,15 +306,11 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 
 	@Override
 	public int getDatabaseMinorVersion() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
 		return 0;
 	}
 
 	@Override
 	public String getDatabaseProductName() throws SQLException {
-		
 		return "SQLite for Android";
 	}
 
@@ -313,15 +321,12 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 
 	@Override
 	public int getDefaultTransactionIsolation() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return 0;
+		return Connection.TRANSACTION_SERIALIZABLE;
 	}
 
 	@Override
 	public int getDriverMajorVersion() {
-		return 0;
+		return 1;
 	}
 
 	@Override
@@ -331,7 +336,6 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 
 	@Override
 	public String getDriverName() throws SQLException {
-		
 		return "SQLDroid";
 	}
 
@@ -340,231 +344,412 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 		return "0.0.1 alpha";
 	}
 
+	private final static Map<String, Integer> RULE_MAP = new HashMap<String, Integer>();
+
+	static {
+		RULE_MAP.put("NO ACTION", importedKeyNoAction);
+		RULE_MAP.put("CASCADE", importedKeyCascade);
+		RULE_MAP.put("RESTRICT", importedKeyRestrict);
+		RULE_MAP.put("SET NULL", importedKeySetNull);
+		RULE_MAP.put("SET DEFAULT", importedKeySetDefault);
+	}
+
+	/**
+	 * Pattern used to extract a named primary key.
+	 */
+	protected final static Pattern FK_NAMED_PATTERN =
+			Pattern.compile(".* constraint +(.*?) +foreign +key *\\((.*?)\\).*", Pattern.CASE_INSENSITIVE);
+
+	/**
+	 * Pattern used to extract column order for an unnamed primary key.
+	 */
+	protected final static Pattern PK_UNNAMED_PATTERN =
+			Pattern.compile(".* primary +key *\\((.*?,+.*?)\\).*", Pattern.CASE_INSENSITIVE);
+
+	/**
+	 * Pattern used to extract a named primary key.
+	 */
+	protected final static Pattern PK_NAMED_PATTERN =
+			Pattern.compile(".* constraint +(.*?) +primary +key *\\((.*?)\\).*", Pattern.CASE_INSENSITIVE);
+
+	
 	@Override
 	public ResultSet getExportedKeys(String catalog, String schema, String table)
 			throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return null;
+		PrimaryKeyFinder pkFinder = new PrimaryKeyFinder(table);
+		String[] pkColumns = pkFinder.getColumns();
+		Statement stat = con.createStatement();
+
+		catalog = (catalog != null) ? quote(catalog) : null;
+		schema = (schema != null) ? quote(schema) : null;
+
+		StringBuilder exportedKeysQuery = new StringBuilder(512);
+
+		int count = 0;
+		if (pkColumns != null) {
+			// retrieve table list
+			ResultSet rs = stat.executeQuery("select name from sqlite_master where type = 'table'");
+			ArrayList<String> tableList = new ArrayList<String>();
+
+			while (rs.next()) {
+				tableList.add(rs.getString(1));
+			}
+
+			rs.close();
+
+			ResultSet fk = null;
+			String target = table.toLowerCase();
+			// find imported keys for each table
+			for (String tbl : tableList) {
+				try {
+					fk = stat.executeQuery("pragma foreign_key_list('" + escape(tbl) + "')");
+				} catch (SQLException e) {
+					if (e.getErrorCode() == SQLITE_DONE)
+						continue; // expected if table has no foreign keys
+
+					throw e;
+				}
+
+				Statement stat2 = null;
+				try {
+					stat2 = con.createStatement();
+
+					while(fk.next()) {
+						int keySeq = fk.getInt(2) + 1;
+						String PKTabName = fk.getString(3).toLowerCase();
+
+						if (PKTabName == null || !PKTabName.equals(target)) {
+							continue;
+						}
+
+						String PKColName = fk.getString(5);
+						PKColName = (PKColName == null) ? pkColumns[0] : PKColName.toLowerCase();
+
+						exportedKeysQuery
+						.append(count > 0 ? " union all select " : "select ")
+						.append(Integer.toString(keySeq)).append(" as ks, lower('")
+						.append(escape(tbl)).append("') as fkt, lower('")
+						.append(escape(fk.getString(4))).append("') as fcn, '")
+						.append(escape(PKColName)).append("' as pcn, ")
+						.append(RULE_MAP.get(fk.getString(6))).append(" as ur, ")
+						.append(RULE_MAP.get(fk.getString(7))).append(" as dr, ");
+
+						rs = stat2.executeQuery("select sql from sqlite_master where" +
+								" lower(name) = lower('" + escape(tbl) + "')");
+
+						if (rs.next()) {
+							Matcher matcher = FK_NAMED_PATTERN.matcher(rs.getString(1));
+
+							if (matcher.find()){
+								exportedKeysQuery.append("'").append(escape(matcher.group(1).toLowerCase())).append("' as fkn");
+							}
+							else {
+								exportedKeysQuery.append("'' as fkn");
+							}
+						}
+
+						rs.close();
+						count++;
+					}
+				}
+				finally {
+					try{
+						if (rs != null) rs.close();
+					}catch(SQLException e) {}
+					try{
+						if (stat2 != null) stat2.close();
+					}catch(SQLException e) {}
+					try{
+						if (fk != null) fk.close();
+					}catch(SQLException e) {}
+				}
+			}
+		}
+
+		boolean hasImportedKey = (count > 0);
+		StringBuilder sql = new StringBuilder(512);
+		sql.append("select ")
+		.append(catalog).append(" as PKTABLE_CAT, ")
+		.append(schema).append(" as PKTABLE_SCHEM, ")
+		.append(quote(table)).append(" as PKTABLE_NAME, ")
+		.append(hasImportedKey ? "pcn" : "''").append(" as PKCOLUMN_NAME, ")
+		.append(catalog).append(" as FKTABLE_CAT, ")
+		.append(schema).append(" as FKTABLE_SCHEM, ")
+		.append(hasImportedKey ? "fkt" : "''").append(" as FKTABLE_NAME, ")
+		.append(hasImportedKey ? "fcn" : "''").append(" as FKCOLUMN_NAME, ")
+		.append(hasImportedKey ? "ks" : "-1").append(" as KEY_SEQ, ")
+		.append(hasImportedKey ? "ur" : "3").append(" as UPDATE_RULE, ")
+		.append(hasImportedKey ? "dr" : "3").append(" as DELETE_RULE, ")
+		.append(hasImportedKey ? "fkn" : "''").append(" as FK_NAME, ")
+		.append(pkFinder.getName() != null ? pkFinder.getName() : "''").append(" as PK_NAME, ")
+		.append(Integer.toString(importedKeyInitiallyDeferred)) // FIXME: Check for pragma foreign_keys = true ?
+		.append(" as DEFERRABILITY ");
+
+		if (hasImportedKey) {
+			sql.append("from (").append(exportedKeysQuery).append(") order by fkt");
+		}
+		else {
+			sql.append("limit 0");
+		}
+
+		return stat.executeQuery(sql.toString());
 	}
 
 	@Override
 	public String getExtraNameCharacters() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return null;
+		return "";
 	}
 
 	@Override
 	public String getIdentifierQuoteString() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return null;
+		return " ";
 	}
 
 	@Override
 	public ResultSet getImportedKeys(String catalog, String schema, String table)
 			throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return null;
+		ResultSet rs = null;
+		Statement stat = con.createStatement();
+		StringBuilder sql = new StringBuilder(700);
+
+		sql.append("select ").append(quote(catalog)).append(" as PKTABLE_CAT, ")
+		.append(quote(schema)).append(" as PKTABLE_SCHEM, ")
+		.append("ptn as PKTABLE_NAME, pcn as PKCOLUMN_NAME, ")
+		.append(quote(catalog)).append(" as FKTABLE_CAT, ")
+		.append(quote(schema)).append(" as FKTABLE_SCHEM, ")
+		.append(quote(table)).append(" as FKTABLE_NAME, ")
+		.append("fcn as FKCOLUMN_NAME, ks as KEY_SEQ, ur as UPDATE_RULE, dr as DELETE_RULE, '' as FK_NAME, '' as PK_NAME, ")
+		.append(Integer.toString(importedKeyInitiallyDeferred)).append(" as DEFERRABILITY from (");
+
+		// Use a try catch block to avoid "query does not return ResultSet" error
+		try {
+			rs = stat.executeQuery("pragma foreign_key_list('" + escape(table) + "');");
+		}
+		catch (SQLException e) {
+			sql.append("select -1 as ks, '' as ptn, '' as fcn, '' as pcn, ")
+			.append(importedKeyNoAction).append(" as ur, ")
+			.append(importedKeyNoAction).append(" as dr) limit 0;");
+
+			return stat.executeQuery(sql.toString());
+		}
+
+		boolean rsHasNext = false;
+		
+		for (int i = 0; rs.next(); i++) {
+			rsHasNext = true;
+			int keySeq = rs.getInt(2) + 1;
+			String PKTabName = rs.getString(3);
+			String FKColName = rs.getString(4);
+			String PKColName = rs.getString(5);
+
+			if (PKColName == null) {
+				PKColName = new PrimaryKeyFinder(PKTabName).getColumns()[0];
+			}
+
+			String updateRule = rs.getString(6);
+			String deleteRule = rs.getString(7);
+
+			if (i > 0) {
+				sql.append(" union all ");
+			}
+
+			sql.append("select ").append(keySeq).append(" as ks,")
+			.append("'").append(escape(PKTabName)).append("' as ptn, '")
+			.append(escape(FKColName)).append("' as fcn, '")
+			.append(escape(PKColName)).append("' as pcn,")
+			.append("case '").append(escape(updateRule)).append("'")
+			.append(" when 'NO ACTION' then ").append(importedKeyNoAction)
+			.append(" when 'CASCADE' then ").append(importedKeyCascade)
+			.append(" when 'RESTRICT' then ").append(importedKeyRestrict)
+			.append(" when 'SET NULL' then ").append(importedKeySetNull)
+			.append(" when 'SET DEFAULT' then ").append(importedKeySetDefault).append(" end as ur, ")
+			.append("case '").append(escape(deleteRule)).append("'")
+			.append(" when 'NO ACTION' then ").append(importedKeyNoAction)
+			.append(" when 'CASCADE' then ").append(importedKeyCascade)
+			.append(" when 'RESTRICT' then ").append(importedKeyRestrict)
+			.append(" when 'SET NULL' then ").append(importedKeySetNull)
+			.append(" when 'SET DEFAULT' then ").append(importedKeySetDefault).append(" end as dr");
+		}
+		rs.close();
+		
+		if(!rsHasNext){
+			sql.append("select -1 as ks, '' as ptn, '' as fcn, '' as pcn, ")
+			.append(importedKeyNoAction).append(" as ur, ")
+			.append(importedKeyNoAction).append(" as dr) limit 0;");
+		}
+
+		return stat.executeQuery(sql.append(");").toString());
 	}
 
 	@Override
 	public ResultSet getIndexInfo(String catalog, String schema, String table,
 			boolean unique, boolean approximate) throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return null;
+		ResultSet rs = null;
+		Statement stat = con.createStatement();
+		StringBuilder sql = new StringBuilder(500);
+
+		sql.append("select null as TABLE_CAT, null as TABLE_SCHEM, '")
+		.append(escape(table)).append("' as TABLE_NAME, un as NON_UNIQUE, null as INDEX_QUALIFIER, n as INDEX_NAME, ")
+		.append(Integer.toString(tableIndexOther)).append(" as TYPE, op as ORDINAL_POSITION, ")
+		.append("cn as COLUMN_NAME, null as ASC_OR_DESC, 0 as CARDINALITY, 0 as PAGES, null as FILTER_CONDITION from (");
+
+		// Use a try catch block to avoid "query does not return ResultSet" error
+		try {
+			rs = stat.executeQuery("pragma index_list('" + escape(table) + "');");
+		}
+		catch (SQLException e) {
+			sql.append("select null as un, null as n, null as op, null as cn) limit 0;");
+
+			return stat.executeQuery(sql.toString());
+		}
+
+		ArrayList<ArrayList<Object>> indexList = new ArrayList<ArrayList<Object>>();
+		while (rs.next()) {
+			indexList.add(new ArrayList<Object>());
+			indexList.get(indexList.size() - 1).add(rs.getString(2));
+			indexList.get(indexList.size() - 1).add(rs.getInt(3));
+		}
+		rs.close();
+
+		int i = 0;
+		Iterator<ArrayList<Object>> indexIterator = indexList.iterator();
+		ArrayList<Object> currentIndex;
+
+		while (indexIterator.hasNext()) {
+			currentIndex = indexIterator.next();
+			String indexName = currentIndex.get(0).toString();
+			rs = stat.executeQuery("pragma index_info('" + escape(indexName) + "');");
+
+			while(rs.next()) {
+				if (i++ > 0) {
+					sql.append(" union all ");
+				}
+
+				sql.append("select ").append(Integer.toString(1 - (Integer)currentIndex.get(1))).append(" as un,'")
+				.append(escape(indexName)).append("' as n,")
+				.append(Integer.toString(rs.getInt(1) + 1)).append(" as op,'")
+				.append(escape(rs.getString(3))).append("' as cn");
+			}
+
+			rs.close();
+		}
+
+		return stat.executeQuery(sql.append(");").toString());
 	}
 
 	@Override
 	public int getJDBCMajorVersion() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return 0;
+		return 2;
 	}
 
 	@Override
 	public int getJDBCMinorVersion() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return 0;
+		return 1;
 	}
 
 	@Override
 	public int getMaxBinaryLiteralLength() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
 		return 0;
 	}
 
 	@Override
 	public int getMaxCatalogNameLength() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
 		return 0;
 	}
 
 	@Override
 	public int getMaxCharLiteralLength() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
 		return 0;
 	}
 
 	@Override
 	public int getMaxColumnNameLength() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
 		return 0;
 	}
 
 	@Override
 	public int getMaxColumnsInGroupBy() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
 		return 0;
 	}
 
 	@Override
 	public int getMaxColumnsInIndex() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
 		return 0;
 	}
 
 	@Override
 	public int getMaxColumnsInOrderBy() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
 		return 0;
 	}
 
 	@Override
-	public int getMaxColumnsInSelect() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
+	public int getMaxColumnsInSelect() {
 		return 0;
 	}
 
 	@Override
-	public int getMaxColumnsInTable() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
+	public int getMaxColumnsInTable() {
 		return 0;
 	}
 
 	@Override
-	public int getMaxConnections() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
+	public int getMaxConnections() {
 		return 0;
 	}
 
 	@Override
-	public int getMaxCursorNameLength() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
+	public int getMaxCursorNameLength() {
 		return 0;
 	}
 
 	@Override
-	public int getMaxIndexLength() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
+	public int getMaxIndexLength() {
 		return 0;
 	}
 
 	@Override
-	public int getMaxProcedureNameLength() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
+	public int getMaxProcedureNameLength() {
 		return 0;
 	}
 
 	@Override
-	public int getMaxRowSize() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
+	public int getMaxRowSize() {
 		return 0;
 	}
 
 	@Override
-	public int getMaxSchemaNameLength() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
+	public int getMaxSchemaNameLength() {
 		return 0;
 	}
 
 	@Override
-	public int getMaxStatementLength() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
+	public int getMaxStatementLength() {
 		return 0;
 	}
 
 	@Override
-	public int getMaxStatements() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
+	public int getMaxStatements() {
 		return 0;
 	}
 
 	@Override
-	public int getMaxTableNameLength() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
+	public int getMaxTableNameLength() {
 		return 0;
 	}
 
 	@Override
-	public int getMaxTablesInSelect() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
+	public int getMaxTablesInSelect() {
 		return 0;
 	}
 
 	@Override
-	public int getMaxUserNameLength() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
+	public int getMaxUserNameLength() {
 		return 0;
 	}
 
 	@Override
 	public String getNumericFunctions() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return null;
+		return "";
 	}
 
 	@Override
@@ -589,62 +774,52 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 	}
 
 	@Override
-	public ResultSet getProcedureColumns(String catalog, String schemaPattern,
-			String procedureNamePattern, String columnNamePattern)
-			throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return null;
+	public ResultSet getProcedureColumns(String c, String s, String p, String colPat) throws SQLException {
+		if (getProcedures == null) {
+			getProcedureColumns = con.prepareStatement("select null as PROCEDURE_CAT, " +
+					"null as PROCEDURE_SCHEM, null as PROCEDURE_NAME, null as COLUMN_NAME, " +
+					"null as COLUMN_TYPE, null as DATA_TYPE, null as TYPE_NAME, null as PRECISION, " +
+					"null as LENGTH, null as SCALE, null as RADIX, null as NULLABLE, " +
+					"null as REMARKS limit 0;");
+		}
+		return getProcedureColumns.executeQuery();
+
 	}
 
 	@Override
 	public String getProcedureTerm() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return null;
+		return "not_implemented";
 	}
 
 	@Override
 	public ResultSet getProcedures(String catalog, String schemaPattern,
 			String procedureNamePattern) throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return null;
+		if (getProcedures == null) {
+			getProcedures = con.prepareStatement("select null as PROCEDURE_CAT, null as PROCEDURE_SCHEM, " +
+					"null as PROCEDURE_NAME, null as UNDEF1, null as UNDEF2, null as UNDEF3, " +
+					"null as REMARKS, null as PROCEDURE_TYPE limit 0;");
+		}
+		return getProcedures.executeQuery();
 	}
 
 	@Override
 	public int getResultSetHoldability() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return 0;
+		return ResultSet.CLOSE_CURSORS_AT_COMMIT;
 	}
 
 	@Override
 	public String getSQLKeywords() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return null;
+		return "";
 	}
 
 	@Override
 	public int getSQLStateType() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return 0;
+		return sqlStateSQL99;
 	}
 
 	@Override
 	public String getSchemaTerm() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return null;
+		return "schema";
 	}
 
 	@Override
@@ -657,67 +832,71 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 
 	@Override
 	public String getSearchStringEscape() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
 		return null;
 	}
 
 	@Override
 	public String getStringFunctions() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return null;
+		return "";
 	}
 
 	@Override
 	public ResultSet getSuperTables(String catalog, String schemaPattern,
 			String tableNamePattern) throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return null;
+		if (getSuperTypes == null) {
+			getSuperTypes = con.prepareStatement("select null as TYPE_CAT, null as TYPE_SCHEM, " +
+					"null as TYPE_NAME, null as SUPERTYPE_CAT, null as SUPERTYPE_SCHEM, " +
+					"null as SUPERTYPE_NAME limit 0;");
+		}
+		return getSuperTypes.executeQuery();
 	}
 
 	@Override
 	public ResultSet getSuperTypes(String catalog, String schemaPattern,
 			String typeNamePattern) throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return null;
+		if (getSuperTypes == null) {
+			getSuperTypes = con.prepareStatement("select null as TYPE_CAT, null as TYPE_SCHEM, " +
+					"null as TYPE_NAME, null as SUPERTYPE_CAT, null as SUPERTYPE_SCHEM, " +
+					"null as SUPERTYPE_NAME limit 0;");
+		}
+		return getSuperTypes.executeQuery();
 	}
 
 	@Override
 	public String getSystemFunctions() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return null;
+		return "";
 	}
 
 	@Override
 	public ResultSet getTablePrivileges(String catalog, String schemaPattern,
 			String tableNamePattern) throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return null;
+		if (getTablePrivileges == null) {
+			getTablePrivileges = con.prepareStatement("select  null as TABLE_CAT, "
+					+ "null as TABLE_SCHEM, null as TABLE_NAME, null as GRANTOR, null "
+					+ "GRANTEE,  null as PRIVILEGE, null as IS_GRANTABLE limit 0;");
+		}
+		return getTablePrivileges.executeQuery();
 	}
 
 	@Override
 	public ResultSet getTableTypes() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return null;
+		checkOpen();
+		if (getTableTypes == null) {
+			getTableTypes = con.prepareStatement("select 'TABLE' as TABLE_TYPE "
+					+ "union select 'VIEW' as TABLE_TYPE;");
+		}
+		getTableTypes.clearParameters();
+		return getTableTypes.executeQuery();
 	}
 
 	@Override
 	public ResultSet getTables(String catalog, String schemaPattern,
 			String tableNamePattern, String[] types) throws SQLException {
 
+		if(tableNamePattern == null){
+			tableNamePattern = "%";
+		}
+		
 	  if ( types == null ) {
 	    types = new String[] {TABLE_TYPE};
 	  }
@@ -778,40 +957,37 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 
 	@Override
 	public String getTimeDateFunctions() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return null;
+		return "";
 	}
 
-    public ResultSet getTypeInfo() throws SQLException {
-        String sql = "select "
-                + "tn as TYPE_NAME, "
-                + "dt as DATA_TYPE, "
-                + "0 as PRECISION, "
-                + "null as LITERAL_PREFIX, "
-                + "null as LITERAL_SUFFIX, "
-                + "null as CREATE_PARAMS, "
-                + typeNullable + " as NULLABLE, "
-                + "1 as CASE_SENSITIVE, "
-                + typeSearchable + " as SEARCHABLE, "
-                + "0 as UNSIGNED_ATTRIBUTE, "
-                + "0 as FIXED_PREC_SCALE, "
-                + "0 as AUTO_INCREMENT, "
-                + "null as LOCAL_TYPE_NAME, "
-                + "0 as MINIMUM_SCALE, "
-                + "0 as MAXIMUM_SCALE, "
-                + "0 as SQL_DATA_TYPE, "
-                + "0 as SQL_DATETIME_SUB, "
-                + "10 as NUM_PREC_RADIX from ("
-                + "    select 'BLOB' as tn, " + Types.BLOB + " as dt union"
-                + "    select 'NULL' as tn, " + Types.NULL + " as dt union"
-                + "    select 'REAL' as tn, " + Types.REAL+ " as dt union"
-                + "    select 'TEXT' as tn, " + Types.VARCHAR + " as dt union"
-                + "    select 'INTEGER' as tn, "+ Types.INTEGER +" as dt"
-                + ") order by TYPE_NAME";
+  public ResultSet getTypeInfo() throws SQLException {
+  	String sql = "select "
+              + "tn as TYPE_NAME, "
+              + "dt as DATA_TYPE, "
+              + "0 as PRECISION, "
+              + "null as LITERAL_PREFIX, "
+              + "null as LITERAL_SUFFIX, "
+              + "null as CREATE_PARAMS, "
+              + typeNullable + " as NULLABLE, "
+              + "1 as CASE_SENSITIVE, "
+              + typeSearchable + " as SEARCHABLE, "
+              + "0 as UNSIGNED_ATTRIBUTE, "
+              + "0 as FIXED_PREC_SCALE, "
+              + "0 as AUTO_INCREMENT, "
+              + "null as LOCAL_TYPE_NAME, "
+              + "0 as MINIMUM_SCALE, "
+              + "0 as MAXIMUM_SCALE, "
+              + "0 as SQL_DATA_TYPE, "
+              + "0 as SQL_DATETIME_SUB, "
+              + "10 as NUM_PREC_RADIX from ("
+              + "    select 'BLOB' as tn, " + Types.BLOB + " as dt union"
+              + "    select 'NULL' as tn, " + Types.NULL + " as dt union"
+              + "    select 'REAL' as tn, " + Types.REAL+ " as dt union"
+              + "    select 'TEXT' as tn, " + Types.VARCHAR + " as dt union"
+              + "    select 'INTEGER' as tn, "+ Types.INTEGER +" as dt"
+              + ") order by TYPE_NAME";
 
-        //      if (getTypeInfo == null) {
+      //      if (getTypeInfo == null) {
 //      getTypeInfo = con.prepareStatement(sql);
 //            
 //        }
@@ -819,22 +995,23 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 //        getTypeInfo.clearParameters();
 //        return getTypeInfo.executeQuery();
 
-        return new SQLDroidResultSet(con.getDb().rawQuery(sql, new String[0]));
-    }
+  	return new SQLDroidResultSet(con.getDb().rawQuery(sql, new String[0]));
+  }
 
-	
-	
-	
 	
 	
 	
 	@Override
 	public ResultSet getUDTs(String catalog, String schemaPattern,
 			String typeNamePattern, int[] types) throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return null;
+		if (getUDTs == null) {
+			getUDTs = con.prepareStatement("select  null as TYPE_CAT, null as TYPE_SCHEM, "
+					+ "null as TYPE_NAME,  null as CLASS_NAME,  null as DATA_TYPE, null as REMARKS, "
+					+ "null as BASE_TYPE " + "limit 0;");
+		}
+
+		getUDTs.clearParameters();
+		return getUDTs.executeQuery();
 	}
 
 	@Override
@@ -847,738 +1024,470 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 
 	@Override
 	public String getUserName() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
 		return null;
 	}
 
 	@Override
 	public ResultSet getVersionColumns(String catalog, String schema,
 			String table) throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return null;
+		if (getVersionColumns == null) {
+			getVersionColumns = con.prepareStatement("select null as SCOPE, null as COLUMN_NAME, "
+					+ "null as DATA_TYPE, null as TYPE_NAME, null as COLUMN_SIZE, "
+					+ "null as BUFFER_LENGTH, null as DECIMAL_DIGITS, null as PSEUDO_COLUMN limit 0;");
+		}
+		return getVersionColumns.executeQuery();
 	}
 
 	@Override
 	public boolean insertsAreDetected(int type) throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
 		return false;
 	}
 
 	@Override
 	public boolean isCatalogAtStart() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return false;
+		return true;
 	}
 
 	@Override
 	public boolean isReadOnly() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return false;
+		return con.isReadOnly();
 	}
 
 	@Override
 	public boolean locatorsUpdateCopy() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
 		return false;
 	}
 
 	@Override
 	public boolean nullPlusNonNullIsNull() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return false;
-	}
-
-	@Override
-	public boolean nullsAreSortedAtEnd() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return false;
-	}
-
-	@Override
-	public boolean nullsAreSortedAtStart() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return false;
-	}
-
-	@Override
-	public boolean nullsAreSortedHigh() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return false;
-	}
-
-	@Override
-	public boolean nullsAreSortedLow() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return false;
-	}
-
-	@Override
-	public boolean othersDeletesAreVisible(int type) throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return false;
-	}
-
-	@Override
-	public boolean othersInsertsAreVisible(int type) throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return false;
-	}
-
-	@Override
-	public boolean othersUpdatesAreVisible(int type) throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return false;
-	}
-
-	@Override
-	public boolean ownDeletesAreVisible(int type) throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return false;
-	}
-
-	@Override
-	public boolean ownInsertsAreVisible(int type) throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return false;
-	}
-
-	@Override
-	public boolean ownUpdatesAreVisible(int type) throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return false;
-	}
-
-	@Override
-	public boolean storesLowerCaseIdentifiers() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return false;
-	}
-
-	@Override
-	public boolean storesLowerCaseQuotedIdentifiers() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return false;
-	}
-
-	@Override
-	public boolean storesMixedCaseIdentifiers() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return false;
-	}
-
-	@Override
-	public boolean storesMixedCaseQuotedIdentifiers() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return false;
-	}
-
-	@Override
-	public boolean storesUpperCaseIdentifiers() throws SQLException {
-		return false;
-	}
-
-	@Override
-	public boolean storesUpperCaseQuotedIdentifiers() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return false;
-	}
-
-	@Override
-	public boolean supportsANSI92EntryLevelSQL() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return false;
-	}
-
-	@Override
-	public boolean supportsANSI92FullSQL() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return false;
-	}
-
-	@Override
-	public boolean supportsANSI92IntermediateSQL() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return false;
-	}
-
-	@Override
-	public boolean supportsAlterTableWithAddColumn() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return false;
-	}
-
-	@Override
-	public boolean supportsAlterTableWithDropColumn() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return false;
-	}
-
-	@Override
-	public boolean supportsBatchUpdates() throws SQLException {
 		return true;
 	}
 
 	@Override
-	public boolean supportsCatalogsInDataManipulation() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
+	public boolean nullsAreSortedAtEnd() {
+		return !nullsAreSortedAtStart();
+	}
+
+	@Override
+	public boolean nullsAreSortedAtStart() {
+		return true;
+	}
+
+	@Override
+	public boolean nullsAreSortedHigh() {
+		return true;
+	}
+
+	@Override
+	public boolean nullsAreSortedLow() {
+		return !nullsAreSortedHigh();
+	}
+
+	@Override
+	public boolean othersDeletesAreVisible(int type) {
 		return false;
 	}
 
 	@Override
-	public boolean supportsCatalogsInIndexDefinitions() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
+	public boolean othersInsertsAreVisible(int type) {
 		return false;
 	}
 
 	@Override
-	public boolean supportsCatalogsInPrivilegeDefinitions() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
+	public boolean othersUpdatesAreVisible(int type) {
 		return false;
 	}
 
 	@Override
-	public boolean supportsCatalogsInProcedureCalls() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
+	public boolean ownDeletesAreVisible(int type) {
 		return false;
 	}
 
 	@Override
-	public boolean supportsCatalogsInTableDefinitions() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
+	public boolean ownInsertsAreVisible(int type) {
 		return false;
 	}
 
 	@Override
-	public boolean supportsColumnAliasing() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
+	public boolean ownUpdatesAreVisible(int type) {
 		return false;
 	}
 
 	@Override
-	public boolean supportsConvert() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
+	public boolean storesLowerCaseIdentifiers() {
 		return false;
 	}
 
 	@Override
-	public boolean supportsConvert(int fromType, int toType)
-			throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
+	public boolean storesLowerCaseQuotedIdentifiers() {
+		return false;
+	}
+
+	@Override
+	public boolean storesMixedCaseIdentifiers() {
+		return true;
+	}
+
+	@Override
+	public boolean storesMixedCaseQuotedIdentifiers() {
+		return false;
+	}
+
+	@Override
+	public boolean storesUpperCaseIdentifiers() {
+		return false;
+	}
+
+	@Override
+	public boolean storesUpperCaseQuotedIdentifiers() {
+		return false;
+	}
+
+	@Override
+	public boolean supportsANSI92EntryLevelSQL() {
+		return false;
+	}
+
+	@Override
+	public boolean supportsANSI92FullSQL() {
+		return false;
+	}
+	
+	@Override
+	public boolean supportsANSI92IntermediateSQL() {
+		return false;
+	}
+
+	@Override
+	public boolean supportsAlterTableWithAddColumn() {
+		return false;
+	}
+
+	@Override
+	public boolean supportsAlterTableWithDropColumn() {
+		return false;
+	}
+
+	@Override
+	public boolean supportsBatchUpdates() {
+		return true;
+	}
+
+	@Override
+	public boolean supportsCatalogsInDataManipulation() {
+		return false;
+	}
+
+	@Override
+	public boolean supportsCatalogsInIndexDefinitions() {
+		return false;
+	}
+
+	@Override
+	public boolean supportsCatalogsInPrivilegeDefinitions() {
+		return false;
+	}
+
+	@Override
+	public boolean supportsCatalogsInProcedureCalls() {
+		return false;
+	}
+
+	@Override
+	public boolean supportsCatalogsInTableDefinitions() {
+		return false;
+	}
+
+	@Override
+	public boolean supportsColumnAliasing() {
+		return true;
+	}
+
+	@Override
+	public boolean supportsConvert() {
+		return false;
+	}
+
+	@Override
+	public boolean supportsConvert(int fromType, int toType) {
 		return false;
 	}
 
 	@Override
 	public boolean supportsCoreSQLGrammar() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return false;
-	}
-
-	@Override
-	public boolean supportsCorrelatedSubqueries() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return false;
-	}
-
-	@Override
-	public boolean supportsDataDefinitionAndDataManipulationTransactions()
-			throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return false;
-	}
-
-	@Override
-	public boolean supportsDataManipulationTransactionsOnly()
-			throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return false;
-	}
-
-	@Override
-	public boolean supportsDifferentTableCorrelationNames() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return false;
-	}
-
-	@Override
-	public boolean supportsExpressionsInOrderBy() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return false;
-	}
-
-	@Override
-	public boolean supportsExtendedSQLGrammar() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return false;
-	}
-
-	@Override
-	public boolean supportsFullOuterJoins() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return false;
-	}
-
-	@Override
-	public boolean supportsGetGeneratedKeys() throws SQLException {
 		return true;
 	}
 
 	@Override
-	public boolean supportsGroupBy() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
+	public boolean supportsCorrelatedSubqueries() {
 		return false;
 	}
 
 	@Override
-	public boolean supportsGroupByBeyondSelect() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
+	public boolean supportsDataDefinitionAndDataManipulationTransactions() {
+		return true;
+	}
+
+	@Override
+	public boolean supportsDataManipulationTransactionsOnly() {
 		return false;
 	}
 
 	@Override
-	public boolean supportsGroupByUnrelated() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
+	public boolean supportsDifferentTableCorrelationNames() {
 		return false;
 	}
 
 	@Override
-	public boolean supportsIntegrityEnhancementFacility() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
+	public boolean supportsExpressionsInOrderBy() {
+		return true;
+	}
+
+	@Override
+	public boolean supportsExtendedSQLGrammar() {
 		return false;
 	}
 
 	@Override
-	public boolean supportsLikeEscapeClause() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
+	public boolean supportsFullOuterJoins() {
 		return false;
 	}
 
 	@Override
-	public boolean supportsLimitedOuterJoins() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
+	public boolean supportsGetGeneratedKeys(){
+		return true;
+	}
+
+	@Override
+	public boolean supportsGroupBy() {
+		return true;
+	}
+
+	@Override
+	public boolean supportsGroupByBeyondSelect() {
 		return false;
 	}
 
 	@Override
-	public boolean supportsMinimumSQLGrammar() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
+	public boolean supportsGroupByUnrelated() {
 		return false;
 	}
 
 	@Override
-	public boolean supportsMixedCaseIdentifiers() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
+	public boolean supportsIntegrityEnhancementFacility() {
 		return false;
 	}
 
 	@Override
-	public boolean supportsMixedCaseQuotedIdentifiers() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
+	public boolean supportsLikeEscapeClause() {
 		return false;
 	}
 
 	@Override
-	public boolean supportsMultipleOpenResults() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
+	public boolean supportsLimitedOuterJoins() {
+		return true;
+	}
+
+	@Override
+	public boolean supportsMinimumSQLGrammar() {
+		return true;
+	}
+
+	@Override
+	public boolean supportsMixedCaseIdentifiers() {
+		return true;
+	}
+
+	@Override
+	public boolean supportsMixedCaseQuotedIdentifiers() {
 		return false;
 	}
 
 	@Override
-	public boolean supportsMultipleResultSets() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
+	public boolean supportsMultipleOpenResults() {
 		return false;
 	}
 
 	@Override
-	public boolean supportsMultipleTransactions() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
+	public boolean supportsMultipleResultSets() {
 		return false;
 	}
 
 	@Override
-	public boolean supportsNamedParameters() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
+	public boolean supportsMultipleTransactions() {
+		return true;
+	}
+
+	@Override
+	public boolean supportsNamedParameters() {
+		return true;
+	}
+
+	@Override
+	public boolean supportsNonNullableColumns() {
+		return true;
+	}
+
+	@Override
+	public boolean supportsOpenCursorsAcrossCommit() {
 		return false;
 	}
 
 	@Override
-	public boolean supportsNonNullableColumns() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
+	public boolean supportsOpenCursorsAcrossRollback() {
 		return false;
 	}
 
 	@Override
-	public boolean supportsOpenCursorsAcrossCommit() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
+	public boolean supportsOpenStatementsAcrossCommit() {
 		return false;
 	}
 
 	@Override
-	public boolean supportsOpenCursorsAcrossRollback() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
+	public boolean supportsOpenStatementsAcrossRollback() {
 		return false;
 	}
 
 	@Override
-	public boolean supportsOpenStatementsAcrossCommit() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
+	public boolean supportsOrderByUnrelated() {
 		return false;
 	}
 
 	@Override
-	public boolean supportsOpenStatementsAcrossRollback() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
+	public boolean supportsOuterJoins() {
+		return true;
+	}
+
+	@Override
+	public boolean supportsPositionedDelete() {
 		return false;
 	}
 
 	@Override
-	public boolean supportsOrderByUnrelated() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
+	public boolean supportsPositionedUpdate() {
 		return false;
 	}
 
 	@Override
-	public boolean supportsOuterJoins() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
+	public boolean supportsResultSetConcurrency(int t, int c) {
+		return t == ResultSet.TYPE_FORWARD_ONLY && c == ResultSet.CONCUR_READ_ONLY;
+	}
+
+	@Override
+	public boolean supportsResultSetHoldability(int h) {
+		return h == ResultSet.CLOSE_CURSORS_AT_COMMIT;
+	}
+
+	@Override
+	public boolean supportsResultSetType(int t) {
+		return t == ResultSet.TYPE_FORWARD_ONLY;
+	}
+
+	@Override
+	public boolean supportsSavepoints() {
 		return false;
 	}
 
 	@Override
-	public boolean supportsPositionedDelete() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
+	public boolean supportsSchemasInDataManipulation() {
 		return false;
 	}
 
 	@Override
-	public boolean supportsPositionedUpdate() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
+	public boolean supportsSchemasInIndexDefinitions() {
 		return false;
 	}
 
 	@Override
-	public boolean supportsResultSetConcurrency(int type, int concurrency)
-			throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
+	public boolean supportsSchemasInPrivilegeDefinitions() {
 		return false;
 	}
 
 	@Override
-	public boolean supportsResultSetHoldability(int holdability)
-			throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
+	public boolean supportsSchemasInProcedureCalls() {
 		return false;
 	}
 
 	@Override
-	public boolean supportsResultSetType(int type) throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
+	public boolean supportsSchemasInTableDefinitions() {
 		return false;
 	}
 
 	@Override
-	public boolean supportsSavepoints() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
+	public boolean supportsSelectForUpdate() {
 		return false;
 	}
 
 	@Override
-	public boolean supportsSchemasInDataManipulation() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
+	public boolean supportsStatementPooling() {
 		return false;
 	}
 
 	@Override
-	public boolean supportsSchemasInIndexDefinitions() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
+	public boolean supportsStoredProcedures() {
 		return false;
 	}
 
 	@Override
-	public boolean supportsSchemasInPrivilegeDefinitions() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
+	public boolean supportsSubqueriesInComparisons() {
 		return false;
 	}
 
 	@Override
-	public boolean supportsSchemasInProcedureCalls() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
+	public boolean supportsSubqueriesInExists() {
+		return true;
+	} // TODO: check
+
+	@Override
+	public boolean supportsSubqueriesInIns() {
+		return true;
+	} // TODO: check
+
+	@Override
+	public boolean supportsSubqueriesInQuantifieds() {
 		return false;
 	}
 
 	@Override
-	public boolean supportsSchemasInTableDefinitions() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
+	public boolean supportsTableCorrelationNames() {
+		return false;
+	}
+	
+	@Override
+	public boolean supportsTransactionIsolationLevel(int level) {
+		return level == Connection.TRANSACTION_SERIALIZABLE;
+	}
+
+	@Override
+	public boolean supportsTransactions() {
+		return true;
+	}
+
+	@Override
+	public boolean supportsUnion() {
+		return true;
+	}
+
+	@Override
+	public boolean supportsUnionAll() {
+		return true;
+	}
+
+	@Override
+	public boolean updatesAreDetected(int type) {
 		return false;
 	}
 
 	@Override
-	public boolean supportsSelectForUpdate() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
+	public boolean usesLocalFilePerTable() {
 		return false;
 	}
 
 	@Override
-	public boolean supportsStatementPooling() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return false;
+	public boolean usesLocalFiles() {
+		return true;
 	}
-
-	@Override
-	public boolean supportsStoredProcedures() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return false;
-	}
-
-	@Override
-	public boolean supportsSubqueriesInComparisons() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return false;
-	}
-
-	@Override
-	public boolean supportsSubqueriesInExists() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return false;
-	}
-
-	@Override
-	public boolean supportsSubqueriesInIns() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return false;
-	}
-
-	@Override
-	public boolean supportsSubqueriesInQuantifieds() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return false;
-	}
-
-	@Override
-	public boolean supportsTableCorrelationNames() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return false;
-	}
-
-	@Override
-	public boolean supportsTransactionIsolationLevel(int level)
-			throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return false;
-	}
-
-	@Override
-	public boolean supportsTransactions() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return false;
-	}
-
-	@Override
-	public boolean supportsUnion() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return false;
-	}
-
-	@Override
-	public boolean supportsUnionAll() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return false;
-	}
-
-	@Override
-	public boolean updatesAreDetected(int type) throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return false;
-	}
-
-	@Override
-	public boolean usesLocalFilePerTable() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return false;
-	}
-
-	@Override
-	public boolean usesLocalFiles() throws SQLException {
-		System.err.println(" ********************* not implemented @ "
-				+ DebugPrinter.getFileName() + " line "
-				+ DebugPrinter.getLineNumber());
-		return false;
-	}
-
+	
 	@Override
 	public boolean isWrapperFor(Class<?> arg0) throws SQLException {
 		// TODO Auto-generated method stub
@@ -1648,6 +1557,136 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
       // TODO Auto-generated method stub
       return null;
   }
+  
+  /**
+	 * Adds SQL string quotes to the given string.
+	 * @param tableName The string to quote.
+	 * @return The quoted string.
+	 */
+	private static String quote(String tableName) {
+		if (tableName == null) {
+			return "null";
+		}
+		else {
+			return String.format("'%s'", tableName);
+		}
+	}
+	
+	/**
+	 * Applies SQL escapes for special characters in a given string.
+	 * @param val The string to escape.
+	 * @return The SQL escaped string.
+	 */
+	private String escape(final String val) {
+		// TODO: this function is ugly, pass this work off to SQLite, then we
+		//       don't have to worry about Unicode 4, other characters needing
+		//       escaping, etc.
+		int len = val.length();
+		StringBuilder buf = new StringBuilder(len);
+		for (int i = 0; i < len; i++) {
+			if (val.charAt(i) == '\'') {
+				buf.append('\'');
+			}
+			buf.append(val.charAt(i));
+		}
+		return buf.toString();
+	}
+	
+	/**
+	 * @throws SQLException
+	 */
+	private void checkOpen() throws SQLException {
+		if (con == null) {
+			throw new SQLException("connection closed");
+		}
+	}
+	
+	/**
+	 * Parses the sqlite_master table for a table's primary key
+	 */
+	class PrimaryKeyFinder {
+		/** The table name. */
+		String table;
+
+		/** The primary key name. */
+		String pkName = null;
+
+		/** The column(s) for the primary key. */
+		String pkColumns[] = null;
+
+		/**
+		 * Constructor.
+		 * @param table The table for which to get find a primary key.
+		 * @throws SQLException
+		 */
+		public PrimaryKeyFinder(String table) throws SQLException {
+			this.table = table;
+
+			if (table == null || table.trim().length() == 0) {
+				throw new SQLException("Invalid table name: '" + this.table + "'");
+			}
+
+			Statement stat = null;
+			ResultSet rs = null;
+
+			try {
+				stat = con.createStatement();
+				// read create SQL script for table
+				rs = stat.executeQuery("select sql from sqlite_master where" +
+						" lower(name) = lower('" + escape(table) + "') and type = 'table'");
+
+				if (!rs.next())
+					throw new SQLException("Table not found: '" + table + "'");
+
+				Matcher matcher = PK_NAMED_PATTERN.matcher(rs.getString(1));
+				if (matcher.find()){
+					pkName = '\'' + escape(matcher.group(1).toLowerCase()) + '\'';
+					pkColumns = matcher.group(2).split(",");
+				}
+				else {
+					matcher = PK_UNNAMED_PATTERN.matcher(rs.getString(1));
+					if (matcher.find()){
+						pkColumns = matcher.group(1).split(",");
+					}
+				}
+
+				if (pkColumns == null) {
+					rs = stat.executeQuery("pragma table_info('" + escape(table) + "');");
+					while(rs.next()) {
+						if (rs.getBoolean(6))
+							pkColumns = new String[]{rs.getString(2)};
+					}
+				}
+
+				if (pkColumns != null)
+					for (int i = 0; i < pkColumns.length; i++) {
+						pkColumns[i] = pkColumns[i].toLowerCase().trim();
+					}
+			}
+			finally {
+				try {
+					if (rs != null) rs.close();
+				} catch (Exception e) {}
+				try {
+					if (stat != null) stat.close();
+				} catch (Exception e) {}
+			}
+		}
+
+		/**
+		 * @return The primary key name if any.
+		 */
+		public String getName() {
+			return pkName;
+		}
+
+		/**
+		 * @return Array of primary key column(s) if any.
+		 */
+		public String[] getColumns() {
+			return pkColumns;
+		}
+	}
 
 
 }
