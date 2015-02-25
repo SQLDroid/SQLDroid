@@ -206,12 +206,12 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
   public ResultSet executeQuery() throws SQLException {
     updateCount = -1;
     closeResultSet();
-    //Log.d("sqldroid", "executeQuery " + sql);
+    // Log.d("sqldroid", "executeQuery " + sql);
     // when querying, all ? values must be converted to Strings for some reason
     Cursor c = db.rawQuery(sql, makeArgListQueryString());
-    //Log.d("sqldroid", "executeQuery " + 2);
+    // Log.d("sqldroid", "executeQuery " + 2);
     rs = new SQLDroidResultSet(c);
-    //Log.d("sqldroid", "executeQuery " + 3);
+    // Log.d("sqldroid", "executeQuery " + 3);
     return rs;
   }
 

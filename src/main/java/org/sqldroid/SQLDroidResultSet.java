@@ -22,19 +22,49 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Map;
 
 import android.database.Cursor;
 
 public class SQLDroidResultSet implements ResultSet {
-  
+    public static boolean dump = false;
+
     private final Cursor c;
     private int lastColumnRead; // JDBC style column index starting from 1
 
-    public SQLDroidResultSet(Cursor c) {
+    public SQLDroidResultSet(Cursor c) throws SQLException {
         this.c = c;
+        if (dump) {
+            dumpResultSet();
+        }
     }
+
+    private void dumpResultSet() throws SQLException {
+        ResultSet rs = this;
+        boolean headerDrawn = false;
+        while (rs.next()) {
+          if (!headerDrawn) {
+            for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
+              System.out.print(" | ");
+              System.out.print(rs.getMetaData().getColumnLabel(i));
+            }
+            System.out.println(" | ");
+            headerDrawn = true;
+          }
+          for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
+            System.out.print(" | ");
+            System.out.print(rs.getString(i));
+            if (rs.getString(i) != null) {
+                System.out.print(" (" + rs.getString(i).length() + ")");
+            }
+          }
+          System.out.println(" | ");
+        }
+        rs.beforeFirst();
+    }
+
 
   /**
    * convert JDBC column index (one-based) to sqlite column index (zero-based)
@@ -182,8 +212,7 @@ public class SQLDroidResultSet implements ResultSet {
   @Override
   public Blob getBlob(int index) throws SQLException {
     try {
-      lastColumnRead = index;
-      byte [] b = c.getBlob(ci(index));
+      byte [] b = getBytes(index);
       return new SQLDroidBlob(b);
     } catch (android.database.SQLException e) {
       throw SQLDroidConnection.chainException(e);
@@ -228,15 +257,20 @@ public class SQLDroidResultSet implements ResultSet {
     return getByte(index);
   }
 
-  @Override
-  public byte[] getBytes(int index) throws SQLException {
-    try {
-      lastColumnRead = index;
-      return c.getBlob(ci(index));
-    } catch (android.database.SQLException e) {
-      throw SQLDroidConnection.chainException(e);
+    @Override
+    public byte[] getBytes(int index) throws SQLException {
+        try {
+            lastColumnRead = index;
+            byte [] bytes = c.getBlob(ci(index));
+            // SQLite includes the zero-byte at the end for Strings.
+            if (SQLDroidResultSetMetaData.getType(c, ci(index)) == 3) { //  Cursor.FIELD_TYPE_STRING
+		        bytes = Arrays.copyOf(bytes, bytes.length - 1);
+            }
+            return bytes;
+        } catch (android.database.SQLException e) {
+            throw SQLDroidConnection.chainException(e);
+        }
     }
-  }
 
   @Override
   public byte[] getBytes(String columnName) throws SQLException {
