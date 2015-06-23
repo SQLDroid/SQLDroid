@@ -64,7 +64,7 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
   public int updateCount = -1;
 
   public SQLDroidPreparedStatement(String sql, SQLDroidConnection sqldroid) {
-    Log.v("SQLDRoid", "new SqlDRoid prepared statement from " + sqldroid);
+    // Log.v("SQLDRoid", "new SqlDRoid prepared statement from " + sqldroid);
     this.sqldroidConnection = sqldroid;
     this.db = sqldroid.getDb();
     setSQL(sql);
@@ -175,7 +175,7 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
 
     @Override
     public boolean execute() throws SQLException {
-        updateCount	= -1;
+        updateCount = -1;
         closeResultSet();
         // problem, a PRAGMA statement (and maybe others) should also cause a result set
         if ( !isSelect && sql.toUpperCase().matches("(?m)(?s)\\s*PRAGMA.*") ) {
@@ -357,8 +357,8 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
   @Override
   /** There are no more results when the following is true:
 
-	     // stmt is a Statement object
-	     ((stmt.getMoreResults() == false) && (stmt.getUpdateCount() == -1))*/
+         // stmt is a Statement object
+         ((stmt.getMoreResults() == false) && (stmt.getUpdateCount() == -1))*/
   public boolean getMoreResults() throws SQLException {
     return getMoreResults(CLOSE_CURRENT_RESULT);
   }
@@ -409,8 +409,8 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
   }
 
   /**Retrieves the current result as an update count; if the result is a ResultSet object or there are no more results, -1 is returned. This method should be called only once per result.
-	Returns:
-	the current result as an update count; -1 if the current result is a ResultSet object or there are no more results*/
+    Returns:
+    the current result as an update count; -1 if the current result is a ResultSet object or there are no more results*/
   @Override
   public int getUpdateCount() throws SQLException {
     if ( updateCount != -1 ) {  // for any successful update/insert, update count will have been set
@@ -617,8 +617,8 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
 
   @Override
   public void setClob(int parameterIndex, Clob theClob) throws SQLException {
-	  ensureCap(parameterIndex);
-	  setString(parameterIndex, theClob.getSubString(1L, (int)theClob.length()));
+      ensureCap(parameterIndex);
+      setString(parameterIndex, theClob.getSubString(1L, (int)theClob.length()));
   }
 
   @Override
