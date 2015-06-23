@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/GitHubRGI/SQLDroid.svg?branch=master)](https://travis-ci.org/SQLDroid/SQLDroid)
+[![Build Status](https://travis-ci.org/GitHubRGI/SQLDroid.svg?branch=master)](https://travis-ci.org/GitHubRGI/SQLDroid)
 
 # SQLDroid
 
