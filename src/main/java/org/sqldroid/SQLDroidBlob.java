@@ -26,7 +26,6 @@ public class SQLDroidBlob implements Blob {
 
 	@Override
 	public long length() throws SQLException {
-		
 		return b.length;
 	}
 
