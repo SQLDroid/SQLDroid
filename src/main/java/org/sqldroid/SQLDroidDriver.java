@@ -56,7 +56,7 @@ public class SQLDroidDriver implements java.sql.Driver {
             return true;
         }
 
-        return false; 
+        return false;
     }
 
     @Override

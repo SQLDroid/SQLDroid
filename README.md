@@ -45,6 +45,18 @@ You can find an example of how to use SQLDroid with ActiveRecord on Ruboto here:
 
 https://github.com/ruboto/ruboto/wiki/Tutorial%3A-Using-an-SQLite-database-with-ActiveRecord
 
+## Debug output
+
+You can set the SQLDroid log output level like this
+
+    org.sqldroid.Log.LEVEL = android.util.Log.VERBOSE;
+
+You can turn on resultset dumps like this
+
+    org.sqldroid.SQLDroidResultSet.dump = true;
+
+
+
 ## Building
 
 The SQLDroid JAR file is a straight collection of the compiled classes.  If you have Ruby installed,
