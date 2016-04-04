@@ -130,8 +130,8 @@ public class SQLDroidConnection implements Connection {
                 Log.i("SQLDroidConnection: " + Thread.currentThread().getId() + " \"" + Thread.currentThread().getName() + "\" " + this + " Opening new database: " + dbQname);
                 sqlitedb = new SQLiteDatabase(dbQname, timeout, retryInterval, flags);
                 dbMap.put(dbQname, sqlitedb);
-                clientMap.put(this, sqlitedb);
             }
+            clientMap.put(this, sqlitedb);
         }
     }
 
