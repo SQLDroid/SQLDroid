@@ -507,7 +507,7 @@ public class DriverUnitTest extends TestCase {
       
       stmt = con.prepareStatement("SELECT * FROM dummytable where name = 'fig'");
       hasResultSet = stmt.execute();  // no matching result
-      assertFalse("Should return a result set", hasResultSet);
+      assertTrue("Should return a result set", hasResultSet);
       assertNotNull ("Result Set should not be null ", stmt.getResultSet());
       assertEquals ("Should not be -1 ", -1, stmt.getUpdateCount());
       // second time this will be true.
