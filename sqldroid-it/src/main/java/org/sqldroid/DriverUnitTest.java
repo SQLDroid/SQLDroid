@@ -479,7 +479,7 @@ public class DriverUnitTest extends TestCase {
       assertTrue("Should  be no more results ", noMoreResults);
       assertNull ("Result Set should be non-null ", statement.getResultSet());
       statement.close();      
-      
+      //failure!
       statement = con.createStatement();
       hasResultSet = statement.execute("SELECT * FROM dummytable where name = 'fig'");  // no matching result
       assertFalse("Should not return a result set", hasResultSet);
