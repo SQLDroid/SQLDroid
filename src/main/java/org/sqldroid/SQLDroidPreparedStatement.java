@@ -63,7 +63,7 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
   public int updateCount = -1;
 
   public SQLDroidPreparedStatement(String sql, SQLDroidConnection sqldroid) {
-    Log.v("new SqlDRoid prepared statement from " + sqldroid);
+    Log.v("new SqlDroid prepared statement from " + sqldroid);
     this.sqldroidConnection = sqldroid;
     this.db = sqldroid.getDb();
     setSQL(sql);
