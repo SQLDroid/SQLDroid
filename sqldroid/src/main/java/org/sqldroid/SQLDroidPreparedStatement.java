@@ -622,6 +622,8 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
 
   @Override
   public void setDate(int parameterIndex, Date theDate) throws SQLException {
+    //ensureCap(parameterIndex);
+    //setObj(parameterIndex, new Long(theDate.getTime()));
     System.err.println(" ********************* not implemented @ "
         + DebugPrinter.getFileName() + " line "
         + DebugPrinter.getLineNumber());
