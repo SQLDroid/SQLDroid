@@ -44,13 +44,13 @@ env:
 
     matrix:
     #api15
-    - API=15 ANDROID_TARGET=3  ANDROID_ABI=armeabi-v7a
+    - API=15 ANDROID_TARGET=2  ANDROID_ABI=armeabi-v7a
     #api15 with google
-    - API=15g ANDROID_TARGET=14  ANDROID_ABI=armeabi-v7a
+    - API=15g ANDROID_TARGET=11  ANDROID_ABI=armeabi-v7a
     #api19
-    - API=19 ANDROID_TARGET=7  ANDROID_ABI=armeabi-v7a
+    - API=19 ANDROID_TARGET=6  ANDROID_ABI=armeabi-v7a
     #api19 with google
-    - API=19g ANDROID_TARGET=16  ANDROID_ABI=armeabi-v7a
+    - API=19g ANDROID_TARGET=13  ANDROID_ABI=armeabi-v7a
     #api21
     #- ANDROID_TARGET=17  ANDROID_ABI=armeabi-v7a no abi available with google apis
     #api22
