@@ -14,24 +14,18 @@ android:
     - android-19
     - android-18
     - android-15
-    - android-10
-    - android-8
-    - addon-google_apis-google-10
     - addon-google_apis-google-15
     - addon-google_apis-google-18
     - addon-google_apis-google-19
     - addon-google_apis-google-21
     - addon-google_apis-google-22
     - addon-google_apis-google-23
-    - addon-google_apis-google-8
 
     # Additional components
     - extra-google-google_play_services
     - extra-google-m2repository
     - extra-android-m2repository
     - addon-google_apis-google-19
-    - sys-img-armeabi-android-8
-    - sys-img-armeabi-android-10
     - sys-img-armeabi-android-15
     - sys-img-armeabi-android-19
     - sys-img-armeabi-android-21
@@ -49,16 +43,6 @@ env:
     - ADB_INSTALL_TIMEOUT=14
 
     matrix:
-    #note when changing these, updating the gradle build file for the GoogleWrapper project
-    # first env var is just for display purposes
-    #api8 with google
-    - API=8g ANDROID_TARGET=12  ANDROID_ABI=armeabi
-    #api8
-    - API=8 ANDROID_TARGET=1  ANDROID_ABI=armeabi
-    #api10
-    - API=10 ANDROID_TARGET=2  ANDROID_ABI=armeabi
-    #api10 with google
-    - API=10g ANDROID_TARGET=13  ANDROID_ABI=armeabi
     #api15
     - API=15 ANDROID_TARGET=3  ANDROID_ABI=armeabi-v7a
     #api15 with google
