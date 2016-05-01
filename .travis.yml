@@ -14,6 +14,11 @@ android:
     - android-19
     - android-18
     - android-15
+    - android-10
+    - android-11
+    - android-12
+    - android-13
+    - android-14
     - addon-google_apis-google-15
     - addon-google_apis-google-18
     - addon-google_apis-google-19
@@ -43,6 +48,10 @@ env:
     - ADB_INSTALL_TIMEOUT=14
 
     matrix:
+    - API=11 ANDROID_TARGET=2  ANDROID_ABI=armeabi-v7a
+    - API=12 ANDROID_TARGET=2  ANDROID_ABI=armeabi-v7a
+    - API=13 ANDROID_TARGET=2  ANDROID_ABI=armeabi-v7a
+    - API=14 ANDROID_TARGET=2  ANDROID_ABI=armeabi-v7a
     #api15
     - API=15 ANDROID_TARGET=2  ANDROID_ABI=armeabi-v7a
     #api15 with google
