@@ -19,12 +19,12 @@ android:
     - android-12
     - android-13
     - android-14
-    - addon-google_apis-google-15
-    - addon-google_apis-google-18
-    - addon-google_apis-google-19
-    - addon-google_apis-google-21
-    - addon-google_apis-google-22
-    - addon-google_apis-google-23
+    #- addon-google_apis-google-15
+    #- addon-google_apis-google-18
+    #- addon-google_apis-google-19
+    #- addon-google_apis-google-21
+    #- addon-google_apis-google-22
+    #- addon-google_apis-google-23
 
     # Additional components
     - extra-google-google_play_services
@@ -33,10 +33,10 @@ android:
     - addon-google_apis-google-19
     - sys-img-armeabi-android-15
     - sys-img-armeabi-android-19
-    - sys-img-armeabi-android-21
-    - sys-img-x86-android-22
-    - sys-img-x86-android-23
-    - addon-google_apis-google-23
+    #- sys-img-armeabi-android-21
+    #- sys-img-x86-android-22
+    #- sys-img-x86-android-23
+    #- addon-google_apis-google-23
 
 sudo: required
 
@@ -48,25 +48,16 @@ env:
     - ADB_INSTALL_TIMEOUT=14
 
     matrix:
+    - API=10 ANDROID_TARGET=1  ANDROID_ABI=armeabi-v7a
     - API=11 ANDROID_TARGET=2  ANDROID_ABI=armeabi-v7a
-    - API=12 ANDROID_TARGET=2  ANDROID_ABI=armeabi-v7a
-    - API=13 ANDROID_TARGET=2  ANDROID_ABI=armeabi-v7a
-    - API=14 ANDROID_TARGET=2  ANDROID_ABI=armeabi-v7a
-    #api15
-    - API=15 ANDROID_TARGET=2  ANDROID_ABI=armeabi-v7a
-    #api15 with google
-    - API=15g ANDROID_TARGET=11  ANDROID_ABI=armeabi-v7a
-    #api19
-    - API=19 ANDROID_TARGET=6  ANDROID_ABI=armeabi-v7a
-    #api19 with google
-    - API=19g ANDROID_TARGET=13  ANDROID_ABI=armeabi-v7a
-    #api21
-    #- ANDROID_TARGET=17  ANDROID_ABI=armeabi-v7a no abi available with google apis
-    #api22
-    # ANDROID_TARGET=18  ANDROID_ABI=x86 not currently possible with travis, missing some kind of hardware acceleration driver
-    #api23
-    # ANDROID_TARGET=19  ANDROID_ABI=x86 not currently possible with travis, missing some kind of hardware acceleration driver
-
+    - API=12 ANDROID_TARGET=3  ANDROID_ABI=armeabi-v7a
+    - API=13 ANDROID_TARGET=4  ANDROID_ABI=armeabi-v7a
+    - API=14 ANDROID_TARGET=5  ANDROID_ABI=armeabi-v7a
+    - API=15 ANDROID_TARGET=6  ANDROID_ABI=armeabi-v7a
+    - API=16 ANDROID_TARGET=7  ANDROID_ABI=armeabi-v7a
+    - API=17 ANDROID_TARGET=8  ANDROID_ABI=armeabi-v7a
+    - API=18 ANDROID_TARGET=9  ANDROID_ABI=armeabi-v7a
+    - API=19 ANDROID_TARGET=10  ANDROID_ABI=armeabi-v7a
 before_install:
   # create and start emulators
   - android list targets
