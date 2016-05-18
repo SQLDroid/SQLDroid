@@ -43,7 +43,7 @@ public class SQLDroidClob implements Clob
     private InputStream inputStream;
 
     /** Whether we have already freed resources. */
-    boolean freed = false;
+    private boolean freed = false;
 
     /**
      * Constructor taking a string.

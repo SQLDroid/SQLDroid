@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 import javax.sql.DataSource;
 
 public class DroidDataSource implements DataSource {
-    Connection connection = null;    
+    private Connection connection = null;
     protected String description = "Android Sqlite Data Source";
     protected String packageName;
     protected String databaseName;  
