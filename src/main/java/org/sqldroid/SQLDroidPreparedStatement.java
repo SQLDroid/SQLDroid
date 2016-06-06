@@ -1,7 +1,6 @@
 package org.sqldroid;
 
 import android.database.Cursor;
-import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -69,7 +68,7 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
   private ResultSet rowIdResultSet = null; 
 
   public SQLDroidPreparedStatement(String sql, SQLDroidConnection sqldroid) {
-    Log.v("SQLDRoid", "new SqlDRoid prepared statement from " + sqldroid);
+    Log.v("new SqlDroid prepared statement from " + sqldroid);
     this.sqldroidConnection = sqldroid;
     this.db = sqldroid.getDb();
     setSQL(sql);

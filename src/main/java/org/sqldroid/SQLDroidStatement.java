@@ -92,6 +92,8 @@ public class SQLDroidStatement implements Statement {
       String limitedSql = sql + (maxRows != null ? " LIMIT " + maxRows : "");
       Cursor c = db.rawQuery(limitedSql, new String[0]);
       rs = new SQLDroidResultSet(c);
+      if (c.getCount()==0)
+           return false;
     } else {
       db.execSQL(sql);
       rs = null;
