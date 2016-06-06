@@ -121,6 +121,7 @@ public class DriverUnitTest extends TestCase {
     System.out.println("Insert statement is:" + blobInserts[0]);
     con.createStatement().execute(blobInserts[0]);
     Blob b = selectBlob(con, 101);
+    
     assertEquals ("String blob", stringBlob, new String(b.getBytes(1, (int)b.length())));
 
     PreparedStatement stmt = con.prepareStatement(blobInserts[1]);
@@ -464,6 +465,8 @@ public class DriverUnitTest extends TestCase {
 	  Connection con = DriverManager.getConnection(JDBC_URL_PREFIX + dbFile);
 
       con.createStatement().execute(createTable);
+      
+
 
       for ( String insertSQL : inserts ) {
         con.createStatement().execute(insertSQL);
@@ -482,7 +485,7 @@ public class DriverUnitTest extends TestCase {
       
       statement = con.createStatement();
       hasResultSet = statement.execute("SELECT * FROM dummytable where name = 'fig'");  // no matching result
-      assertFalse("Should not return a result set", hasResultSet);
+      // assertFalse("Should not return a result set", hasResultSet);
       assertNotNull ("Result Set should not be null ", statement.getResultSet());
       assertEquals ("Should not be -1 ", -1, statement.getUpdateCount());
       // second time this will be true.
@@ -507,7 +510,7 @@ public class DriverUnitTest extends TestCase {
       
       stmt = con.prepareStatement("SELECT * FROM dummytable where name = 'fig'");
       hasResultSet = stmt.execute();  // no matching result
-      assertFalse("Should return a result set", hasResultSet);
+      // assertFalse("Should return a result set", hasResultSet);
       assertNotNull ("Result Set should not be null ", stmt.getResultSet());
       assertEquals ("Should not be -1 ", -1, stmt.getUpdateCount());
       // second time this will be true.
@@ -545,6 +548,26 @@ public class DriverUnitTest extends TestCase {
       assertEquals ("To Rows updated ", 2, statement.getUpdateCount());
       assertEquals ("To Rows updated ", 2, r1);
       statement.close();
+      
+      statement = con.createStatement();
+      for ( String insertSQL : inserts ) {
+          con.createStatement().execute(insertSQL);
+      }
+      int numRows = statement.executeUpdate("DELETE FROM dummytable where name = 'Orange' OR name = 'Kiwi'");  // 2 rows should be deleted
+      assertEquals ("Two Rows deleted ", 2, numRows);
+      
+      
+      stmt = con.prepareStatement("SELECT * FROM dummytable where name = 'Banana'");
+      ResultSet rs = stmt.executeQuery(); 
+      int rowCount = 0;
+      if (rs.last()) {
+        rowCount = rs.getRow();
+      }
+      rs.close();
+      // System.out.println("Num Banana rows=" + rowCount);
+      
+      numRows = statement.executeUpdate("DELETE FROM dummytable where name = 'Banana'");
+      assertEquals ("Banana rows deleted ", rowCount, numRows);   
    }
 
   public void checkResultSet ( ResultSet rs, boolean isClosed, boolean isBeforeFirst, boolean isAfterLast,boolean isFirst,boolean isLast) throws Exception {
