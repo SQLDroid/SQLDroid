@@ -267,9 +267,5 @@ public class SQLiteDatabase {
     }
     return 1;  // assume that the insert/update succeeded in changing exactly one row (terrible assumption, but I have nothing better).
   }
-  
-/*  public boolean inTransaction() {
-	  return sqliteDatabase.inTransaction();
-  }*/
 
 }
