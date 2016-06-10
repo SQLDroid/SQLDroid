@@ -465,8 +465,6 @@ public class DriverUnitTest extends TestCase {
 	  Connection con = DriverManager.getConnection(JDBC_URL_PREFIX + dbFile);
 
       con.createStatement().execute(createTable);
-      
-
 
       for ( String insertSQL : inserts ) {
         con.createStatement().execute(insertSQL);
@@ -485,7 +483,6 @@ public class DriverUnitTest extends TestCase {
       
       statement = con.createStatement();
       hasResultSet = statement.execute("SELECT * FROM dummytable where name = 'fig'");  // no matching result
-      // assertFalse("Should not return a result set", hasResultSet);
       assertNotNull ("Result Set should not be null ", statement.getResultSet());
       assertEquals ("Should not be -1 ", -1, statement.getUpdateCount());
       // second time this will be true.
@@ -506,11 +503,10 @@ public class DriverUnitTest extends TestCase {
       assertTrue("Should  be no more results ", noMoreResults);
       assertNull ("Result Set should be null ", stmt.getResultSet());  // no more results
       stmt.close();
-      
-      
+          
       stmt = con.prepareStatement("SELECT * FROM dummytable where name = 'fig'");
-      hasResultSet = stmt.execute();  // no matching result
-      // assertFalse("Should return a result set", hasResultSet);
+      hasResultSet = stmt.execute();  // no matching result but an empty Result Set should be returned
+      assertTrue("Should return a result set", hasResultSet);
       assertNotNull ("Result Set should not be null ", stmt.getResultSet());
       assertEquals ("Should not be -1 ", -1, stmt.getUpdateCount());
       // second time this will be true.
@@ -555,8 +551,7 @@ public class DriverUnitTest extends TestCase {
       }
       int numRows = statement.executeUpdate("DELETE FROM dummytable where name = 'Orange' OR name = 'Kiwi'");  // 2 rows should be deleted
       assertEquals ("Two Rows deleted ", 2, numRows);
-      
-      
+          
       stmt = con.prepareStatement("SELECT * FROM dummytable where name = 'Banana'");
       ResultSet rs = stmt.executeQuery(); 
       int rowCount = 0;
@@ -611,7 +606,6 @@ public class DriverUnitTest extends TestCase {
         " (CAST(STRIP_PASTIMES.count AS REAL)/PASTIMES.count*100.00) as percent FROM PASTIMES, STRIP_PASTIMES " + 
     " WHERE PASTIMES.pastime = STRIP_PASTIMES.pastime");
 
-
     ResultSet rs = con.getMetaData().getTables(null, null, "%", new String[] {"table"});
     // rs.next() returns true is there is 1 or more rows
     // should be two tables
@@ -655,7 +649,6 @@ public class DriverUnitTest extends TestCase {
       assertEquals ("All columns accounted for", columnNames[columnCounter], rs.getString(4));
       columnCounter++;
     }
-
 
     rs = con.createStatement().executeQuery("SELECT * FROM PERCENTAGES ORDER BY percent");
 
@@ -749,7 +742,6 @@ public class DriverUnitTest extends TestCase {
     suite.addTest(new DriverUnitTest("testExecute"));
     return  suite;
   }
-
 
   /** Run the test cases by hand. */
   @SuppressWarnings({ "rawtypes", "unchecked" })
