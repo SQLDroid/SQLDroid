@@ -121,6 +121,7 @@ public class DriverUnitTest extends TestCase {
     System.out.println("Insert statement is:" + blobInserts[0]);
     con.createStatement().execute(blobInserts[0]);
     Blob b = selectBlob(con, 101);
+    
     assertEquals ("String blob", stringBlob, new String(b.getBytes(1, (int)b.length())));
 
     PreparedStatement stmt = con.prepareStatement(blobInserts[1]);
@@ -482,7 +483,6 @@ public class DriverUnitTest extends TestCase {
       
       statement = con.createStatement();
       hasResultSet = statement.execute("SELECT * FROM dummytable where name = 'fig'");  // no matching result
-      assertFalse("Should not return a result set", hasResultSet);
       assertNotNull ("Result Set should not be null ", statement.getResultSet());
       assertEquals ("Should not be -1 ", -1, statement.getUpdateCount());
       // second time this will be true.
@@ -503,11 +503,10 @@ public class DriverUnitTest extends TestCase {
       assertTrue("Should  be no more results ", noMoreResults);
       assertNull ("Result Set should be null ", stmt.getResultSet());  // no more results
       stmt.close();
-      
-      
+          
       stmt = con.prepareStatement("SELECT * FROM dummytable where name = 'fig'");
-      hasResultSet = stmt.execute();  // no matching result
-      assertFalse("Should return a result set", hasResultSet);
+      hasResultSet = stmt.execute();  // no matching result but an empty Result Set should be returned
+      assertTrue("Should return a result set", hasResultSet);
       assertNotNull ("Result Set should not be null ", stmt.getResultSet());
       assertEquals ("Should not be -1 ", -1, stmt.getUpdateCount());
       // second time this will be true.
@@ -545,6 +544,25 @@ public class DriverUnitTest extends TestCase {
       assertEquals ("To Rows updated ", 2, statement.getUpdateCount());
       assertEquals ("To Rows updated ", 2, r1);
       statement.close();
+      
+      statement = con.createStatement();
+      for ( String insertSQL : inserts ) {
+          con.createStatement().execute(insertSQL);
+      }
+      int numRows = statement.executeUpdate("DELETE FROM dummytable where name = 'Orange' OR name = 'Kiwi'");  // 2 rows should be deleted
+      assertEquals ("Two Rows deleted ", 2, numRows);
+          
+      stmt = con.prepareStatement("SELECT * FROM dummytable where name = 'Banana'");
+      ResultSet rs = stmt.executeQuery(); 
+      int rowCount = 0;
+      if (rs.last()) {
+        rowCount = rs.getRow();
+      }
+      rs.close();
+      // System.out.println("Num Banana rows=" + rowCount);
+      
+      numRows = statement.executeUpdate("DELETE FROM dummytable where name = 'Banana'");
+      assertEquals ("Banana rows deleted ", rowCount, numRows);   
    }
 
   public void checkResultSet ( ResultSet rs, boolean isClosed, boolean isBeforeFirst, boolean isAfterLast,boolean isFirst,boolean isLast) throws Exception {
@@ -587,7 +605,6 @@ public class DriverUnitTest extends TestCase {
     con.createStatement().execute("CREATE VIEW PERCENTAGES AS SELECT PASTIMES.pastime, PASTIMES.count , STRIP_PASTIMES.count as stripcount, "+
         " (CAST(STRIP_PASTIMES.count AS REAL)/PASTIMES.count*100.00) as percent FROM PASTIMES, STRIP_PASTIMES " + 
     " WHERE PASTIMES.pastime = STRIP_PASTIMES.pastime");
-
 
     ResultSet rs = con.getMetaData().getTables(null, null, "%", new String[] {"table"});
     // rs.next() returns true is there is 1 or more rows
@@ -632,7 +649,6 @@ public class DriverUnitTest extends TestCase {
       assertEquals ("All columns accounted for", columnNames[columnCounter], rs.getString(4));
       columnCounter++;
     }
-
 
     rs = con.createStatement().executeQuery("SELECT * FROM PERCENTAGES ORDER BY percent");
 
@@ -726,7 +742,6 @@ public class DriverUnitTest extends TestCase {
     suite.addTest(new DriverUnitTest("testExecute"));
     return  suite;
   }
-
 
   /** Run the test cases by hand. */
   @SuppressWarnings({ "rawtypes", "unchecked" })

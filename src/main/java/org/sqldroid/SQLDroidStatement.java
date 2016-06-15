@@ -97,7 +97,7 @@ public class SQLDroidStatement implements Statement {
     } else {
       db.execSQL(sql);
       rs = null;
-      updateCount = db.changedRowCount();
+      updateCount = sqldroidConnection.changedRowsCount();
     }
 
     boolean resultSetAvailable = (rs != null);
@@ -135,7 +135,7 @@ public class SQLDroidStatement implements Statement {
     int[] results = new int[1];
     results[0] = EXECUTE_FAILED;
     db.execSQL(sqlBatch.toString());
-    results[0] = db.changedRowCount();
+    results[0] = sqldroidConnection.changedRowsCount();
     updateCount = results[0];
     return results;
   }
@@ -152,7 +152,7 @@ public class SQLDroidStatement implements Statement {
   public int executeUpdate(String sql) throws SQLException {
     closeResultSet();
     db.execSQL(sql);
-    updateCount = db.changedRowCount();
+    updateCount = sqldroidConnection.changedRowsCount();
     return updateCount;
   }
 
@@ -198,8 +198,7 @@ public class SQLDroidStatement implements Statement {
 
   @Override
   public ResultSet getGeneratedKeys() throws SQLException {
-    execute("SELECT last_insert_rowid()");
-    return rs;
+    return sqldroidConnection.getGeneratedRowIdResultSet();
   }
 
   @Override
