@@ -59,6 +59,8 @@ public class SQLDroidConnection implements Connection {
 	 */
 	private PreparedStatement generatedRowIdStatement = null; 
 
+    private final String url;
+
     /** Connect to the database with the given url and properties.
      *
      * @param url the URL string, typically something like
@@ -70,6 +72,7 @@ public class SQLDroidConnection implements Connection {
         Log.v("SQLDroidConnection: " + Thread.currentThread().getId() + " \"" + Thread.currentThread().getName() + "\" " + this);
         Log.v("New sqlite jdbc from url '" + url + "', " + "'" + info + "'");
 
+        this.url = url;
         // Make a filename from url
         String dbQname;
         if(url.startsWith(SQLDroidDriver.xerialPrefix)) {
@@ -264,7 +267,7 @@ public class SQLDroidConnection implements Connection {
     public int getTransactionIsolation() throws SQLException {
         System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "
                 + DebugPrinter.getLineNumber());
-        return 0;
+        return Connection.TRANSACTION_NONE;
     }
 
     @Override
@@ -517,6 +520,13 @@ public class SQLDroidConnection implements Connection {
     public void setClientInfo(String name, String value) throws SQLClientInfoException {
         // TODO Auto-generated method stub
 
+    }
+
+    /**
+     * @return Where the database is located.
+     */
+    public String url() {
+        return url;
     }
 
     // methods added for JDK7 compilation
