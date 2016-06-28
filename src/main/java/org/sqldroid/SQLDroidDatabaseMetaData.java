@@ -34,7 +34,7 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 	getBestRowIdentifier  = null,   getVersionColumns    = null,
 	getColumnPrivileges   = null;
 	
-	SQLDroidConnection con;
+	private SQLDroidConnection con;
     
 	public SQLDroidDatabaseMetaData(SQLDroidConnection con) {
 		this.con = con;
@@ -1606,13 +1606,13 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 	 */
 	class PrimaryKeyFinder {
 		/** The table name. */
-		String table;
+		private String table;
 
 		/** The primary key name. */
-		String pkName = null;
+		private String pkName = null;
 
 		/** The column(s) for the primary key. */
-		String pkColumns[] = null;
+		private String pkColumns[] = null;
 
 		/**
 		 * Constructor.

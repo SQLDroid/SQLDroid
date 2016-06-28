@@ -7,7 +7,7 @@ import java.sql.SQLException;
 
 public class SQLDroidBlob implements Blob {
 
-	byte [] b;
+	private byte [] b;
 	
 	public SQLDroidBlob(byte [] b) {
 		this.b = b;
