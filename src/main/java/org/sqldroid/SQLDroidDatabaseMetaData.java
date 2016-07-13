@@ -22,6 +22,7 @@ import android.database.MergeCursor;
 
 public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 
+	private final static Map<String, Integer> RULE_MAP = new HashMap<String, Integer>();
 	private static final int SQLITE_DONE       =  101;
 	private static final String VIEW_TYPE = "VIEW";
 	private static final String TABLE_TYPE = "TABLE";
@@ -35,7 +36,25 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 	getColumnPrivileges   = null;
 	
 	SQLDroidConnection con;
-    
+
+	/**
+	 * Pattern used to extract a named primary key.
+	 */
+	protected final static Pattern FK_NAMED_PATTERN =
+			Pattern.compile(".* constraint +(.*?) +foreign +key *\\((.*?)\\).*", Pattern.CASE_INSENSITIVE);
+
+	/**
+	 * Pattern used to extract column order for an unnamed primary key.
+	 */
+	protected final static Pattern PK_UNNAMED_PATTERN =
+			Pattern.compile(".* primary +key *\\((.*?,+.*?)\\).*", Pattern.CASE_INSENSITIVE);
+
+	/**
+	 * Pattern used to extract a named primary key.
+	 */
+	protected final static Pattern PK_NAMED_PATTERN =
+			Pattern.compile(".* constraint +(.*?) +primary +key *\\((.*?)\\).*", Pattern.CASE_INSENSITIVE);
+
 	public SQLDroidDatabaseMetaData(SQLDroidConnection con) {
 		this.con = con;
 	}
@@ -344,8 +363,6 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 		return "0.0.1 alpha";
 	}
 
-	private final static Map<String, Integer> RULE_MAP = new HashMap<String, Integer>();
-
 	static {
 		RULE_MAP.put("NO ACTION", importedKeyNoAction);
 		RULE_MAP.put("CASCADE", importedKeyCascade);
@@ -354,25 +371,6 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 		RULE_MAP.put("SET DEFAULT", importedKeySetDefault);
 	}
 
-	/**
-	 * Pattern used to extract a named primary key.
-	 */
-	protected final static Pattern FK_NAMED_PATTERN =
-			Pattern.compile(".* constraint +(.*?) +foreign +key *\\((.*?)\\).*", Pattern.CASE_INSENSITIVE);
-
-	/**
-	 * Pattern used to extract column order for an unnamed primary key.
-	 */
-	protected final static Pattern PK_UNNAMED_PATTERN =
-			Pattern.compile(".* primary +key *\\((.*?,+.*?)\\).*", Pattern.CASE_INSENSITIVE);
-
-	/**
-	 * Pattern used to extract a named primary key.
-	 */
-	protected final static Pattern PK_NAMED_PATTERN =
-			Pattern.compile(".* constraint +(.*?) +primary +key *\\((.*?)\\).*", Pattern.CASE_INSENSITIVE);
-
-	
 	@Override
 	public ResultSet getExportedKeys(String catalog, String schema, String table)
 			throws SQLException {
