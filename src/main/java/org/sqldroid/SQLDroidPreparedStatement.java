@@ -131,7 +131,6 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
     System.err.println(" ********************* not implemented @ "
         + DebugPrinter.getFileName() + " line "
         + DebugPrinter.getLineNumber());
-
   }
 
   @Override
@@ -144,7 +143,6 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
     System.err.println(" ********************* not implemented @ "
         + DebugPrinter.getFileName() + " line "
         + DebugPrinter.getLineNumber());
-
   }
 
   @Override
@@ -171,6 +169,7 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
 
     return strList.toArray(new String [1]);
   }
+  
   private Object[] makeArgListQueryObject() {
     return l.toArray();
   }
@@ -646,7 +645,6 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
 
   @Override
   public void setDouble(int parameterIndex, double theDouble) throws SQLException {
-
     ensureCap(parameterIndex);
     setObj(parameterIndex, new Double(theDouble));
   }
@@ -688,11 +686,8 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
   }
 
   @Override
-  public void setObject(int parameterIndex, Object theObject,
-      int targetSqlType) throws SQLException {
-    System.err.println(" ********************* not implemented @ "
-        + DebugPrinter.getFileName() + " line "
-        + DebugPrinter.getLineNumber());
+  public void setObject(int parameterIndex, Object theObject, int targetSqlType) throws SQLException {
+    setObject(parameterIndex, theObject);
   }
 
   @Override
