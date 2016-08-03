@@ -1,32 +1,16 @@
 package org.sqldroid;
 
-import java.io.IOException;
+import android.database.Cursor;
+
 import java.io.InputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
 import java.net.URL;
-import java.sql.Array;
-import java.sql.Blob;
-import java.sql.Clob;
-import java.sql.Date;
-import java.sql.NClob;
-import java.sql.Ref;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.RowId;
-import java.sql.SQLException;
-import java.sql.SQLWarning;
-import java.sql.SQLXML;
-import java.sql.Statement;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.sql.Types;
+import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Map;
-
-import android.database.Cursor;
 
 public class SQLDroidResultSet implements ResultSet {
     public static boolean dump = false;
@@ -564,9 +548,12 @@ public class SQLDroidResultSet implements ResultSet {
   @Override
   public Timestamp getTimestamp(int index) throws SQLException {
     try {
+      lastColumnRead = index;
       ResultSetMetaData md = getMetaData();
       Timestamp timestamp = null;
       switch ( md.getColumnType(index)) {
+        case Types.NULL:
+          return null;
         case Types.INTEGER:
         case Types.BIGINT:
           timestamp = new Timestamp(getLong(index));
@@ -575,7 +562,7 @@ public class SQLDroidResultSet implements ResultSet {
           timestamp = new Timestamp(getDate(index).getTime());
           break;
         default:
-          // format 2011-07-11 11:36:30.0
+          // format 2011-07-11 11:36:30.009
           try {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.S");
             java.util.Date parsedDate = dateFormat.parse(getString(index));
