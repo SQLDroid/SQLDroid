@@ -19,6 +19,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.UUID;
 
 import junit.framework.AssertionFailedError;
 
@@ -238,6 +239,32 @@ public class SQLDroidTest {
         }
     }
 
+    @Test
+    public void shouldReturnGeneratedKeys() throws SQLException {
+        try(Connection conn = DriverManager.getConnection(createDatabase("simple-types.db"))) {
+            conn.createStatement().execute("create table simpletest (id integer primary key autoincrement, value varchar(255))");
+
+            long id;
+            String randomString = UUID.randomUUID().toString();
+            try (PreparedStatement stmt = conn.prepareStatement("insert into simpletest (value) values (?)", PreparedStatement.RETURN_GENERATED_KEYS)) {
+                stmt.setString(1, randomString);
+                stmt.executeUpdate();
+                try(ResultSet rs = stmt.getGeneratedKeys()) {
+                    rs.next();
+                    id = rs.getLong(1);
+                }
+            }
+
+            try (PreparedStatement stmt = conn.prepareStatement("select value from simpletest where id = ?")) {
+                stmt.setLong(1, id);
+                try(ResultSet rs = stmt.executeQuery()) {
+                    rs.next();
+                    assertThat(rs.getString(1)).isEqualTo(randomString);
+                }
+            }
+        }
+    }
+    
     private String createDatabase(String filename) {
         DB_DIR.mkdirs();
         assertThat(DB_DIR).exists();
