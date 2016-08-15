@@ -564,7 +564,7 @@ public class SQLDroidResultSet implements ResultSet {
         default:
           // format 2011-07-11 11:36:30.009
           try {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.S");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
             java.util.Date parsedDate = dateFormat.parse(getString(index));
             timestamp = new Timestamp(parsedDate.getTime());
           } catch ( Exception any ) {
