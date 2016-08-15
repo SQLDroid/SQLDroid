@@ -641,9 +641,7 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
 
   @Override
   public void setDate(int parameterIndex, Date theDate) throws SQLException {
-    System.err.println(" ********************* not implemented @ "
-        + DebugPrinter.getFileName() + " line "
-        + DebugPrinter.getLineNumber());
+    setTimestamp(parameterIndex, theDate != null ? new Timestamp(theDate.getTime()) : null);
   }
 
   @Override

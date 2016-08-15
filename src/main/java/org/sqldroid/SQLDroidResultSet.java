@@ -302,15 +302,43 @@ public class SQLDroidResultSet implements ResultSet {
   }
 
   @Override
-  public Date getDate(int colID) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return null;
+  public Date getDate(int index) throws SQLException {
+    try {
+      lastColumnRead = index;
+      ResultSetMetaData md = getMetaData();
+      Date date = null;
+      switch ( md.getColumnType(index)) {
+        case Types.NULL:
+          return null;
+        case Types.INTEGER:
+        case Types.BIGINT:
+          date = new Date(getLong(index));
+          break;
+        case Types.DATE:
+          date = new Date(getDate(index).getTime());
+          break;
+        default:
+          // format 2011-07-11 11:36:30.009
+          try {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            java.util.Date parsedDate = dateFormat.parse(getString(index));
+            date = new Date(parsedDate.getTime());
+          } catch ( Exception any ) {
+            any.printStackTrace();
+          }
+          break;
+
+      }
+      return date;
+    } catch (android.database.SQLException e) {
+      throw SQLDroidConnection.chainException(e);
+    }
   }
 
   @Override
   public Date getDate(String columnName) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-    return null;
+    int index = findColumn(columnName);
+    return getDate(index);
   }
 
   @Override

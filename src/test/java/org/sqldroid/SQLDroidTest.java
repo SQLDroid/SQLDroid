@@ -11,6 +11,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.sql.Blob;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -264,6 +265,37 @@ public class SQLDroidTest {
             }
         }
     }
+    
+    @Test
+    public void shouldSaveAndRetrieveDates() throws SQLException {
+        try(Connection conn = DriverManager.getConnection(createDatabase("null-dates.db"))) {
+            conn.createStatement().execute("create table datetest (id integer primary key autoincrement, created_at date)");
+
+            long id;
+
+            Calendar calendar = new GregorianCalendar(2016, 7, 15);
+            Date date = new Date(calendar.getTimeInMillis());
+
+            try (PreparedStatement stmt = conn.prepareStatement("insert into datetest (created_at) values (?)", PreparedStatement.RETURN_GENERATED_KEYS)) {
+                stmt.setDate(1, date);
+                stmt.executeUpdate();
+                try(ResultSet rs = conn.createStatement().executeQuery("select last_insert_rowid();")) {
+                    rs.next();
+                    id = rs.getLong(1);
+                }
+            }
+
+            try (PreparedStatement stmt = conn.prepareStatement("select created_at from datetest where id = ?")) {
+                stmt.setLong(1, id);
+                try(ResultSet rs = stmt.executeQuery()) {
+                    rs.next();
+                    assertThat(date)
+                        .isEqualTo(rs.getDate(1)).isEqualTo(rs.getDate("created_at"))
+                        .isEqualTo(new Date(rs.getTimestamp(1).getTime()));
+                }
+            }
+        }
+    }    
     
     private String createDatabase(String filename) {
         DB_DIR.mkdirs();
