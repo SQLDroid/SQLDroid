@@ -28,7 +28,7 @@ import junit.framework.AssertionFailedError;
 @Config(sdk = 16)
 public class SQLDroidTest {
 
-    private static final File DB_DIR = new File("/data/data/org.sqldroid/databases/");
+    private static final File DB_DIR = new File("target/data/org.sqldroid/databases/");
 
     static {
         registerDriver();
@@ -305,6 +305,6 @@ public class SQLDroidTest {
         dbFile.delete();
         assertThat(dbFile).doesNotExist();
 
-        return "jdbc:sqlite:/data/data/org.sqldroid/databases/" + filename;
+        return "jdbc:sqlite:./target/data/org.sqldroid/databases/" + filename;
     }
 }

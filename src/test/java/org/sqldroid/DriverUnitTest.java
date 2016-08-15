@@ -39,7 +39,7 @@ public class DriverUnitTest {
   protected String packageName = "org.sqldroid";
   
   /** Database file directory for this app on Android */
-  protected String DB_DIRECTORY = "/data/data/" + packageName + "/databases/";
+  protected String DB_DIRECTORY = "./target/data/" + packageName + "/databases/";
   
   /** Name of an in-memory database */
   protected String dummyDatabase = "dummydatabase.db";
