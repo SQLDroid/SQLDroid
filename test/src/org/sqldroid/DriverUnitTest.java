@@ -10,11 +10,15 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Properties;
 
+import android.database.SQLException;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -681,6 +685,38 @@ public class DriverUnitTest extends TestCase {
 
     rs.close();
   }
+  
+  public void testTimestamp() throws Exception {
+      String dbName = "timestamptest.db";
+      String dbFile = DB_DIRECTORY + dbName;
+      setupDatabaseFileAndJDBCDriver(dbFile);
+      
+      Connection conn = DriverManager.getConnection(JDBC_URL_PREFIX + dbFile);
+      conn.createStatement()
+          .execute("create table timestamptest (id integer, created_at timestamp)");
+
+      // Make sure timestamp is around noon to check for DateFormat bug
+      Calendar calendar = new GregorianCalendar(2016, 7, 15, 12, 0, 0);
+      Timestamp timestamp = new Timestamp(calendar.getTimeInMillis() + 853); // make sure millis are included      
+      
+      int id = 23432;
+      PreparedStatement insertStmt = conn.prepareStatement("insert into timestamptest values (?, ?)");
+      insertStmt.setInt(1, id);
+      insertStmt.setTimestamp(2, timestamp);
+      insertStmt.executeUpdate();
+      insertStmt.close();
+      
+      PreparedStatement selectStmt = conn.prepareStatement("select * from timestamptest where id = ?");
+      selectStmt.setInt(1, id);
+      ResultSet rs = selectStmt.executeQuery();
+      rs.next();
+      
+      assertEquals(timestamp, rs.getTimestamp("created_at"));
+      rs.close();
+      selectStmt.close();
+      
+      conn.close();
+  }
 
   public void testAutoCommit() throws Exception {  
 	    String dbName = "autocommittest.db";
@@ -736,6 +772,7 @@ public class DriverUnitTest extends TestCase {
     TestSuite suite =  new TestSuite("SQLDroid Tests");
     suite.addTest(new DriverUnitTest("testAutoCommit"));
     suite.addTest(new DriverUnitTest("testBlob"));
+    suite.addTest(new DriverUnitTest("testTimestamp"));
     suite.addTest(new DriverUnitTest("testMetaData"));
     suite.addTest(new DriverUnitTest("testCursors"));
     suite.addTest(new DriverUnitTest("testResultSets"));
