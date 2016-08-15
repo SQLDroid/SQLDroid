@@ -232,6 +232,12 @@ public class SQLiteDatabase {
   public void endTransaction() throws SQLException {    
     execNoArgVoidMethod(Transaction.endTransaction);
   }
+   
+  /** Checks if the current thread has a transaction pending in the database.
+   * @return true if the current thread has a transaction pending in the database */
+  public boolean inTransaction() {
+    return sqliteDatabase.inTransaction();
+  }
 
   /** Call the "close" method on the database. 
    * @throws SQLException */
@@ -239,7 +245,6 @@ public class SQLiteDatabase {
     execNoArgVoidMethod(Transaction.close);
   }
 
-  
   /** The count of changed rows.  On JNA platforms, this is a call to sqlite3_changes
    * On Android, it's a convoluted call to a package-private method (or, if that fails, the
    * response is '1'.
