@@ -1,3 +1,6 @@
 language: android
 jdk:
   - oraclejdk7
+script:
+  - mvn install -B
+  - rake gem
