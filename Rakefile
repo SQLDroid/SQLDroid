@@ -2,13 +2,14 @@ require 'fileutils'
 require File.expand_path 'lib/sqldroid/version', File.dirname(__FILE__)
 require 'rake/clean'
 
-if ENV['ANDROID_HOME']
-  ANDROID_SDK_HOME = ENV['ANDROID_HOME']
-else
+unless ENV['ANDROID_HOME'] && Dir.exist?(ENV['ANDROID_HOME'])
   dx_location = `which dx`
-  raise 'Unable to find ANDROID_HOME environment variable or the "dx" command.' unless $? == 0
-  ANDROID_SDK_HOME = File.dirname(File.dirname(File.dirname(dx_location)))
+  unless $? == 0
+    raise 'Unable to find ANDROID_HOME environment variable or the "dx" command.'
+  end
+  ENV['ANDROID_HOME'] = File.dirname(File.dirname(File.dirname(dx_location)))
 end
+
 TARGET_DIR       = File.expand_path 'target'
 JAR              = "sqldroid-#{SQLDroid::MAVEN_VERSION}.jar"
 JAR_IN_TARGET    = "#{TARGET_DIR}/#{JAR}"
@@ -18,8 +19,8 @@ GEM_BASE_FILE    = "sqldroid-#{SQLDroid::VERSION}-java.gem"
 GEM_FILE_TARGET  = "#{TARGET_DIR}/#{GEM_BASE_FILE}"
 JAVA_SRC_FILES   = Dir[File.expand_path 'src/main/java/**/*.java']
 
-CLEAN.include('bin', 'pkg')
-CLOBBER.include('bin', 'pkg')
+CLEAN.include('target')
+CLOBBER.include('target', 'lib/sqldroid/sqldroid-*.jar')
 
 desc 'Generate the binary and source jars'
 task :jar => JAR_IN_TARGET
