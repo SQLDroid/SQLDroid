@@ -13,6 +13,10 @@ import java.util.Calendar;
 import java.util.Map;
 
 public class SQLDroidResultSet implements ResultSet {
+    private static final String DATE_PATTERN = "yyyy-MM-dd";
+
+    private static final String TIMESTAMP_PATTERN = "yyyy-MM-dd HH:mm:ss.SSS";
+
     public static boolean dump = false;
 
     private final Cursor c;
@@ -320,7 +324,7 @@ public class SQLDroidResultSet implements ResultSet {
         default:
           // format 2011-07-11 11:36:30.009
           try {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_PATTERN);
             java.util.Date parsedDate = dateFormat.parse(getString(index));
             date = new Date(parsedDate.getTime());
           } catch ( Exception any ) {
@@ -592,7 +596,7 @@ public class SQLDroidResultSet implements ResultSet {
         default:
           // format 2011-07-11 11:36:30.009
           try {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
+            SimpleDateFormat dateFormat = new SimpleDateFormat(TIMESTAMP_PATTERN);
             java.util.Date parsedDate = dateFormat.parse(getString(index));
             timestamp = new Timestamp(parsedDate.getTime());
           } catch ( Exception any ) {

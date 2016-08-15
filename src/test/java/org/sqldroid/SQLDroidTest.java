@@ -218,7 +218,7 @@ public class SQLDroidTest {
             long id;
 
             Calendar calendar = new GregorianCalendar(2016, 7, 15, 12, 0, 0);
-            Timestamp timestamp = new Timestamp(calendar.getTimeInMillis());
+            Timestamp timestamp = new Timestamp(calendar.getTimeInMillis() + 985);
 
             try (PreparedStatement stmt = conn.prepareStatement("insert into timestamptest (created_at) values (?)",
                     PreparedStatement.RETURN_GENERATED_KEYS)) {
