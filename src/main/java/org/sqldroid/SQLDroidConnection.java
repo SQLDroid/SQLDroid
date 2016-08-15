@@ -388,9 +388,11 @@ public class SQLDroidConnection implements Connection {
         }
         this.autoCommit = autoCommit;
         if (autoCommit) {
-            sqlitedb.setTransactionSuccessful();
-            Log.d("END TRANSACTION (autocommit on) " + Thread.currentThread().getId() + " \"" + Thread.currentThread().getName() + "\" " + this);
-            sqlitedb.endTransaction();
+            if (sqlitedb.inTransaction()) { // to be on safe side.
+                sqlitedb.setTransactionSuccessful();
+                Log.d("END TRANSACTION (autocommit on) " + Thread.currentThread().getId() + " \"" + Thread.currentThread().getName() + "\" " + this);
+                sqlitedb.endTransaction();
+            }
         } else {
             Log.d("BEGIN TRANSACTION (autocommit off) " + Thread.currentThread().getId() + " \"" + Thread.currentThread().getName() + "\" " + this);
             sqlitedb.beginTransaction();
