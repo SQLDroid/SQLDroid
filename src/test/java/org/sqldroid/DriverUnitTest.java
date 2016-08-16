@@ -39,6 +39,7 @@ public class DriverUnitTest {
   protected String packageName = "org.sqldroid";
   
   /** Database file directory for this app on Android */
+  // TODO: This should be /data/data/org.sqldroid/databases/ if running on device
   protected String DB_DIRECTORY = "./target/data/" + packageName + "/databases/";
   
   /** Name of an in-memory database */

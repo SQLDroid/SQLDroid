@@ -32,12 +32,13 @@ import junit.framework.AssertionFailedError;
  * This is a refactoring is SQLDroidTest that shares quite a bit of common code between test methods.
  * I'm not sure which approach reads the best.
  * 
- * @author jbrodwal
+ * @author Johannes Brodwall <johannes@brodwall.com>
  */
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = 16)
 public class SQLDroidTest2 {
 
+    // TODO: This should be /data/data/org.sqldroid/databases/ if running on device
     private static final File DB_DIR = new File("./target/data/org.sqldroid/databases/");
 
     private Connection conn;
@@ -296,6 +297,6 @@ public class SQLDroidTest2 {
         dbFile.delete();
         assertThat(dbFile).doesNotExist();
 
-        return "jdbc:sqlite:./target/data/org.sqldroid/databases/" + filename;
+        return "jdbc:sqlite:" + dbFile.getAbsolutePath();
     }
 }
