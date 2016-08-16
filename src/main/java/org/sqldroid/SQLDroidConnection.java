@@ -12,6 +12,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLClientInfoException;
 import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
 import java.sql.SQLWarning;
 import java.sql.SQLXML;
 import java.sql.Savepoint;
@@ -224,19 +225,21 @@ public class SQLDroidConnection implements Connection {
 
     @Override
     public Statement createStatement(int resultSetType, int resultSetConcurrency) throws SQLException {
-        System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "
-                + DebugPrinter.getLineNumber());
-
-        return null;
+      return createStatement(resultSetType, resultSetConcurrency, ResultSet.CLOSE_CURSORS_AT_COMMIT);
     }
 
     @Override
-    public Statement createStatement(int resultSetType, int resultSetConcurrency, int resultSetHoldability)
-    throws SQLException {
-        System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "
-                + DebugPrinter.getLineNumber());
-
-        return null;
+    public Statement createStatement(int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
+      if (resultSetType != ResultSet.TYPE_FORWARD_ONLY) {
+        throw new SQLFeatureNotSupportedException("createStatement supported with TYPE_FORWARD_ONLY");
+      }
+      if (resultSetConcurrency != ResultSet.CONCUR_READ_ONLY) {
+        throw new SQLFeatureNotSupportedException("createStatement supported with CONCUR_READ_ONLY");
+      }
+      if (resultSetHoldability != ResultSet.CLOSE_CURSORS_AT_COMMIT) {
+        throw new SQLFeatureNotSupportedException("createStatement supported with CLOSE_CURSORS_AT_COMMIT");
+      }
+      return createStatement();
     }
 
     @Override
@@ -246,16 +249,12 @@ public class SQLDroidConnection implements Connection {
 
     @Override
     public String getCatalog() throws SQLException {
-        System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "
-                + DebugPrinter.getLineNumber());
         return null;
     }
 
     @Override
     public int getHoldability() throws SQLException {
-        System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "
-                + DebugPrinter.getLineNumber());
-        return 0;
+      return ResultSet.CLOSE_CURSORS_AT_COMMIT;
     }
 
     @Override
@@ -272,9 +271,7 @@ public class SQLDroidConnection implements Connection {
 
     @Override
     public Map<String, Class<?>> getTypeMap() throws SQLException {
-        System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "
-                + DebugPrinter.getLineNumber());
-        return null;
+      throw new SQLFeatureNotSupportedException("getTypeMap not supported");
     }
 
     @Override
@@ -293,37 +290,30 @@ public class SQLDroidConnection implements Connection {
 
     @Override
     public boolean isReadOnly() throws SQLException {
-        System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
         return false;
     }
 
     @Override
     public String nativeSQL(String sql) throws SQLException {
-        System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-        sqlitedb.execSQL(sql);
-        return "SQLDroid: no return info available from sqlite";
+      return sql;
     }
 
     @Override
     public CallableStatement prepareCall(String sql) throws SQLException {
-        System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-
-        return null;
+        return prepareCall(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY,
+            ResultSet.CLOSE_CURSORS_AT_COMMIT);
     }
 
     @Override
     public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
-        System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-
-        return null;
+        return prepareCall(sql, resultSetType, resultSetConcurrency,
+            ResultSet.CLOSE_CURSORS_AT_COMMIT);
     }
 
     @Override
     public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency,
             int resultSetHoldability) throws SQLException {
-        System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-
-        return null;
+      throw new SQLFeatureNotSupportedException("prepareCall not supported");
     }
 
     @Override
@@ -338,30 +328,37 @@ public class SQLDroidConnection implements Connection {
 
     @Override
     public PreparedStatement prepareStatement(String sql, int[] columnIndexes) throws SQLException {
-        System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-        return null;
+        throw new SQLFeatureNotSupportedException("prepareStatement(String,int[]) not supported");
     }
 
     @Override
     public PreparedStatement prepareStatement(String sql, String[] columnNames) throws SQLException {
-        System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-        return null;
+        throw new SQLFeatureNotSupportedException("prepareStatement(String,String[]) not supported");
     }
 
     @Override
     public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
-        return prepareStatement (sql );
+        return prepareStatement(sql, resultSetType, resultSetConcurrency, ResultSet.CLOSE_CURSORS_AT_COMMIT);
     }
 
     @Override
     public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
-        System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-        return null;
+      if (resultSetType != ResultSet.TYPE_FORWARD_ONLY) {
+        throw new SQLFeatureNotSupportedException("createStatement supported with TYPE_FORWARD_ONLY");
+      }
+      if (resultSetConcurrency != ResultSet.CONCUR_READ_ONLY) {
+        throw new SQLFeatureNotSupportedException("createStatement supported with CONCUR_READ_ONLY");
+      }
+      if (resultSetHoldability != ResultSet.CLOSE_CURSORS_AT_COMMIT) {
+        throw new SQLFeatureNotSupportedException("createStatement supported with CLOSE_CURSORS_AT_COMMIT");
+      }
+      return prepareStatement(sql);
     }
 
     @Override
     public void releaseSavepoint(Savepoint savepoint) throws SQLException {
-        System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+      // TODO: Implemented in Xerial as db.exec(String.format("RELEASE SAVEPOINT %s", savepoint.getSavepointName()));
+      throw new SQLFeatureNotSupportedException("releaseSavepoint not supported");
     }
 
     @Override
@@ -377,8 +374,8 @@ public class SQLDroidConnection implements Connection {
 
     @Override
     public void rollback(Savepoint savepoint) throws SQLException {
-        System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "
-                + DebugPrinter.getLineNumber());
+      // TODO: Implemented in Xerial as db.exec(String.format("ROLLBACK TO SAVEPOINT %s", savepoint.getSavepointName()));
+      throw new SQLFeatureNotSupportedException("rollback not supported");
     }
 
     @Override
@@ -407,7 +404,8 @@ public class SQLDroidConnection implements Connection {
 
     @Override
     public void setHoldability(int holdability) throws SQLException {
-        System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+      if (holdability != ResultSet.CLOSE_CURSORS_AT_COMMIT)
+        throw new SQLException("SQLDroid only supports CLOSE_CURSORS_AT_COMMIT");
     }
 
     @Override
@@ -417,14 +415,13 @@ public class SQLDroidConnection implements Connection {
 
     @Override
     public Savepoint setSavepoint() throws SQLException {
-        System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-        return null;
+      // TODO: In Xerial: db.exec(String.format("SAVEPOINT %s", sp.getSavepointName()))
+      throw new SQLFeatureNotSupportedException("setSavepoint not supported");
     }
 
     @Override
     public Savepoint setSavepoint(String name) throws SQLException {
-        System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-        return null;
+      throw new SQLFeatureNotSupportedException("setSavepoint not supported");
     }
 
     @Override
@@ -447,51 +444,48 @@ public class SQLDroidConnection implements Connection {
     }
 
     @Override
-    public boolean isWrapperFor(Class<?> arg0) throws SQLException {
-        // TODO Auto-generated method stub
-        return false;
+    public boolean isWrapperFor(Class<?> iface) throws SQLException {
+      return iface != null && iface.isAssignableFrom(getClass());
     }
 
     @Override
-    public <T> T unwrap(Class<T> arg0) throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
+    public <T> T unwrap(Class<T> iface) throws SQLException {
+      if (isWrapperFor(iface)) {
+        return (T) this;
+      }
+      throw new SQLException(getClass() + " does not wrap " + iface);
     }
 
     @Override
     public Array createArrayOf(String typeName, Object[] elements) throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
+      throw new SQLFeatureNotSupportedException("createArrayOf not supported");
     }
 
     @Override
     public Blob createBlob() throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
+      // TODO: Can return new SQLDroidBlob(new byte[0]) once setBytes is implemented
+      throw new SQLFeatureNotSupportedException("createBlob not supported");
     }
 
     @Override
-    public Clob createClob() throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
+    public SQLDroidClob createClob() throws SQLException {
+      // TODO: Can return new SQLDroidClob("") once setString is implemented
+      throw new SQLFeatureNotSupportedException("createClob not supported");
     }
 
     @Override
     public NClob createNClob() throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
+        return createClob();
     }
 
     @Override
     public SQLXML createSQLXML() throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
+      throw new SQLFeatureNotSupportedException("createSQLXML not supported");
     }
 
     @Override
     public Struct createStruct(String typeName, Object[] attributes) throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
+      throw new SQLFeatureNotSupportedException("createStruct not supported");
     }
 
     @Override
@@ -508,20 +502,18 @@ public class SQLDroidConnection implements Connection {
 
     @Override
     public boolean isValid(int timeout) throws SQLException {
-        // TODO Auto-generated method stub
-        return false;
+        // TODO createStatement().execute("select 1");
+        return true;
     }
 
     @Override
     public void setClientInfo(Properties properties) throws SQLClientInfoException {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public void setClientInfo(String name, String value) throws SQLClientInfoException {
         // TODO Auto-generated method stub
-
     }
 
     /**
@@ -538,21 +530,18 @@ public class SQLDroidConnection implements Connection {
     }
 
     public int getNetworkTimeout() throws SQLException {
-        // TODO Auto-generated method stub
         return 0;
     }
 
     public void abort(Executor executor) throws SQLException {
-        // TODO Auto-generated method stub
+      close();
     }
 
     public String getSchema() throws SQLException {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public void setSchema(String schema) throws SQLException {
-        // TODO Auto-generated method stub
     } 
     
 	/**
