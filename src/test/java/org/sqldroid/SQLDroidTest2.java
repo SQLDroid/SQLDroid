@@ -198,6 +198,11 @@ public class SQLDroidTest2 {
                 rs.next();
                 Blob blob = rs.getBlob(1);
                 assertThat(blob.getBytes(0, aBlob.length)).isEqualTo(aBlob);
+                assertThat(blob.getBytes(1, aBlob.length-2))
+                  .hasSize(aBlob.length-2)
+                  .startsWith(aBlob[1])
+                  .endsWith(aBlob[aBlob.length-2]);
+                assertThat(aBlob).containsSubsequence(blob.getBytes(1, aBlob.length-2));
             }
         }
     }

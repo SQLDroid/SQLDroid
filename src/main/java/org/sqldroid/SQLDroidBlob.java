@@ -34,7 +34,9 @@ public class SQLDroidBlob implements Blob {
       throw new SQLException("length must be > 0");
     }
     if (pos > 0 || length < b.length) {
-      throw new UnsupportedOperationException("getBytes implementation only supports return full byte array");
+      byte[] tmp = new byte[length];
+      System.arraycopy(b, (int)pos, tmp, 0, length);
+      return tmp;
     }
 		return b;
 	}
