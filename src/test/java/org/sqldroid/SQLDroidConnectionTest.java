@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.assertj.core.api.ThrowableAssert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
@@ -76,6 +77,19 @@ public class SQLDroidConnectionTest {
     }).isInstanceOf(SQLException.class)
       .hasMessageContaining("SQLiteCantOpenDatabaseException");
     assertThat(dbSubdir).doesNotExist();
+  }
+  
+  @Test
+  @Ignore("Issue #68")
+  public void shouldSupportReconnectAfterAbortedTransaction() throws SQLException {
+    File dbFile = cleanDbFile("aborted-tranaction.db");
+    final String jdbcUrl = "jdbc:sqlite:" + dbFile.getAbsolutePath();
+    try(Connection connection = new SQLDroidDriver().connect(jdbcUrl, new Properties())) {
+      connection.setAutoCommit(false);
+    }
+    Connection conn = new SQLDroidDriver().connect(jdbcUrl, new Properties());
+    assertThat(conn.isClosed()).isFalse();
+    conn.close();
   }
   
 
