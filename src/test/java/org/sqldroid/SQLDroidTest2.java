@@ -21,12 +21,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
-import edu.emory.mathcs.backport.java.util.Arrays;
 import junit.framework.AssertionFailedError;
 
 
@@ -298,7 +298,6 @@ public class SQLDroidTest2 {
         }
     }
 
-    @SuppressWarnings("unchecked")
     private long executeForGeneratedKey(String query, Object... parameters) throws SQLException {
         return executeForGeneratedKeyWithList(query, Arrays.asList(parameters));
     }

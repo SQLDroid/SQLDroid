@@ -347,7 +347,6 @@ public class SQLDroidTest {
         }
     }
 
-    
     private String createDatabase(String filename) {
         DB_DIR.mkdirs();
         assertThat(DB_DIR).exists();
