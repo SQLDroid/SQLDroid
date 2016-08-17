@@ -11,7 +11,6 @@ import org.robolectric.annotation.Config;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -58,6 +57,25 @@ public class SQLDroidConnectionTest {
       }
     }).isInstanceOf(SQLException.class)
       .hasMessageContaining("SQLiteCantOpenDatabaseException");
+  }
+  
+  @Test
+  // TODO: Many issues seem to stem from users expecting subdirectories to be created. Should this be supported?
+  public void shouldFailOnMissingSubdirectory() throws SQLException {
+    DB_DIR.mkdirs();
+    assertThat(DB_DIR).isDirectory();
+    File dbSubdir = new File(DB_DIR, "non-existing-dir");
+    assertThat(dbSubdir).doesNotExist();
+    File dbFile = new File(dbSubdir, "database.db");
+    final String jdbcUrl = "jdbc:sqlite:" + dbFile.getAbsolutePath();
+    assertThatThrownBy(new ThrowableAssert.ThrowingCallable() {
+      @Override
+      public void call() throws Throwable {
+        new SQLDroidDriver().connect(jdbcUrl, new Properties());
+      }
+    }).isInstanceOf(SQLException.class)
+      .hasMessageContaining("SQLiteCantOpenDatabaseException");
+    assertThat(dbSubdir).doesNotExist();
   }
   
 
