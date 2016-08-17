@@ -82,7 +82,7 @@ public class SQLDroidConnectionTest {
   @Test
   @Ignore("Issue #68")
   public void shouldSupportReconnectAfterAbortedTransaction() throws SQLException {
-    File dbFile = cleanDbFile("aborted-tranaction.db");
+    File dbFile = cleanDbFile("aborted-transaction.db");
     final String jdbcUrl = "jdbc:sqlite:" + dbFile.getAbsolutePath();
     try(Connection connection = new SQLDroidDriver().connect(jdbcUrl, new Properties())) {
       connection.setAutoCommit(false);
@@ -92,6 +92,21 @@ public class SQLDroidConnectionTest {
     conn.close();
   }
   
+  @Test
+  @Ignore("Issue #54")
+  public void shouldAllowNewTransactionAfterCommit() throws SQLException {
+    File dbFile = cleanDbFile("transaction.db");
+    final String jdbcUrl = "jdbc:sqlite:" + dbFile.getAbsolutePath();
+    try(Connection connection = new SQLDroidDriver().connect(jdbcUrl, new Properties())) {
+      connection.setAutoCommit(false);
+      connection.commit();
+    }
+
+    try(Connection connection = new SQLDroidDriver().connect(jdbcUrl, new Properties())) {
+      // The following line should not throw an exception "database is locked"
+      connection.setAutoCommit(false);
+    }
+  }
 
   private static final File DB_DIR = new File("./target/data/org.sqldroid/databases/");
 
