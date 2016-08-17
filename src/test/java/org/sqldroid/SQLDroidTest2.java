@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
@@ -22,6 +23,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
@@ -178,17 +180,12 @@ public class SQLDroidTest2 {
     public void shouldRetrieveSavedBlob() throws SQLException {
         conn.createStatement().execute("create table blobtest (key int, value blob)");
 
-        // create a blob
-        final int blobSize = 70000;
-        byte[] aBlob = new byte[blobSize];
-        for (int counter = 0; counter < blobSize; counter++) {
-            aBlob[counter] = (byte) (counter % 10);
-        }
+        byte[] byteArray = randomByteArray();
 
         int id = 441;
         try (PreparedStatement stmt = conn.prepareStatement("INSERT INTO blobtest(key,value) VALUES (?, ?)")) {
             stmt.setInt(1, id);
-            stmt.setBinaryStream(2, new ByteArrayInputStream(aBlob), aBlob.length);
+            stmt.setBinaryStream(2, new ByteArrayInputStream(byteArray), byteArray.length);
             stmt.executeUpdate();
         }
 
@@ -197,15 +194,43 @@ public class SQLDroidTest2 {
             try (ResultSet rs = stmt.executeQuery()) {
                 rs.next();
                 Blob blob = rs.getBlob(1);
-                assertThat(blob.getBytes(0, aBlob.length)).isEqualTo(aBlob);
-                assertThat(blob.getBytes(1, aBlob.length-2))
-                  .hasSize(aBlob.length-2)
-                  .startsWith(aBlob[1])
-                  .endsWith(aBlob[aBlob.length-2]);
-                assertThat(aBlob).containsSubsequence(blob.getBytes(1, aBlob.length-2));
+                assertThat(blob.length()).isEqualTo(byteArray.length);
+                assertThat(blob.getBytes(0, byteArray.length)).isEqualTo(byteArray);
+                assertThat(blob.getBytes(1, byteArray.length-2))
+                  .hasSize(byteArray.length-2)
+                  .startsWith(byteArray[1])
+                  .endsWith(byteArray[byteArray.length-2]);
+                assertThat(byteArray).containsSubsequence(blob.getBytes(1, byteArray.length-2));
+                
+                Blob blobAsObj = (Blob)rs.getObject(1);
+                assertThat(blobAsObj.getBytes(0, (int)blobAsObj.length()))
+                  .isEqualTo(byteArray);
             }
         }
     }
+
+    @Test
+    @Ignore("TODO This seems to have been broken by c6a59b700c81c223936f2d38aef13d42cf1f91ca to fix #24")
+    public void shouldRetrieveSavedStringAsBlob() throws SQLException {
+        conn.createStatement().execute("CREATE TABLE stringblobtest (value TEXT)");
+        
+        String s = "a random test string";
+        byte[] byteArray = s.getBytes();
+  
+        try (PreparedStatement stmt = conn.prepareStatement("INSERT INTO stringblobtest (value) VALUES (?)")) {
+            stmt.setString(1, s);
+            stmt.executeUpdate();
+        }
+        
+        try (PreparedStatement stmt = conn.prepareStatement("SELECT value FROM stringblobtest")) {
+            try (ResultSet rs = stmt.executeQuery()) {
+                rs.next();
+                Blob blob = rs.getBlob(1);
+                assertThat(blob.getBytes(0, (int) blob.length()))
+                  .isEqualTo(byteArray);
+            }
+        }
+      }
 
     @Test
     public void shouldSaveAndRetrieveTimestamps() throws SQLException {
@@ -317,5 +342,14 @@ public class SQLDroidTest2 {
         assertThat(dbFile).doesNotExist();
 
         return "jdbc:sqlite:" + dbFile.getAbsolutePath();
+    }
+
+    private static Random random = new Random();
+
+    private byte[] randomByteArray() {
+        int blobSize = 1000 + random.nextInt(10_000);
+        byte[] aBlob = new byte[blobSize];
+        random.nextBytes(aBlob);
+        return aBlob;
     }
 }
