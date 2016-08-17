@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e) {
             throw new RuntimeException("Failed to register SQLDroidDriver");
         }
-        String jdbcUrl = "jdbc:sqldroid:" + "/data/data/" + getPackageName() + "/priceagentDB.db";
+        String jdbcUrl = "jdbc:sqldroid:" + "/data/data/" + getPackageName() + "/my-database.db";
         try {
             this.connection = DriverManager.getConnection(jdbcUrl);
         } catch (SQLException e) {
