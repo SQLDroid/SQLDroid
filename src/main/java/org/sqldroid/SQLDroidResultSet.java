@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.sql.*;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -19,6 +20,7 @@ public class SQLDroidResultSet implements ResultSet {
     private static final String DATE_PATTERN = "yyyy-MM-dd";
 
     private static final String TIMESTAMP_PATTERN = "yyyy-MM-dd HH:mm:ss.SSS";
+    private static final String TIMESTAMP_PATTERN_NO_MILLIS = "yyyy-MM-dd HH:mm:ss";
 
     public static boolean dump = false;
 
@@ -570,31 +572,28 @@ public class SQLDroidResultSet implements ResultSet {
   public Timestamp getTimestamp(int index) throws SQLException {
     try {
       lastColumnRead = index;
-      ResultSetMetaData md = getMetaData();
-      Timestamp timestamp = null;
-      switch ( md.getColumnType(index)) {
+      switch ( getMetaData().getColumnType(index)) {
         case Types.NULL:
           return null;
         case Types.INTEGER:
         case Types.BIGINT:
-          timestamp = new Timestamp(getLong(index));
-          break;
+          return new Timestamp(getLong(index));
         case Types.DATE:
-          timestamp = new Timestamp(getDate(index).getTime());
-          break;
+          return new Timestamp(getDate(index).getTime());
         default:
-          // format 2011-07-11 11:36:30.009
+          // format 2011-07-11 11:36:30.009 OR 2011-07-11 11:36:30 
+          SimpleDateFormat dateFormat = new SimpleDateFormat(TIMESTAMP_PATTERN);
+          SimpleDateFormat dateFormatNoMillis = new SimpleDateFormat(TIMESTAMP_PATTERN_NO_MILLIS);
           try {
-            SimpleDateFormat dateFormat = new SimpleDateFormat(TIMESTAMP_PATTERN);
-            java.util.Date parsedDate = dateFormat.parse(getString(index));
-            timestamp = new Timestamp(parsedDate.getTime());
-          } catch ( Exception any ) {
-            any.printStackTrace();
+            return new Timestamp(dateFormat.parse(getString(index)).getTime());
+          } catch (ParseException e) {
+            try {
+              return new Timestamp(dateFormatNoMillis.parse(getString(index)).getTime());
+            } catch (ParseException e1) {
+              throw new SQLException(e.toString());
+            }
           }
-          break;
-
       }
-      return timestamp;
     } catch (android.database.SQLException e) {
       throw SQLDroidConnection.chainException(e);
     }

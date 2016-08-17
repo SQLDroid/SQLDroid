@@ -254,6 +254,20 @@ public class SQLDroidTest2 {
         }
     }
 
+    @Test
+    public void shouldRetrieveDefaultDates() throws SQLException {
+        conn.createStatement().execute("CREATE TABLE datetime_now_test (datetimecol TEXT NOT NULL DEFAULT (datetime('now')), unused TEXT)");
+        conn.createStatement().executeUpdate("INSERT INTO datetime_now_test (unused) VALUES (null)");
+
+        try (PreparedStatement stmt = conn.prepareStatement("SELECT datetimecol FROM datetime_now_test")) {
+            try (ResultSet rs = stmt.executeQuery()) {
+                rs.next();
+                assertThat(rs.getTimestamp("datetimecol").toString())
+                  .matches("20\\d\\d-\\d\\d-\\d\\d.*");
+            }
+        }
+    }
+
     @SuppressWarnings("unchecked")
     private long executeForGeneratedKey(String query, Object... parameters) throws SQLException {
         return executeForGeneratedKeyWithList(query, Arrays.asList(parameters));

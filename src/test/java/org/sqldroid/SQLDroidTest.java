@@ -296,7 +296,24 @@ public class SQLDroidTest {
                 }
             }
         }
-    }    
+    }
+
+    @Test
+    public void shouldRetrieveDefaultDates() throws SQLException {
+        try(Connection conn = DriverManager.getConnection(createDatabase("null-dates.db"))) {
+            conn.createStatement().execute("CREATE TABLE datetime_now_test (datetimecol TEXT NOT NULL DEFAULT (datetime('now')), unused TEXT)");
+            conn.createStatement().executeUpdate("INSERT INTO datetime_now_test (unused) VALUES (null)");
+    
+            try (PreparedStatement stmt = conn.prepareStatement("SELECT datetimecol FROM datetime_now_test")) {
+                try (ResultSet rs = stmt.executeQuery()) {
+                    rs.next();
+                    assertThat(rs.getTimestamp("datetimecol").toString())
+                      .matches("20\\d\\d-\\d\\d-\\d\\d.*");
+                }
+            }
+        }
+    }
+
     
     private String createDatabase(String filename) {
         DB_DIR.mkdirs();
