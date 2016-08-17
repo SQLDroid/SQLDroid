@@ -25,6 +25,9 @@ public class SQLDroidResultSet implements ResultSet {
     private final Cursor c;
     private int lastColumnRead; // JDBC style column index starting from 1
 
+    // TODO: Implement behavior (as Xerial driver)
+    private int limitRows = 0;
+
     public SQLDroidResultSet(Cursor c) throws SQLException {
         this.c = c;
         if (dump) {
@@ -99,6 +102,7 @@ public class SQLDroidResultSet implements ResultSet {
 
   @Override
   public void clearWarnings() throws SQLException {
+    // TODO: Evaluate if implementation is sufficient (if so, delete comment and log)
     System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
   }
 
@@ -374,9 +378,7 @@ public class SQLDroidResultSet implements ResultSet {
 
   @Override
   public int getFetchSize() throws SQLException {
-    // TODO Implement as Xerial driver (which really does nothing)
-    // https://github.com/xerial/sqlite-jdbc/blob/master/src/main/java/org/sqlite/jdbc3/JDBC3ResultSet.java#L98
-    throw new UnsupportedOperationException("Not implemented yet");
+    return limitRows;
   }
 
   @Override
@@ -607,6 +609,7 @@ public class SQLDroidResultSet implements ResultSet {
   @Override
   public Timestamp getTimestamp(int colID, Calendar cal)
   throws SQLException {
+    // TODO Implement with Calendar
     System.err.println(" ********************* not implemented correctly - Calendar is ignored. @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
     return getTimestamp(colID);
   }
@@ -782,7 +785,11 @@ public class SQLDroidResultSet implements ResultSet {
 
   @Override
   public void setFetchSize(int rows) throws SQLException {
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+    // TODO: Implement as max row number for next()
+    if (rows != 0) {
+      throw new UnsupportedOperationException("Not implemented yet");
+    }
+    limitRows = rows;
   }
 
   @Override

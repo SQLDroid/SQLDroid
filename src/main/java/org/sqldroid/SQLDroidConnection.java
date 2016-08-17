@@ -62,6 +62,8 @@ public class SQLDroidConnection implements Connection {
 
     private final String url;
 
+    private int transactionIsolation = TRANSACTION_SERIALIZABLE;
+
     /** Connect to the database with the given url and properties.
      *
      * @param url the URL string, typically something like
@@ -130,7 +132,7 @@ public class SQLDroidConnection implements Connection {
                 } catch ( NumberFormatException nfe ) {
                     Log.e("Error Parsing DatabaseFlags \"" + info.getProperty(SQLDroidDriver.DATABASE_FLAGS) + " not a number ", nfe);
                 }
-            } else if ( info != null && info.getProperty(SQLDroidDriver.ADDITONAL_DATABASE_FLAGS) != null ) {
+            } else if ( info.getProperty(SQLDroidDriver.ADDITONAL_DATABASE_FLAGS) != null ) {
                 try {
                     int extraFlags = Integer.parseInt(info.getProperty(SQLDroidDriver.ADDITONAL_DATABASE_FLAGS));
                     flags |= extraFlags;
@@ -264,9 +266,7 @@ public class SQLDroidConnection implements Connection {
 
     @Override
     public int getTransactionIsolation() throws SQLException {
-        System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "
-                + DebugPrinter.getLineNumber());
-        return Connection.TRANSACTION_NONE;
+        return transactionIsolation;
     }
 
     @Override
@@ -276,6 +276,7 @@ public class SQLDroidConnection implements Connection {
 
     @Override
     public SQLWarning getWarnings() throws SQLException {
+        // TODO: Is this a sufficient implementation? (If so, delete comment and logging)
         System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "
                 + DebugPrinter.getLineNumber());
         return null;
@@ -398,8 +399,8 @@ public class SQLDroidConnection implements Connection {
 
     @Override
     public void setCatalog(String catalog) throws SQLException {
-        System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-
+      // From spec: 
+      // If the driver does not support catalogs, it will silently ignore this request.
     }
 
     @Override
@@ -410,7 +411,9 @@ public class SQLDroidConnection implements Connection {
 
     @Override
     public void setReadOnly(boolean readOnly) throws SQLException {
-        System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+        if (readOnly != isReadOnly()) {
+            throw new SQLException("Cannot change read-only flag after establishing a connection");
+        }
     }
 
     @Override
@@ -426,12 +429,16 @@ public class SQLDroidConnection implements Connection {
 
     @Override
     public void setTransactionIsolation(int level) throws SQLException {
-        System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "+ DebugPrinter.getLineNumber());
+        // TODO: Xerial implements this with PRAGMA read_uncommitted
+        if (level != TRANSACTION_SERIALIZABLE) {
+          throw new SQLException("SQLDroid supports only TRANSACTION_SERIALIZABLE.");
+        }
+        transactionIsolation = level;
     }
 
     @Override
     public void setTypeMap(Map<String, Class<?>> arg0) throws SQLException {
-        System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "+ DebugPrinter.getLineNumber());
+      throw new SQLFeatureNotSupportedException("setTypeMap not supported");
     }
 
     @Override
@@ -490,13 +497,13 @@ public class SQLDroidConnection implements Connection {
 
     @Override
     public Properties getClientInfo() throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
+        // TODO Evaluate if this is a sufficient implementation (if so, remove this comment)
+        return new Properties();
     }
 
     @Override
     public String getClientInfo(String name) throws SQLException {
-        // TODO Auto-generated method stub
+        // TODO Evaluate if this is a sufficient implementation (if so, remove this comment)
         return null;
     }
 
@@ -508,12 +515,12 @@ public class SQLDroidConnection implements Connection {
 
     @Override
     public void setClientInfo(Properties properties) throws SQLClientInfoException {
-        // TODO Auto-generated method stub
+        // TODO Evaluate if this is a sufficient implementation (if so, remove this comment)
     }
 
     @Override
     public void setClientInfo(String name, String value) throws SQLClientInfoException {
-        // TODO Auto-generated method stub
+        // TODO Evaluate if this is a sufficient implementation (if so, remove this comment)
     }
 
     /**
@@ -526,11 +533,11 @@ public class SQLDroidConnection implements Connection {
     // methods added for JDK7 compilation
 
     public void setNetworkTimeout(Executor executor, int milliseconds) throws SQLException {
-        // TODO Auto-generated method stub
+        throw new SQLFeatureNotSupportedException("setNetworkTimeout not supported");
     }
 
     public int getNetworkTimeout() throws SQLException {
-        return 0;
+        throw new SQLFeatureNotSupportedException("getNetworkTimeout not supported");
     }
 
     public void abort(Executor executor) throws SQLException {

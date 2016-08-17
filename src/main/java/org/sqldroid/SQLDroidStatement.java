@@ -57,6 +57,7 @@ public class SQLDroidStatement implements Statement {
 
   @Override
   public void clearWarnings() throws SQLException {
+    // TODO Evaluate if the implementation is sufficient (if so, delete comment and log)
     System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
   }
 
@@ -252,6 +253,7 @@ public class SQLDroidStatement implements Statement {
 
   @Override
   public SQLWarning getWarnings() throws SQLException {
+    // TODO Evaluate if the implementation is sufficient (if so, delete comment and log)
     System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "
         + DebugPrinter.getLineNumber());
     return null;
