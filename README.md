@@ -37,6 +37,8 @@ Binary distributions are available for download from the Maven Central Repositor
 
 ## Usage
 
+Here is a minimal example of an Android Activity implemented in Java with SQLDroid.
+
 ```java
 import java.sql.DriverManager;
 import java.sql.Connection;
@@ -72,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
                 throw new RuntimeException(e);
             }
         }
+        super.onDestroy();
     }
 }
 ```

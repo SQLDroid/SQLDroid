@@ -199,6 +199,7 @@ public class SQLDroidConnection implements Connection {
                 clientMap.remove(this);
                 if (!clientMap.containsValue(sqlitedb)) {
                     Log.i("SQLDroidConnection.close(): " + Thread.currentThread().getId() + " \"" + Thread.currentThread().getName() + "\" " + this + " Closing the database since since last connection was closed.");
+                    setAutoCommit(true);
                     sqlitedb.close();
                     dbMap.remove(sqlitedb.dbQname);
                 }
