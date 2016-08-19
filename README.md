@@ -37,8 +37,43 @@ Binary distributions are available for download from the Maven Central Repositor
 
 ## Usage
 
-```
-// Insert example here
+```java
+import java.sql.DriverManager;
+import java.sql.Connection;
+import java.sql.Driver;
+import java.sql.SQLException;
+
+public class MainActivity extends AppCompatActivity {
+
+    private Connection connection;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        try {
+            DriverManager.registerDriver((Driver) Class.forName("org.sqldroid.SQLDroidDriver").newInstance());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to register SQLDroidDriver");
+        }
+        String jdbcUrl = "jdbc:sqldroid:" + "/data/data/" + getPackageName() + "/my-database.db";
+        try {
+            this.connection = DriverManager.getConnection(jdbcUrl);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        if (connection != null) {
+            try {
+                connection.close();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+}
 ```
 
 You can find an example of how to use SQLDroid with ActiveRecord on Ruboto here:
