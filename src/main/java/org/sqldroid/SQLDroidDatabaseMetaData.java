@@ -1,9 +1,5 @@
 package org.sqldroid;
 
-import android.database.Cursor;
-import android.database.MatrixCursor;
-import android.database.MergeCursor;
-
 import java.sql.*;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -15,7 +11,7 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 	private static final int SQLITE_DONE       =  101;
 	private static final String VIEW_TYPE = "VIEW";
 	private static final String TABLE_TYPE = "TABLE";
-	
+
 	private PreparedStatement
 	getTableTypes        = null,   getCatalogs          = null,
 	getUDTs              = null,   getSuperTypes        = null,
@@ -23,7 +19,7 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 	getProcedureColumns   = null,   getAttributes        = null,
 	getBestRowIdentifier  = null,   getVersionColumns    = null,
 	getColumnPrivileges   = null;
-	
+
 	SQLDroidConnection con;
 
 	/**
@@ -47,7 +43,7 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 	public SQLDroidDatabaseMetaData(SQLDroidConnection con) {
 		this.con = con;
 	}
-	
+
 	@Override
 	public boolean allProceduresAreCallable() throws SQLException {
 		return false;
@@ -147,12 +143,12 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 	  // and return the columname and type from:
 	  //	"PRAGMA table_info(tablename)"
 	  // which returns data like this:
-	  //		sqlite> PRAGMA lastyear.table_info(gross_sales); 
-	  //		cid|name|type|notnull|dflt_value|pk 
-	  //		0|year|INTEGER|0|'2006'|0 
-	  //		1|month|TEXT|0||0 
-	  //		2|monthlygross|REAL|0||0 
-	  //		3|sortcol|INTEGER|0||0 
+	  //		sqlite> PRAGMA lastyear.table_info(gross_sales);
+	  //		cid|name|type|notnull|dflt_value|pk
+	  //		0|year|INTEGER|0|'2006'|0
+	  //		1|month|TEXT|0||0
+	  //		2|monthlygross|REAL|0||0
+	  //		3|sortcol|INTEGER|0||0
 	  //		sqlite>
 
 	  // and then make the cursor have these columns
@@ -188,28 +184,28 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 	  //		YES --- if the column is auto incremented
 	  //		NO --- if the column is not auto incremented
 	  //		empty string --- if it cannot be determined whether the column is auto incremented parameter is unknown
-	  final String[] columnNames = new String [] {"TABLE_CAT", "TABLE_SCHEM", "TABLE_NAME", "COLUMN_NAME", 
-	      "DATA_TYPE",  "TYPE_NAME",  "COLUMN_SIZE", "BUFFER_LENGTH", "DECIMAL_DIGITS", "NUM_PREC_RADIX", 
-	      "NULLABLE", "REMARKS","COLUMN_DEF", "SQL_DATA_TYPE", "SQL_DATETIME_SUB", "CHAR_OCTET_LENGTH", 
-	      "ORDINAL_POSITION", "IS_NULLABLE", "SCOPE_CATLOG", "SCOPE_SCHEMA", "SCOPE_TABLE", "SOURCE_DATA_TYPE", 
+	  final String[] columnNames = new String [] {"TABLE_CAT", "TABLE_SCHEM", "TABLE_NAME", "COLUMN_NAME",
+	      "DATA_TYPE",  "TYPE_NAME",  "COLUMN_SIZE", "BUFFER_LENGTH", "DECIMAL_DIGITS", "NUM_PREC_RADIX",
+	      "NULLABLE", "REMARKS","COLUMN_DEF", "SQL_DATA_TYPE", "SQL_DATETIME_SUB", "CHAR_OCTET_LENGTH",
+	      "ORDINAL_POSITION", "IS_NULLABLE", "SCOPE_CATLOG", "SCOPE_SCHEMA", "SCOPE_TABLE", "SOURCE_DATA_TYPE",
 	  "IS_AUTOINCREMENT"};
-	  final Object[] columnValues = new Object[] {null, null, null, null, null, null, null, null, null, Integer.valueOf(10), 
+	  final Object[] columnValues = new Object[] {null, null, null, null, null, null, null, null, null, Integer.valueOf(10),
 	          Integer.valueOf(2) /* columnNullableUnknown */, null, null, null, null, Integer.valueOf(-1), Integer.valueOf(-1), "",
 	      null, null, null, null, ""};
 
 	  SQLiteDatabase db = con.getDb();
 	  final String[] types = new String[] {TABLE_TYPE, VIEW_TYPE};
 	  ResultSet rs = null;
-	  List<Cursor> cursorList = new ArrayList<Cursor>();
+	  List<SQLiteCursor> cursorList = new ArrayList<SQLiteCursor>();
 	  try {
 	    rs = getTables(catalog, schemaPattern,	tableNamePattern, types);
 	    while ( rs.next() ) {
-	      Cursor c = null;
+	      SQLiteCursor c = null;
 	      try {
 	        String tableName = rs.getString(3);
 	        String pragmaStatement = "PRAGMA table_info('"+ tableName + "')";   // ?)";  substitutions don't seem to work in a pragma statment...
 	        c = db.rawQuery(pragmaStatement, new String[] {});
-	        MatrixCursor mc = new MatrixCursor (columnNames,c.getCount());
+	        SQLiteMatrixCursor mc = db.createCursor(columnNames,c.getCount());
 	        while (c.moveToNext() ) {
 	          Object[] column = columnValues.clone();
 	          column[2] = tableName;
@@ -269,15 +265,15 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 	  }
 
 	  SQLDroidResultSet resultSet;
-	  Cursor[] cursors = new Cursor[cursorList.size()];
+	  SQLiteCursor[] cursors = new SQLiteCursor[cursorList.size()];
 	  cursors = cursorList.toArray(cursors);
 
 	  if ( cursors.length == 0 ) {
-	    resultSet = new SQLDroidResultSet(new MatrixCursor(columnNames,0));
+	    resultSet = new SQLDroidResultSet(db.createCursor(columnNames, 0));
 	  } else if ( cursors.length == 1 ) {
 	    resultSet = new SQLDroidResultSet(cursors[0]);
 	  } else {
-	    resultSet = new SQLDroidResultSet(new MergeCursor( cursors )); 
+	    resultSet = new SQLDroidResultSet(db.mergeCursors(cursors));
 	  }
 	  return resultSet;
 	}
@@ -309,7 +305,7 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 	}
 	@Override
 	public int getDatabaseMajorVersion() throws SQLException {
-		return con.getDb().getSqliteDatabase().getVersion();
+		return con.getDb().getVersion();
 	}
 
 	@Override
@@ -521,7 +517,7 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 		}
 
 		boolean rsHasNext = false;
-		
+
 		for (int i = 0; rs.next(); i++) {
 			rsHasNext = true;
 			int keySeq = rs.getInt(2) + 1;
@@ -558,7 +554,7 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 			.append(" when 'SET DEFAULT' then ").append(importedKeySetDefault).append(" end as dr");
 		}
 		rs.close();
-		
+
 		if(!rsHasNext){
 			sql.append("select -1 as ks, '' as ptn, '' as fcn, '' as pcn, ")
 			.append(importedKeyNoAction).append(" as ur, ")
@@ -745,8 +741,8 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 	  final Object[] columnValues = new Object[] {null, null, null, null, null, null};
 	  SQLiteDatabase db = con.getDb();
 
-	  Cursor c = db.rawQuery("pragma table_info('" + table + "')", new String[] {});
-	  MatrixCursor mc = new MatrixCursor(columnNames);
+	  SQLiteCursor c = db.rawQuery("pragma table_info('" + table + "')", new String[] {});
+	  SQLiteMatrixCursor mc = db.createCursor(columnNames, 0);
 	  while (c.moveToNext()) {
 	    if(c.getInt(5) > 0) {
 	      Object[] column = columnValues.clone();
@@ -880,18 +876,18 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 		if(tableNamePattern == null){
 			tableNamePattern = "%";
 		}
-		
+
 	  if ( types == null ) {
 	    types = new String[] {TABLE_TYPE};
 	  }
 		//		.tables command from here:
-		//			http://www.sqlite.org/sqlite.html		
-		//		
-		//	  SELECT name FROM sqlite_master 
+		//			http://www.sqlite.org/sqlite.html
+		//
+		//	  SELECT name FROM sqlite_master
 		//		WHERE type IN ('table','view') AND name NOT LIKE 'sqlite_%'
-		//		UNION ALL 
-		//		SELECT name FROM sqlite_temp_master 
-		//		WHERE type IN ('table','view') 
+		//		UNION ALL
+		//		SELECT name FROM sqlite_temp_master
+		//		WHERE type IN ('table','view')
 		//		ORDER BY 1
 
 		// Documentation for getTables() mandates a certain format for the returned result set.
@@ -900,7 +896,7 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 		// but now it's the third column in the result set and all the other columns are present
 		// The type, which can be 'view', 'table' (maybe also 'index') is returned as the type.
 		// The sort will be wrong if multiple types are selected.  The solution would be to select
-		// one time with type = ('table' | 'view' ), etc. but I think these would have to be 
+		// one time with type = ('table' | 'view' ), etc. but I think these would have to be
 		// substituted by hand (that is, I don't think a ? option could be used - but I could be wrong about that.
 		final String selectStringStart = "SELECT null AS TABLE_CAT,null AS TABLE_SCHEM, tbl_name as TABLE_NAME, '";
 		final String selectStringMiddle = "' as TABLE_TYPE, 'No Comment' as REMARKS, null as TYPE_CAT, null as TYPE_SCHEM, null as TYPE_NAME, null as SELF_REFERENCING_COL_NAME, null as REF_GENERATION" +
@@ -910,7 +906,7 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 		" FROM sqlite_temp_master WHERE tbl_name LIKE ? AND name NOT LIKE 'android_metadata' AND upper(type) = ? ORDER BY 3";
 
 		SQLiteDatabase db = con.getDb();
-		List<Cursor> cursorList = new ArrayList<Cursor>();
+		List<SQLiteCursor> cursorList = new ArrayList<SQLiteCursor>();
 		for ( String tableType : types ) {
 			StringBuffer selectString = new StringBuffer ();
 			selectString.append(selectStringStart);
@@ -918,13 +914,13 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 			selectString.append(selectStringMiddle);
 			selectString.append(tableType);
 			selectString.append(selectStringEnd);
-			Cursor c = db.rawQuery(selectString.toString(), new String[] {
+			SQLiteCursor c = db.rawQuery(selectString.toString(), new String[] {
 					tableNamePattern, tableType.toUpperCase(),
 					tableNamePattern, tableType.toUpperCase() });
 			cursorList.add(c);
 		}
 		SQLDroidResultSet resultSet;
-		Cursor[] cursors = new Cursor[cursorList.size()];
+		SQLiteCursor[] cursors = new SQLiteCursor[cursorList.size()];
 		cursors = cursorList.toArray(cursors);
 
 		if ( cursors.length == 0 ) {
@@ -934,7 +930,7 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 			resultSet = new SQLDroidResultSet(cursors[0]);
 		}
 		else {
-			resultSet = new SQLDroidResultSet(new MergeCursor( cursors )); 
+			resultSet = new SQLDroidResultSet(db.mergeCursors(cursors));
 		}
 		return resultSet;
 	}
@@ -944,7 +940,8 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 		return "";
 	}
 
-  public ResultSet getTypeInfo() throws SQLException {
+  @Override
+public ResultSet getTypeInfo() throws SQLException {
   	String sql = "select "
               + "tn as TYPE_NAME, "
               + "dt as DATA_TYPE, "
@@ -973,7 +970,7 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 
       //      if (getTypeInfo == null) {
 //      getTypeInfo = con.prepareStatement(sql);
-//            
+//
 //        }
 //
 //        getTypeInfo.clearParameters();
@@ -982,9 +979,9 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
   	return new SQLDroidResultSet(con.getDb().rawQuery(sql, new String[0]));
   }
 
-	
-	
-	
+
+
+
 	@Override
 	public ResultSet getUDTs(String catalog, String schemaPattern,
 			String typeNamePattern, int[] types) throws SQLException {
@@ -1133,7 +1130,7 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 	public boolean supportsANSI92FullSQL() {
 		return false;
 	}
-	
+
 	@Override
 	public boolean supportsANSI92IntermediateSQL() {
 		return false;
@@ -1433,7 +1430,7 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 	public boolean supportsTableCorrelationNames() {
 		return false;
 	}
-	
+
 	@Override
 	public boolean supportsTransactionIsolationLevel(int level) {
 		return level == Connection.TRANSACTION_SERIALIZABLE;
@@ -1468,7 +1465,7 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 	public boolean usesLocalFiles() {
 		return true;
 	}
-	
+
   @Override
   public boolean isWrapperFor(Class<?> iface) throws SQLException {
     return iface != null && iface.isAssignableFrom(getClass());
@@ -1522,7 +1519,7 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 	  // TODO Evaluate if this is a sufficient implementation (if so, remove this comment)
 		return false;
 	}
-	
+
   // methods added for JDK7 compilation
 
   public boolean generatedKeyAlwaysReturned() throws SQLException {
@@ -1532,7 +1529,7 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
   public ResultSet getPseudoColumns(String catalog, String schemaPattern, String tableNamePattern, String columnNamePattern) throws SQLException {
       throw new UnsupportedOperationException("getPseudoColumns not implemented yet");
   }
-  
+
   /**
 	 * Adds SQL string quotes to the given string.
 	 * @param tableName The string to quote.
@@ -1546,7 +1543,7 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 			return String.format("'%s'", tableName);
 		}
 	}
-	
+
 	/**
 	 * Applies SQL escapes for special characters in a given string.
 	 * @param val The string to escape.
@@ -1566,7 +1563,7 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 		}
 		return buf.toString();
 	}
-	
+
 	/**
 	 * @throws SQLException
 	 */
@@ -1575,7 +1572,7 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 			throw new SQLException("connection closed");
 		}
 	}
-	
+
 	/**
 	 * Parses the sqlite_master table for a table's primary key
 	 */

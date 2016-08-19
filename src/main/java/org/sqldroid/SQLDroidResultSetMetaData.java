@@ -5,34 +5,23 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
 
-import android.database.Cursor;
-
 public class SQLDroidResultSetMetaData implements ResultSetMetaData {
 
-	private final Cursor cursor;
+    private final SQLiteCursor cursor;
     private static Method getType;
     static {
         try {
-            getType = Cursor.class.getMethod("getType", new Class[] {int.class});
+            getType = SQLiteCursor.class.getMethod("getType", new Class[] {int.class});
         } catch (Exception e) {
             getType = null;
         }
     }
 
-    public SQLDroidResultSetMetaData(Cursor cursor) {
+    public SQLDroidResultSetMetaData(SQLiteCursor cursor) {
       if (cursor == null) {
           throw new NullPointerException("Cursor required to be not null.");
-      }		
+      }
       this.cursor = cursor;
-    }
-
-    static int getType(Cursor cursor, int column) {
-        if (getType != null) {
-            try {
-                return (Integer) getType.invoke(cursor, column);
-            } catch (Exception e) {}
-        }
-        return Types.OTHER; // return something that can be used to understand that the type is unknown.
     }
 
 	@Override
@@ -49,7 +38,7 @@ public class SQLDroidResultSetMetaData implements ResultSetMetaData {
 
 	@Override
 	public int getColumnCount() throws SQLException {
-		return cursor.getColumnCount();
+	    return cursor.getColumnCount();
 	}
 
 	@Override
@@ -79,7 +68,7 @@ public class SQLDroidResultSetMetaData implements ResultSetMetaData {
             cursor.moveToFirst();
             moved = true;
         }
-        int nativeType = getType(cursor, column - 1);
+        int nativeType = cursor.getType(column - 1);
         int type;
         switch (nativeType) {
         case 0: // Cursor.FIELD_TYPE_NULL:

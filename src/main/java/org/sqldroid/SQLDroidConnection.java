@@ -72,9 +72,6 @@ public class SQLDroidConnection implements Connection {
      * @param info Properties object with options.  Supported options are "timeout", "retry", and "shared".
      */
     public SQLDroidConnection(String url, Properties info) throws SQLException {
-        Log.v("SQLDroidConnection: " + Thread.currentThread().getId() + " \"" + Thread.currentThread().getName() + "\" " + this);
-        Log.v("New sqlite jdbc from url '" + url + "', " + "'" + info + "'");
-
         this.url = url;
         // Make a filename from url
         String dbQname;
@@ -112,15 +109,12 @@ public class SQLDroidConnection implements Connection {
                         timeout = optionValue;
                         retryInterval = optionValue;
                     }
-                    Log.v("Timeout: " + timeout);
                 } catch ( NumberFormatException nfe ) {
                     // print and ignore
-                    Log.e("Error Parsing URL \"" + url + "\" Timeout String \"" + optionValueString + "\" is not a valid long", nfe);
                 }
                 options = options.substring(optionEnd + 1);
             }
         }
-        Log.v("opening database " + dbQname);
         new File(dbQname).getParentFile().mkdirs();
         int flags = android.database.sqlite.SQLiteDatabase.CREATE_IF_NECESSARY
                 | android.database.sqlite.SQLiteDatabase.OPEN_READWRITE
@@ -131,25 +125,30 @@ public class SQLDroidConnection implements Connection {
                 try {
                     flags = Integer.parseInt(info.getProperty(SQLDroidDriver.DATABASE_FLAGS));
                 } catch ( NumberFormatException nfe ) {
-                    Log.e("Error Parsing DatabaseFlags \"" + info.getProperty(SQLDroidDriver.DATABASE_FLAGS) + " not a number ", nfe);
                 }
             } else if ( info.getProperty(SQLDroidDriver.ADDITONAL_DATABASE_FLAGS) != null ) {
                 try {
                     int extraFlags = Integer.parseInt(info.getProperty(SQLDroidDriver.ADDITONAL_DATABASE_FLAGS));
                     flags |= extraFlags;
                 } catch ( NumberFormatException nfe ) {
-                    Log.e("Error Parsing DatabaseFlags \"" + info.getProperty(SQLDroidDriver.ADDITONAL_DATABASE_FLAGS) + " not a number ", nfe);
                 }
             }
         }
         synchronized(dbMap) {
             sqlitedb = dbMap.get(dbQname);
             if (sqlitedb == null) {
-                Log.i("SQLDroidConnection: " + Thread.currentThread().getId() + " \"" + Thread.currentThread().getName() + "\" " + this + " Opening new database: " + dbQname);
-                sqlitedb = new SQLiteDatabase(dbQname, timeout, retryInterval, flags);
+                sqlitedb = createDatabase(dbQname, timeout, retryInterval, flags);
                 dbMap.put(dbQname, sqlitedb);
             }
             clientMap.put(this, sqlitedb);
+        }
+    }
+
+    private SQLiteDatabase createDatabase(String dbQname, long timeout, long retryInterval, int flags) throws SQLException {
+        try {
+            return new org.sqldroid.android.AndroidSQLiteDatabase(dbQname, timeout, retryInterval, flags);
+        } catch (NoClassDefFoundError e) {
+            return new org.sqldroid.sqlite.JnaSQLiteDatabase(dbQname, flags);
         }
     }
 
@@ -193,19 +192,15 @@ public class SQLDroidConnection implements Connection {
 
     @Override
     public void close() throws SQLException {
-        Log.v("SQLDroidConnection.close(): " + Thread.currentThread().getId() + " \"" + Thread.currentThread().getName() + "\" " + this);
         if (sqlitedb != null) {
             synchronized(dbMap) {
                 clientMap.remove(this);
                 if (!clientMap.containsValue(sqlitedb)) {
-                    Log.i("SQLDroidConnection.close(): " + Thread.currentThread().getId() + " \"" + Thread.currentThread().getName() + "\" " + this + " Closing the database since since last connection was closed.");
                     sqlitedb.close();
-                    dbMap.remove(sqlitedb.dbQname);
+                    dbMap.remove(sqlitedb.getDatabaseName());
                 }
             }
             sqlitedb = null;
-        } else {
-            Log.e("SQLDroidConnection.close(): " + Thread.currentThread().getId() + " \"" + Thread.currentThread().getName() + "\" " + this + " Duplicate close!");
         }
     }
 
@@ -215,9 +210,7 @@ public class SQLDroidConnection implements Connection {
             throw new SQLException("database in auto-commit mode");
         }
         sqlitedb.setTransactionSuccessful();
-        Log.d("END TRANSACTION  (commit) " + Thread.currentThread().getId() + " \"" + Thread.currentThread().getName() + "\" " + this);
         sqlitedb.endTransaction();
-        Log.d("BEGIN TRANSACTION (after commit) " + Thread.currentThread().getId() + " \"" + Thread.currentThread().getName() + "\" " + this);
         sqlitedb.beginTransaction();
     }
 
@@ -286,8 +279,9 @@ public class SQLDroidConnection implements Connection {
     @Override
     public boolean isClosed() throws SQLException {
         // assuming that "isOpen" doesn't throw a locked exception..
-        return sqlitedb == null || sqlitedb.getSqliteDatabase() == null ||
-                !sqlitedb.getSqliteDatabase().isOpen();
+//        return sqlitedb == null || sqlitedb.getSqliteDatabase() == null ||
+//                !sqlitedb.getSqliteDatabase().isOpen();
+        return sqlitedb == null || sqlitedb.isClosed();
     }
 
     @Override
@@ -368,9 +362,7 @@ public class SQLDroidConnection implements Connection {
         if (autoCommit) {
             throw new SQLException("database in auto-commit mode");
         }
-        Log.d("END TRANSACTION (rollback) " + Thread.currentThread().getId() + " \"" + Thread.currentThread().getName() + "\" " + this);
         sqlitedb.endTransaction();
-        Log.d("BEGIN TRANSACTION (after rollback) " + Thread.currentThread().getId() + " \"" + Thread.currentThread().getName() + "\" " + this);
         sqlitedb.beginTransaction();
     }
 
@@ -389,11 +381,9 @@ public class SQLDroidConnection implements Connection {
         if (autoCommit) {
             if (sqlitedb.inTransaction()) { // to be on safe side.
                 sqlitedb.setTransactionSuccessful();
-                Log.d("END TRANSACTION (autocommit on) " + Thread.currentThread().getId() + " \"" + Thread.currentThread().getName() + "\" " + this);
                 sqlitedb.endTransaction();
             }
         } else {
-            Log.d("BEGIN TRANSACTION (autocommit off) " + Thread.currentThread().getId() + " \"" + Thread.currentThread().getName() + "\" " + this);
             sqlitedb.beginTransaction();
         }
     }
@@ -444,7 +434,6 @@ public class SQLDroidConnection implements Connection {
 
     @Override
     protected void finalize() throws Throwable {
-        Log.v(" --- Finalize SQLDroid.");
         if (!isClosed()) {
             close();
         }

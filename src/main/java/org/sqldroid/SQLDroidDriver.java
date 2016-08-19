@@ -19,7 +19,7 @@ public class SQLDroidDriver implements java.sql.Driver {
     public static final String DATABASE_FLAGS = "DatabaseFlags";
 
     /** Key passed when the SQLDroidConnection is created.  The value of this key should be an
-     * String containing a numeric value which is the value of any additional flags to be passed to the 
+     * String containing a numeric value which is the value of any additional flags to be passed to the
      * Android SQLite database when the database is opened. Additional flags will be added to this set then the values<p>
      * android.database.sqlite.SQLiteDatabase.CREATE_IF_NECESSARY | android.database.sqlite.SQLiteDatabase.OPEN_READWRITE<p>
      * If the passed properties are null then just these default keys will be used.
@@ -29,13 +29,15 @@ public class SQLDroidDriver implements java.sql.Driver {
 
     // TODO(uwe):  Allow jdbc:sqlite: url as well
     public static String sqldroidPrefix = "jdbc:sqldroid:";
-    /** Provide compatibility with the SQLite JDBC driver from Xerial: <p> 
+    /** Provide compatibility with the SQLite JDBC driver from Xerial: <p>
      * http://www.xerial.org/trac/Xerial/wiki/SQLiteJDBC <p>
      * by allowing the URLs to be jdbc:sqlite:
      */
     // this used to be "sqlitePrefix" but it looks too similar to sqldroidPrefix
     // making the code hard to read and easy to mistype.
     public static String xerialPrefix = "jdbc:sqlite:";
+
+    public static String jnaPrefix = "jdbc:jnasqlite:";
 
     static {
         try {
@@ -47,7 +49,7 @@ public class SQLDroidDriver implements java.sql.Driver {
     }
 
     /** Will accept any string that starts with sqldroidPrefix ("jdbc:sqldroid:") or
-     * sqllitePrefix ("jdbc:sqlite"). 
+     * sqllitePrefix ("jdbc:sqlite").
      */
     @Override
     public boolean acceptsURL(String url) throws SQLException {

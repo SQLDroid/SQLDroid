@@ -1,7 +1,5 @@
 package org.sqldroid;
 
-import android.database.Cursor;
-
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.Reader;
@@ -24,13 +22,13 @@ public class SQLDroidResultSet implements ResultSet {
 
     public static boolean dump = false;
 
-    private final Cursor c;
+    private final SQLiteCursor c;
     private int lastColumnRead; // JDBC style column index starting from 1
 
     // TODO: Implement behavior (as Xerial driver)
     private int limitRows = 0;
 
-    public SQLDroidResultSet(Cursor c) throws SQLException {
+    public SQLDroidResultSet(SQLiteCursor c) throws SQLException {
         this.c = c;
         if (dump) {
             dumpResultSet();
@@ -129,7 +127,7 @@ public class SQLDroidResultSet implements ResultSet {
   public int findColumn(String columnName) throws SQLException {
     try {
       // JDBC style column index starts from 1; Android database cursor has zero-based index
-      return (c.getColumnIndexOrThrow(columnName) + 1);  
+      return (c.getColumnIndexOrThrow(columnName) + 1);
     } catch (android.database.SQLException e) {
       throw SQLDroidConnection.chainException(e);
     }
@@ -254,7 +252,7 @@ public class SQLDroidResultSet implements ResultSet {
             lastColumnRead = index;
             byte [] bytes = c.getBlob(ci(index));
             // SQLite includes the zero-byte at the end for Strings.
-            if (SQLDroidResultSetMetaData.getType(c, ci(index)) == 3) { //  Cursor.FIELD_TYPE_STRING
+            if (c.getType(ci(index)) == 3) { //  Cursor.FIELD_TYPE_STRING
 		        bytes = Arrays.copyOf(bytes, bytes.length - 1);
             }
             return bytes;
@@ -440,7 +438,7 @@ public class SQLDroidResultSet implements ResultSet {
     public Object getObject(int colID) throws SQLException {
         lastColumnRead = colID;
         int newIndex = ci(colID);
-        switch(SQLDroidResultSetMetaData.getType(c, newIndex)) {
+        switch(c.getType(colID)) {
             case 4: // Cursor.FIELD_TYPE_BLOB:
                 //CONVERT TO BYTE[] OBJECT
                 return new SQLDroidBlob(c.getBlob(newIndex));
@@ -466,7 +464,7 @@ public class SQLDroidResultSet implements ResultSet {
   @Override
   public Object getObject(int columnIndex, Map<String, Class<?>> clazz)
   throws SQLException {
-    throw new SQLFeatureNotSupportedException("Conversion not supported.  No conversions are supported.  This method will always throw."); 
+    throw new SQLFeatureNotSupportedException("Conversion not supported.  No conversions are supported.  This method will always throw.");
   }
 
   @Override
@@ -476,10 +474,10 @@ public class SQLDroidResultSet implements ResultSet {
   }
 
   public <T> T getObject(int columnIndex, Class<T> clazz) throws SQLException {
-    // This method is entitled to throw if the conversion is not supported, so, 
+    // This method is entitled to throw if the conversion is not supported, so,
     // since we don't support any conversions we'll throw.
     // The only problem with this is that we're required to support certain conversion as specified in the docs.
-    throw new SQLFeatureNotSupportedException("Conversion not supported.  No conversions are supported.  This method will always throw."); 
+    throw new SQLFeatureNotSupportedException("Conversion not supported.  No conversions are supported.  This method will always throw.");
   }
 
   public <T> T getObject(String columnName, Class<T> clazz) throws SQLException {
@@ -488,7 +486,7 @@ public class SQLDroidResultSet implements ResultSet {
 
   @Override
   public Ref getRef(int colID) throws SQLException {
-    throw new SQLFeatureNotSupportedException("getRef not supported"); 
+    throw new SQLFeatureNotSupportedException("getRef not supported");
   }
 
   @Override
@@ -581,7 +579,7 @@ public class SQLDroidResultSet implements ResultSet {
         case Types.DATE:
           return new Timestamp(getDate(index).getTime());
         default:
-          // format 2011-07-11 11:36:30.009 OR 2011-07-11 11:36:30 
+          // format 2011-07-11 11:36:30.009 OR 2011-07-11 11:36:30
           SimpleDateFormat dateFormat = new SimpleDateFormat(TIMESTAMP_PATTERN);
           SimpleDateFormat dateFormatNoMillis = new SimpleDateFormat(TIMESTAMP_PATTERN_NO_MILLIS);
           try {
@@ -637,7 +635,8 @@ public class SQLDroidResultSet implements ResultSet {
   /**
    * @deprecated since JDBC 2.0, use getCharacterStream
    */
-  @Override
+  @Deprecated
+@Override
   public InputStream getUnicodeStream(int colID) throws SQLException {
     throw new SQLFeatureNotSupportedException("ResultSet.getUnicodeStream deprecated, use getCharacterStream instead");
   }
@@ -645,7 +644,8 @@ public class SQLDroidResultSet implements ResultSet {
   /**
    * @deprecated since JDBC 2.0, use getCharacterStream
    */
-  @Override
+  @Deprecated
+@Override
   public InputStream getUnicodeStream(String columnName) throws SQLException {
     return getUnicodeStream(findColumn(columnName));
   }

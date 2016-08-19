@@ -1,7 +1,5 @@
 package org.sqldroid;
 
-import android.database.Cursor;
-
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -92,7 +90,7 @@ public class SQLDroidStatement implements Statement {
     }
     if (isSelect) {
       String limitedSql = sql + (maxRows != null ? " LIMIT " + maxRows : "");
-      Cursor c = db.rawQuery(limitedSql, new String[0]);
+      SQLiteCursor c = db.rawQuery(limitedSql, new String[0]);
       rs = new SQLDroidResultSet(c);
       if (c.getCount()==0)
            return false;
@@ -137,7 +135,7 @@ public class SQLDroidStatement implements Statement {
   @Override
   public ResultSet executeQuery(String sql) throws SQLException {
     closeResultSet();
-    Cursor c = db.rawQuery(sql, null);
+    SQLiteCursor c = db.rawQuery(sql, null);
     rs = new SQLDroidResultSet(c);
     return rs;
   }

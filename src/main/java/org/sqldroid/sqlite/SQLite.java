@@ -6,7 +6,7 @@
  *    May you find forgiveness for yourself and forgive others.
  *    May you share freely, never taking more than you give.
  */
-package android.database;
+package org.sqldroid.sqlite;
 
 import com.sun.jna.Library;
 import com.sun.jna.Memory;
@@ -14,7 +14,7 @@ import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
 
-public class SQLite implements Library {
+class SQLite implements Library {
   public static final String JNA_LIBRARY_NAME = "sqlite3";
   // public static final NativeLibrary JNA_NATIVE_LIB = NativeLibrary.getInstance(SQLite.JNA_LIBRARY_NAME);
   static {

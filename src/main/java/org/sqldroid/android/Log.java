@@ -1,4 +1,4 @@
-package org.sqldroid;
+package org.sqldroid.android;
 
 public class Log {
     public static int LEVEL = android.util.Log.WARN;

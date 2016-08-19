@@ -6,14 +6,13 @@ import java.io.PrintWriter;
 import android.database.SQLException;
 
 
-
 public class SQLDroidSQLException extends java.sql.SQLException {
   private static final long serialVersionUID = -7299376329007161001L;
 
   /** The exception that this exception was created for. */
   SQLException sqlException;
-  
-  /** Create a hard java.sql.SQLException from the RuntimeException android.database.SQLException. */ 
+
+  /** Create a hard java.sql.SQLException from the RuntimeException android.database.SQLException. */
   public SQLDroidSQLException (SQLException sqlException) {
     this.sqlException = sqlException;
   }
@@ -23,7 +22,8 @@ public class SQLDroidSQLException extends java.sql.SQLException {
    * @return
    * @see java.lang.Object#equals(java.lang.Object)
    */
-  public boolean equals(Object o) {
+  @Override
+public boolean equals(Object o) {
     return sqlException.equals(o);
   }
 
@@ -31,7 +31,8 @@ public class SQLDroidSQLException extends java.sql.SQLException {
    * @return
    * @see java.lang.Throwable#fillInStackTrace()
    */
-  public Throwable fillInStackTrace() {
+  @Override
+public Throwable fillInStackTrace() {
     return sqlException.fillInStackTrace();
   }
 
@@ -39,7 +40,8 @@ public class SQLDroidSQLException extends java.sql.SQLException {
    * @return
    * @see java.lang.Throwable#getCause()
    */
-  public Throwable getCause() {
+  @Override
+public Throwable getCause() {
     return sqlException.getCause();
   }
 
@@ -47,7 +49,8 @@ public class SQLDroidSQLException extends java.sql.SQLException {
    * @return
    * @see java.lang.Throwable#getLocalizedMessage()
    */
-  public String getLocalizedMessage() {
+  @Override
+public String getLocalizedMessage() {
     return sqlException.getLocalizedMessage();
   }
 
@@ -55,7 +58,8 @@ public class SQLDroidSQLException extends java.sql.SQLException {
    * @return
    * @see java.lang.Throwable#getMessage()
    */
-  public String getMessage() {
+  @Override
+public String getMessage() {
     return sqlException.getMessage();
   }
 
@@ -63,15 +67,17 @@ public class SQLDroidSQLException extends java.sql.SQLException {
    * @return
    * @see java.lang.Throwable#getStackTrace()
    */
-  public StackTraceElement[] getStackTrace() {
+  @Override
+public StackTraceElement[] getStackTrace() {
     return sqlException.getStackTrace();
   }
 
   /**
-   * 
+   *
    * @see java.lang.Throwable#printStackTrace()
    */
-  public void printStackTrace() {
+  @Override
+public void printStackTrace() {
     sqlException.printStackTrace();
   }
 
@@ -79,7 +85,8 @@ public class SQLDroidSQLException extends java.sql.SQLException {
    * @param err
    * @see java.lang.Throwable#printStackTrace(java.io.PrintStream)
    */
-  public void printStackTrace(PrintStream err) {
+  @Override
+public void printStackTrace(PrintStream err) {
     sqlException.printStackTrace(err);
   }
 
@@ -87,7 +94,8 @@ public class SQLDroidSQLException extends java.sql.SQLException {
    * @param err
    * @see java.lang.Throwable#printStackTrace(java.io.PrintWriter)
    */
-  public void printStackTrace(PrintWriter err) {
+  @Override
+public void printStackTrace(PrintWriter err) {
     sqlException.printStackTrace(err);
   }
 
@@ -95,8 +103,9 @@ public class SQLDroidSQLException extends java.sql.SQLException {
    * @return
    * @see java.lang.Throwable#toString()
    */
-  public String toString() {
+  @Override
+public String toString() {
     return sqlException.toString();
   }
-  
+
 }
