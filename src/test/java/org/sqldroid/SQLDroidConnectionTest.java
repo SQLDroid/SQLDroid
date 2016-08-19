@@ -20,13 +20,13 @@ import java.util.Properties;
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = 16)
 public class SQLDroidConnectionTest {
-  
+
   @Test
   public void shouldConnectToEmptyFile() throws SQLException, IOException {
     Properties properties = new Properties();
-    properties.put(SQLDroidDriver.ADDITONAL_DATABASE_FLAGS, 
+    properties.put(SQLDroidDriver.ADDITONAL_DATABASE_FLAGS,
         android.database.sqlite.SQLiteDatabase.CREATE_IF_NECESSARY | android.database.sqlite.SQLiteDatabase.OPEN_READWRITE);
-    
+
     File dbFile = cleanDbFile("exisising-file.db");
     try (FileOutputStream output = new FileOutputStream(dbFile)) {
     }
@@ -37,18 +37,18 @@ public class SQLDroidConnectionTest {
     assertThat(conn.isClosed()).isFalse();
     conn.close();
   }
-  
+
   @Test
   public void shouldSupportQueryPartOfURL() throws SQLException {
     File dbFile = cleanDbFile("query-test.db");
     String jdbcUrl = "jdbc:sqlite:" + dbFile.getAbsolutePath() + "?timeout=30";
     Connection conn = new SQLDroidDriver().connect(jdbcUrl, new Properties());
     assertThat(conn.isClosed()).isFalse();
-    conn.close();    
+    conn.close();
   }
-  
+
   @Test
-  public void shouldDealWithDatabaseAsDirectory() throws SQLException {
+  public void shouldDealWithInvalidDirectoryGivenAsFile() throws SQLException, IOException {
     File dbFile = cleanDbFile("db-as-dir.db");
     final String jdbcUrl = "jdbc:sqlite:" + dbFile.getParentFile().getAbsolutePath();
     assertThatThrownBy(new ThrowableAssert.ThrowingCallable() {
@@ -59,26 +59,37 @@ public class SQLDroidConnectionTest {
     }).isInstanceOf(SQLException.class)
       .hasMessageContaining("SQLiteCantOpenDatabaseException");
   }
-  
+
   @Test
-  // TODO: Many issues seem to stem from users expecting subdirectories to be created. Should this be supported?
-  public void shouldFailOnMissingSubdirectory() throws SQLException {
+  public void shouldDealWithDirectoryNameAsExistingFile() throws SQLException, IOException {
+      File dbDir = cleanDbFile("subdir");
+      try (FileOutputStream output = new FileOutputStream(dbDir)) {
+      }
+      File dbFile = new File(dbDir, "dbfile.db");
+      final String jdbcUrl = "jdbc:sqlite:" + dbFile.getAbsolutePath();
+      assertThatThrownBy(new ThrowableAssert.ThrowingCallable() {
+          @Override
+          public void call() throws Throwable {
+              new SQLDroidDriver().connect(jdbcUrl, new Properties());
+          }
+      }).isInstanceOf(SQLException.class)
+      .hasMessageContaining("SQLiteCantOpenDatabaseException");
+  }
+
+  @Test
+  public void shouldCreateMissingSubdirectory() throws SQLException {
     DB_DIR.mkdirs();
     assertThat(DB_DIR).isDirectory();
     File dbSubdir = new File(DB_DIR, "non-existing-dir");
-    assertThat(dbSubdir).doesNotExist();
     File dbFile = new File(dbSubdir, "database.db");
-    final String jdbcUrl = "jdbc:sqlite:" + dbFile.getAbsolutePath();
-    assertThatThrownBy(new ThrowableAssert.ThrowingCallable() {
-      @Override
-      public void call() throws Throwable {
-        new SQLDroidDriver().connect(jdbcUrl, new Properties());
-      }
-    }).isInstanceOf(SQLException.class)
-      .hasMessageContaining("SQLiteCantOpenDatabaseException");
+    dbFile.delete();
+    dbSubdir.delete();
     assertThat(dbSubdir).doesNotExist();
+    final String jdbcUrl = "jdbc:sqlite:" + dbFile.getAbsolutePath();
+    new SQLDroidDriver().connect(jdbcUrl, new Properties()).close();
+    assertThat(dbFile).exists();
   }
-  
+
   @Test
   @Ignore("Issue #68")
   public void shouldSupportReconnectAfterAbortedTransaction() throws SQLException {
@@ -91,7 +102,7 @@ public class SQLDroidConnectionTest {
     assertThat(conn.isClosed()).isFalse();
     conn.close();
   }
-  
+
   @Test
   @Ignore("Issue #54")
   public void shouldAllowNewTransactionAfterCommit() throws SQLException {
