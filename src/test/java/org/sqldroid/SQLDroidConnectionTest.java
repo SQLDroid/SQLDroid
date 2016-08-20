@@ -57,7 +57,8 @@ public class SQLDroidConnectionTest {
                 new SQLDroidDriver().connect(jdbcUrl, new Properties());
             }
         }).isInstanceOf(SQLException.class)
-                .hasMessageContaining("SQLiteCantOpenDatabaseException");
+                .hasMessageContaining("Can't create")
+                .hasMessageContaining(dbFile.getParent());
     }
 
     @Test
@@ -73,7 +74,8 @@ public class SQLDroidConnectionTest {
                 new SQLDroidDriver().connect(jdbcUrl, new Properties());
             }
         }).isInstanceOf(SQLException.class)
-                .hasMessageContaining("SQLiteCantOpenDatabaseException");
+                .hasMessageContaining("Can't create")
+                .hasMessageContaining(dbFile.getAbsolutePath());
     }
 
     @Test

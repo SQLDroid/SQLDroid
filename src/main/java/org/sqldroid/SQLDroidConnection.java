@@ -121,7 +121,7 @@ public class SQLDroidConnection implements Connection {
             }
         }
         Log.v("opening database " + dbQname);
-        new File(dbQname).getParentFile().mkdirs();
+        ensureDbFileCreation(dbQname);
         int flags = android.database.sqlite.SQLiteDatabase.CREATE_IF_NECESSARY
                 | android.database.sqlite.SQLiteDatabase.OPEN_READWRITE
                 | android.database.sqlite.SQLiteDatabase.NO_LOCALIZED_COLLATORS;
@@ -150,6 +150,20 @@ public class SQLDroidConnection implements Connection {
                 dbMap.put(dbQname, sqlitedb);
             }
             clientMap.put(this, sqlitedb);
+        }
+    }
+
+    private void ensureDbFileCreation(String dbQname) throws SQLException {
+        File dbFile = new File(dbQname);
+        if (dbFile.isDirectory()) {
+            throw new SQLException("Can't create " + dbFile + " - it already exists as a directory");
+        } else if (dbFile.getParentFile().exists() && !dbFile.getParentFile().isDirectory()) {
+            throw new SQLException("Can't create " + dbFile + " - it because " + dbFile.getParent() + " exists as a regular file");
+        } else if (!dbFile.getParentFile().exists()) {
+            dbFile.getParentFile().mkdirs();
+            if (!dbFile.getParentFile().isDirectory()) {
+                throw new SQLException("Could not create " + dbFile.getParent() + " as parent directory for " + dbFile);
+            }
         }
     }
 
