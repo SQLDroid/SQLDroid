@@ -56,7 +56,7 @@ public class SQLDroidDriver implements java.sql.Driver {
             return true;
         }
 
-        return false; 
+        return false;
     }
 
     @Override
@@ -76,9 +76,10 @@ public class SQLDroidDriver implements java.sql.Driver {
 
     @Override
     public DriverPropertyInfo[] getPropertyInfo(String url, Properties info) throws SQLException {
+        // TODO Evaluate if implementation is sufficient (if so, delete comment and log)
         System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "
                 + DebugPrinter.getLineNumber());
-        return null;
+        return new DriverPropertyInfo[0];
     }
 
     @Override
@@ -89,8 +90,6 @@ public class SQLDroidDriver implements java.sql.Driver {
     // methods added for JDK7 compilation
 
     public Logger getParentLogger() throws SQLFeatureNotSupportedException {
-        //TODO auto-generated code
-        return null;
+      throw new SQLFeatureNotSupportedException("getParentLogger not supported");
     }
-
 }

@@ -19,5 +19,5 @@ This gem makes the JAR available to your JRuby app.}
   s.executables   = []
   s.require_paths = %w(lib)
   s.platform = 'java'
-  s.licenses = ['MIT']
+  s.licenses = %w(MIT EPL-1.0)
 end

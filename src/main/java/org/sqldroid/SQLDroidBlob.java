@@ -1,9 +1,11 @@
 package org.sqldroid;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.sql.Blob;
 import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
 
 public class SQLDroidBlob implements Blob {
 
@@ -15,72 +17,71 @@ public class SQLDroidBlob implements Blob {
 	
 	@Override
 	public InputStream getBinaryStream() throws SQLException {
-		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-		return null;
+		return getBinaryStream(0, b.length);
 	}
 
 	@Override
+  public InputStream getBinaryStream(long pos, long length) throws SQLException {
+  	return new ByteArrayInputStream(b, (int)pos, (int)length);
+  }
+
+  @Override
 	public byte[] getBytes(long pos, int length) throws SQLException {
+    if (pos < 0) {
+      throw new SQLException("pos must be > 0");
+    }
+    if (length < 0) {
+      throw new SQLException("length must be > 0");
+    }
+    if (pos > 0 || length < b.length) {
+      byte[] tmp = new byte[length];
+      System.arraycopy(b, (int)pos, tmp, 0, length);
+      return tmp;
+    }
 		return b;
 	}
 
 	@Override
 	public long length() throws SQLException {
-		
 		return b.length;
 	}
 
 	@Override
 	public long position(Blob pattern, long start) throws SQLException {
-		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-		return 0;
+	  return position(pattern.getBytes(0, (int) pattern.length()), start);
 	}
 
 	@Override
 	public long position(byte[] pattern, long start) throws SQLException {
-		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-		return 0;
+	  throw new SQLFeatureNotSupportedException("position not supported");
 	}
 
 	@Override
 	public OutputStream setBinaryStream(long pos) throws SQLException {
-		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-		return null;
+	  throw new SQLFeatureNotSupportedException("setBinaryStream not supported");
 	}
 
 	@Override
 	public int setBytes(long pos, byte[] theBytes) throws SQLException {
-		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-		return 0;
+	  return setBytes(pos, theBytes, 0, theBytes.length);
 	}
 
 	@Override
-	public int setBytes(long pos, byte[] theBytes, int offset, int len)
-			throws SQLException {
-		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-		return 0;
+	public int setBytes(long pos, byte[] theBytes, int offset, int len) throws SQLException {
+	  throw new SQLFeatureNotSupportedException("setBytes not supported");
 	}
 
 	@Override
 	public void truncate(long len) throws SQLException {
-		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-
+	  throw new SQLFeatureNotSupportedException("truncate not supported");
 	}
 
 	@Override
 	public void free() throws SQLException {
-		// TODO Auto-generated method stub
-		
+	  throw new SQLFeatureNotSupportedException("free not supported");
 	}
 
-	@Override
-	public InputStream getBinaryStream(long pos, long length)
-			throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-  /** Print the length of the blob along with the first 10 characters.
+	/** Print the length of the blob along with the first 10 characters.
    * @see java.lang.Object#toString()
    */
   @Override

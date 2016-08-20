@@ -1720,7 +1720,6 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 		return null;
 	}
 
-	@Override
 	public ResultSet getPseudoColumns(String catalog, String schemaPattern, String tableNamePattern, String columnNamePattern) throws SQLException {
 		System.err.println(" ********************* not implemented @ "
 				+ DebugPrinter.getFileName() + " line "
@@ -1728,7 +1727,6 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 		return null;
 	}
 
-	@Override
 	public boolean generatedKeyAlwaysReturned() throws SQLException {
 		System.err.println(" ********************* not implemented @ "
 				+ DebugPrinter.getFileName() + " line "

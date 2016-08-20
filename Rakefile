@@ -2,51 +2,44 @@ require 'fileutils'
 require File.expand_path 'lib/sqldroid/version', File.dirname(__FILE__)
 require 'rake/clean'
 
-if ENV['ANDROID_HOME']
-  ANDROID_SDK_HOME = ENV['ANDROID_HOME']
-else
+unless ENV['ANDROID_HOME'] && Dir.exist?(ENV['ANDROID_HOME'])
   dx_location = `which dx`
-  raise 'Unable to find ANDROID_HOME environment variable or the "dx" command.' unless $? == 0
-  ANDROID_SDK_HOME = File.dirname(File.dirname(File.dirname(dx_location)))
+  unless $? == 0
+    raise 'Unable to find ANDROID_HOME environment variable or the "dx" command.'
+  end
+  ENV['ANDROID_HOME'] = File.dirname(File.dirname(File.dirname(dx_location)))
 end
-PKG_DIR          = File.expand_path 'pkg'
-JAR              = "sqldroid-#{SQLDroid::VERSION}.jar"
-JAR_IN_PKG       = "#{PKG_DIR}/#{JAR}"
+
+TARGET_DIR       = File.expand_path 'target'
+JAR              = "sqldroid-#{SQLDroid::MAVEN_VERSION}.jar"
+JAR_IN_TARGET    = "#{TARGET_DIR}/#{JAR}"
 LIB_DIR          = File.expand_path 'lib/sqldroid'
 JAR_IN_GEM       = "#{LIB_DIR}/#{JAR}"
 GEM_BASE_FILE    = "sqldroid-#{SQLDroid::VERSION}-java.gem"
-GEM_FILE_PKG     = "#{PKG_DIR}/#{GEM_BASE_FILE}"
+GEM_FILE_TARGET  = "#{TARGET_DIR}/#{GEM_BASE_FILE}"
 JAVA_SRC_FILES   = Dir[File.expand_path 'src/main/java/**/*.java']
-ANDROID_TARGET   = File.read('project.properties').slice(/^target=.*$/)[7..-1]
 
-CLEAN.include('bin', 'pkg')
-CLOBBER.include('bin', 'pkg')
+CLEAN.include('target')
+CLOBBER.include('target', 'lib/sqldroid/sqldroid-*.jar')
 
 desc 'Generate the binary and source jars'
-task :jar => JAR_IN_PKG
+task :jar => JAR_IN_TARGET
 
-file JAR_IN_PKG => JAVA_SRC_FILES do
-  FileUtils.mkdir_p 'bin'
-  jar = "#{ANDROID_SDK_HOME}/platforms/#{ANDROID_TARGET}/android.jar"
-  raise "Expected '#{jar}' file missing." unless File.exists?(jar)
-  sh "javac -source 1.6 -target 1.6 -bootclasspath #{jar} -d bin -sourcepath src #{JAVA_SRC_FILES.join(' ')}"
-  FileUtils.mkdir_p PKG_DIR
-  Dir.chdir 'bin' do
-    sh "jar cf #{PKG_DIR}/#{JAR} org"
-  end
+file JAR_IN_TARGET => JAVA_SRC_FILES do
+  sh 'mvn install -B'
 end
 
-file JAR_IN_GEM => JAR_IN_PKG do
+file JAR_IN_GEM => JAR_IN_TARGET do
   FileUtils.rm_rf Dir["#{LIB_DIR}/sqldroid-*.jar"]
-  FileUtils.cp JAR_IN_PKG, JAR_IN_GEM
+  FileUtils.cp JAR_IN_TARGET, JAR_IN_GEM
 end
 
 desc 'Create a RubyGem for SQLDroid'
-task :gem => GEM_FILE_PKG
+task :gem => GEM_FILE_TARGET
   
-file GEM_FILE_PKG => JAR_IN_GEM do
+file GEM_FILE_TARGET => JAR_IN_GEM do
   sh 'gem build sqldroid.gemspec'
-  FileUtils.mv GEM_BASE_FILE, GEM_FILE_PKG
+  FileUtils.mv GEM_BASE_FILE, GEM_FILE_TARGET
 end
 
 desc 'Tag the project and push the tag to GitHub'
@@ -58,6 +51,6 @@ task :tag do
 end
 
 desc 'Release SQLDroid as a Ruby gem to rubygems.org'
-task :release => [:tag, GEM_FILE_PKG] do
-  sh "gem push #{GEM_FILE_PKG}"
+task :release => [:tag, GEM_FILE_TARGET] do
+  sh "gem push #{GEM_FILE_TARGET}"
 end

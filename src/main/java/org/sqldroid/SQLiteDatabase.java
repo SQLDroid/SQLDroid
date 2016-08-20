@@ -56,21 +56,7 @@ public class SQLiteDatabase {
   /** The method to invoke to get the changed row count. */
   protected Method getChangedRowCount;
 
-  /** Returns true if the exception is an instance of "SQLiteDatabaseLockedException".  Since this exception does not exist
-   * in APIs below 11 this code uses reflection to check the exception type. 
-   */
-  protected boolean isLockedException ( SQLiteException maybeLocked ) {
-    try {
-      if (Class.forName("android.database.sqlite.SQLiteDatabaseLockedException", false, getClass().getClassLoader()).isAssignableFrom(maybeLocked.getClass()) ) {
-        return true;
-      }
-    } catch (ClassNotFoundException e) {
-      // no android.database.sqlite.SQLiteDatabaseLockedException
-    }
-    return false;
-  }
-
-  /** 
+  /**
    * @param dbQname
    * @param timeout
    * @param retryInterval
@@ -103,6 +89,20 @@ public class SQLiteDatabase {
         }
       }
     }
+  }
+
+  /** Returns true if the exception is an instance of "SQLiteDatabaseLockedException".  Since this exception does not exist
+   * in APIs below 11 this code uses reflection to check the exception type.
+   */
+  protected boolean isLockedException ( SQLiteException maybeLocked ) {
+    try {
+      if (Class.forName("android.database.sqlite.SQLiteDatabaseLockedException", false, getClass().getClassLoader()).isAssignableFrom(maybeLocked.getClass()) ) {
+        return true;
+      }
+    } catch (ClassNotFoundException e) {
+      // no android.database.sqlite.SQLiteDatabaseLockedException
+    }
+    return false;
   }
 
   /** Proxy for the "rawQuery" command. 
@@ -179,6 +179,13 @@ public class SQLiteDatabase {
    */
   public android.database.sqlite.SQLiteDatabase getSqliteDatabase() {
     return sqliteDatabase;
+  }
+  
+ /** Checks if the current thread has a transaction pending in the database.
+   * @return true if the current thread has a transaction pending in the database
+   */
+  public boolean inTransaction() {
+      return sqliteDatabase.inTransaction();
   }
 
   /** Executes one of the methods in the "transactions" enum. This just allows the

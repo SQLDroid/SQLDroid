@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/SQLDroid/SQLDroid.svg?branch=master)](https://travis-ci.org/SQLDroid/SQLDroid)
+
 # SQLDroid
 
 SQLDroid is a JDBC driver for Android's sqlite database (android.database.sqlite.SQLiteDatabase) originally conceived by Kristian Lein-Mathisen. See http://sqldroid.org/.
@@ -15,19 +17,83 @@ The SQLDroid JAR with the JDBC driver for Android is 33KB.  We also offer a Ruby
 
 ## Download
 
-A prebuilt JAR is available at
+You can use SQLDroid in you maven project by declaring this dependency:
 
-https://github.com/SQLDroid/SQLDroid/downloads
+```xml
+<dependency>
+    <groupId>org.sqldroid</groupId>
+    <artifactId>sqldroid</artifactId>
+    <version>1.0.3</version>
+</dependency>
+```
+
+Or if you're using gradle:
+
+```groovy
+compile 'org.sqldroid:sqldroid:1.0.3'
+```
+
+Binary distributions are available for download from the Maven Central Repository: http://search.maven.org/#search%7Cga%7C1%7Csqldroid
 
 ## Usage
 
-```
-// Insert example here
+Here is a minimal example of an Android Activity implemented in Java with SQLDroid.
+
+```java
+import java.sql.DriverManager;
+import java.sql.Connection;
+import java.sql.Driver;
+import java.sql.SQLException;
+
+public class MainActivity extends AppCompatActivity {
+
+    private Connection connection;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        try {
+            DriverManager.registerDriver((Driver) Class.forName("org.sqldroid.SQLDroidDriver").newInstance());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to register SQLDroidDriver");
+        }
+        String jdbcUrl = "jdbc:sqldroid:" + "/data/data/" + getPackageName() + "/my-database.db";
+        try {
+            this.connection = DriverManager.getConnection(jdbcUrl);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        if (connection != null) {
+            try {
+                connection.close();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        super.onDestroy();
+    }
+}
 ```
 
 You can find an example of how to use SQLDroid with ActiveRecord on Ruboto here:
 
 https://github.com/ruboto/ruboto/wiki/Tutorial%3A-Using-an-SQLite-database-with-ActiveRecord
+
+## Debug output
+
+You can set the SQLDroid log output level like this
+
+    org.sqldroid.Log.LEVEL = android.util.Log.VERBOSE;
+
+You can turn on resultset dumps like this
+
+    org.sqldroid.SQLDroidResultSet.dump = true;
+
+
 
 ## Building
 

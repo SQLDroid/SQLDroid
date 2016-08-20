@@ -37,26 +37,24 @@ public class SQLDroidResultSetMetaData implements ResultSetMetaData {
 
 	@Override
 	public String getCatalogName(int column) throws SQLException {
-		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-		return null;
+	  return getTableName(column);
 	}
 
 	@Override
 	public String getColumnClassName(int column) throws SQLException {
-		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-		return null;
+	  // TODO In Xerial this is implemented as return "java.lang.Object";
+	  // TODO To a lookup based on getColumnType
+	  throw new UnsupportedOperationException("getColumnClassName not implemented yet");
 	}
 
 	@Override
 	public int getColumnCount() throws SQLException {
-		int columnCount = cursor.getColumnCount();
-		return columnCount;
+		return cursor.getColumnCount();
 	}
 
 	@Override
 	public int getColumnDisplaySize(int column) throws SQLException {
-		System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
-		return 0;
+		return Integer.MAX_VALUE;
 	}
 
 	@Override
@@ -111,62 +109,61 @@ public class SQLDroidResultSetMetaData implements ResultSetMetaData {
 
     @Override
     public String getColumnTypeName(int column) throws SQLException {
-        System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "
-                + DebugPrinter.getLineNumber());
-        return null;
+      switch (getColumnType(column)) {
+      case Types.NULL:
+        return "NULL";
+      case Types.INTEGER:
+        return "INTEGER";
+      case Types.FLOAT:
+        return "FLOAT";
+      case Types.VARCHAR:
+        return "VARCHAR";
+      case Types.BLOB:
+        return "BLOB";
+      default:
+        return "OTHER";
+      }
     }
 
     @Override
     public int getPrecision(int column) throws SQLException {
-        System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "
-                + DebugPrinter.getLineNumber());
-        return 0;
+      throw new UnsupportedOperationException("getPrecision not implemented yet");
     }
 
     @Override
     public int getScale(int column) throws SQLException {
-        System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "
-                + DebugPrinter.getLineNumber());
-        return 0;
+      throw new UnsupportedOperationException("getScale not implemented yet");
     }
 
     @Override
     public String getSchemaName(int column) throws SQLException {
-        System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "
-                + DebugPrinter.getLineNumber());
-        return null;
+      return "";
     }
 
     @Override
     public String getTableName(int column) throws SQLException {
-        System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "
-                + DebugPrinter.getLineNumber());
-        return null;
+      // TODO Supported in Xerial driver with db.column_table_name(stmt.pointer, checkCol(col))
+      throw new UnsupportedOperationException("getTableName not implemented yet");
     }
 
     @Override
     public boolean isAutoIncrement(int column) throws SQLException {
-        System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "
-                + DebugPrinter.getLineNumber());
-        return false;
+      throw new UnsupportedOperationException("isAutoIncrement not implemented yet");
     }
 
     @Override
     public boolean isCaseSensitive(int column) throws SQLException {
-        System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "
-                + DebugPrinter.getLineNumber());
-        return false;
+      return true;
     }
 
     @Override
     public boolean isCurrency(int column) throws SQLException {
-        System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "
-                + DebugPrinter.getLineNumber());
-        return false;
+      return false;
     }
 
     @Override
     public boolean isDefinitelyWritable(int column) throws SQLException {
+        // TODO Evaluate if this is a sufficient implementation (if so, delete comment and log)
         System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "
                 + DebugPrinter.getLineNumber());
         return false;
@@ -174,51 +171,51 @@ public class SQLDroidResultSetMetaData implements ResultSetMetaData {
 
     @Override
     public int isNullable(int column) throws SQLException {
-        System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "
-                + DebugPrinter.getLineNumber());
-        return 0;
+      throw new UnsupportedOperationException("isNullable not implemented yet");
     }
 
     @Override
     public boolean isReadOnly(int column) throws SQLException {
+        // TODO Evaluate if the implementation is sufficient (if so, delete comment and log)
         System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "
                 + DebugPrinter.getLineNumber());
-        return false;
+        return true;
     }
 
     @Override
     public boolean isSearchable(int column) throws SQLException {
+        // TODO Evaluate if the implementation is sufficient (if so, delete comment and log)
         System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "
                 + DebugPrinter.getLineNumber());
-        return false;
+        return true;
     }
 
     @Override
     public boolean isSigned(int column) throws SQLException {
+        // TODO Evaluate if the implementation is sufficient (if so, delete comment and log)
         System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "
                 + DebugPrinter.getLineNumber());
-        return false;
+        return true;
     }
 
     @Override
     public boolean isWritable(int column) throws SQLException {
+        // TODO Evaluate if the implementation is sufficient (if so, delete comment and log)
         System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "
                 + DebugPrinter.getLineNumber());
         return false;
     }
 
     @Override
-    public boolean isWrapperFor(Class<?> arg0) throws SQLException {
-        System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "
-                + DebugPrinter.getLineNumber());
-        return false;
+    public boolean isWrapperFor(Class<?> iface) throws SQLException {
+      return iface != null && iface.isAssignableFrom(getClass());
     }
 
     @Override
-    public <T> T unwrap(Class<T> arg0) throws SQLException {
-        System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "
-                + DebugPrinter.getLineNumber());
-        return null;
+    public  <T> T unwrap(Class<T> iface) throws SQLException {
+      if (isWrapperFor(iface)) {
+        return (T) this;
+      }
+      throw new SQLException(getClass() + " does not wrap " + iface);
     }
-
 }

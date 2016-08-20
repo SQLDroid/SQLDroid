@@ -94,12 +94,15 @@ public class DroidDataSource implements DataSource {
         
     @Override
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
-        throw new UnsupportedOperationException("isWrapperfor");
+      return iface != null && iface.isAssignableFrom(getClass());
     }
 
     @Override
     public  <T> T unwrap(Class<T> iface) throws SQLException {
-        throw new UnsupportedOperationException("unwrap");
+      if (isWrapperFor(iface)) {
+        return (T) this;
+      }
+      throw new SQLException(getClass() + " does not wrap " + iface);
     }
         
     public Logger getParentLogger() throws SQLFeatureNotSupportedException {
