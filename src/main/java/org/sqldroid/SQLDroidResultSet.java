@@ -105,7 +105,7 @@ public class SQLDroidResultSet implements ResultSet {
   @Override
   public void clearWarnings() throws SQLException {
     // TODO: Evaluate if implementation is sufficient (if so, delete comment and log)
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+    Log.e(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
   }
 
   @Override
@@ -609,7 +609,7 @@ public class SQLDroidResultSet implements ResultSet {
   public Timestamp getTimestamp(int colID, Calendar cal)
   throws SQLException {
     // TODO Implement with Calendar
-    System.err.println(" ********************* not implemented correctly - Calendar is ignored. @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+    Log.e(" ********************* not implemented correctly - Calendar is ignored. @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
     return getTimestamp(colID);
   }
 

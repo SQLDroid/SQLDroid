@@ -293,7 +293,7 @@ public class SQLDroidConnection implements Connection {
     @Override
     public SQLWarning getWarnings() throws SQLException {
         // TODO: Is this a sufficient implementation? (If so, delete comment and logging)
-        System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "
+        Log.e(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "
                 + DebugPrinter.getLineNumber());
         return null;
     }
