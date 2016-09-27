@@ -3,26 +3,26 @@ package org.sqldroid;
 public class Log {
 
     public static int LEVEL = android.util.Log.WARN;
-    public static ILog log = new AndroidLog();
+    public static ILog LOG = new AndroidLog();
 
     static void d(String message) {
-        log.d(message);
+        LOG.d(message);
     }
 
     static void e(String message) {
-        log.e(message);
+        LOG.e(message);
     }
 
     static void e(String message, Throwable t) {
-        log.e(message, t);
+        LOG.e(message, t);
     }
 
     static void i(String message) {
-        log.i(message);
+        LOG.i(message);
     }
 
     static void v(String message) {
-        log.v(message);
+        LOG.v(message);
     }
 
     public interface ILog {
