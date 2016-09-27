@@ -6,7 +6,7 @@
     <packaging>jar</packaging>
     <name>sqldroid</name>
     <description>SQLite JDBC driver for Android &amp; now also for non-Android platforms</description>
-    <url>https://github.com/SQLDroid/SQLDroid</url>
+    <url>https://github.com/GitHubRGI/SQLDroid</url>
     <licenses>
         <license>
             <name>MIT License</name>
@@ -15,38 +15,22 @@
         </license>
     </licenses>
     <scm>
-        <connection>scm:git:git@github.com:SQLDroid/SQLDroid.git</connection>
-        <url>scm:git:git@github.com:SQLDroid/SQLDroid.git</url>
-        <developerConnection>scm:git:git@github.com:SQLDroid/SQLDroid.git</developerConnection>
+        <connection>scm:git:git@github.com:GitHubRGI/SQLDroid.git</connection>
+        <url>scm:git:git@github.com:GitHubRGI/SQLDroid.git</url>
+        <developerConnection>scm:git:git@github.com:GitHubRGI/SQLDroid.git</developerConnection>
     </scm>
     <developers>
         <developer>
-            <id>donv</id>
-            <name>Uwe Kubosch</name>
-            <email>uwe@kubosch.no</email>
-            <url>http://kubosch.no/</url>
-            <timezone>+1</timezone>
+            <id>stevendlander</id>
+            <name>Steven D. Lander</name>
+            <email>steven.lander@rgi-corp.com</email>
+            <url>http://www.rgi-corp.com</url>
+            <timezone>-5</timezone>
             <roles>
                 <role>Project Lead</role>
             </roles>
         </developer>
-        <developer>
-            <id>yanaga</id>
-            <name>Edson Yanaga</name>
-            <email>edson@yanaga.me</email>
-            <url>http://www.yanaga.me</url>
-            <timezone>-3</timezone>
-            <roles>
-                <role>Contributor</role>
-            </roles>
-        </developer>
     </developers>
-    <distributionManagement>
-        <repository>
-            <id>bintray</id>
-            <url>https://api.bintray.com/maven/yanaga/maven/sqldroid</url>
-        </repository>
-    </distributionManagement>
     <properties>
         <android.platform>2.3.3</android.platform>
         <android.apilevel>10</android.apilevel>

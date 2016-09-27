@@ -8,3 +8,4 @@
 /sources_list.txt
 /*.iml
 .gradle
+build/

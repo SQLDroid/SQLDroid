@@ -1,18 +1,16 @@
 apply plugin: 'java'
 apply plugin: 'maven'
+apply plugin: 'signing'
 
-group = 'org.sqldroid'
-version = '1.0.5-SNAPSHOT'
+group = 'com.rgi-corp.sqldroid'
+version = '0.1.1'
 
-description = """sqldroid"""
+description = "SQLDroid with performance improvements"
 
 sourceCompatibility = 1.5
 targetCompatibility = 1.5
 
-
-
 repositories {
-        
      maven { url "http://repo.maven.apache.org/maven2" }
 }
 dependencies {
@@ -21,4 +19,67 @@ dependencies {
        This behavior is not yet supported by Gradle, so this dependency has been converted to a compile dependency.
        Please review and delete this closure when resolved. */
     }
+}
+
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives javadocJar, sourcesJar
+}
+
+signing {
+    sign configurations.archives
+}
+
+uploadArchives {
+  repositories {
+    mavenDeployer {
+      beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+      repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+        authentication(userName: ossrhUsername, password: ossrhPassword)
+      }
+
+      snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+        authentication(userName: ossrhUsername, password: ossrhPassword)
+      }
+
+      pom.project {
+        name 'RGi SQLDroid'
+        packaging 'jar'
+        // optionally artifactId can be defined here 
+        description 'SQLDroid with some performance improvements'
+        url 'https://github.com/GitHubRGI/SQLDroid'
+
+        scm {
+          connection 'scm:svn:https://github.com/GitHubRGI/SQLDroid'
+          developerConnection 'scm:svn:https://github.com/GitHubRGI/SQLDroid'
+          url 'https://github.com/GitHubRGI/SQLDroid'
+        }
+
+        licenses {
+          license {
+            name 'MIT License'
+            url 'http://www.opensource.org/licenses/mit-license.php'
+          }
+        }
+
+        developers {
+          developer {
+            id 'stevendlander'
+            name 'Steven D. Lander'
+            email 'steven.lander@rgi-corp.com'
+          }
+        }
+      }
+    }
+  }
 }
