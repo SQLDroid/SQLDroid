@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.sql.*;
@@ -169,7 +170,8 @@ public class SQLDroidResultSet implements ResultSet {
 
   @Override
   public BigDecimal getBigDecimal(int colID) throws SQLException {
-    throw new SQLFeatureNotSupportedException("getBigDecimal is not supported");
+    String s = getString(colID);
+    return s != null ? new BigDecimal(s) : null;
   }
 
   @Override
@@ -178,9 +180,9 @@ public class SQLDroidResultSet implements ResultSet {
   }
 
   @Override
-  public BigDecimal getBigDecimal(int colID, int scale)
-  throws SQLException {
-    throw new SQLFeatureNotSupportedException("getBigDecimal is not supported");
+  public BigDecimal getBigDecimal(int colID, int scale) throws SQLException {
+    String s = getString(colID);
+    return s != null ? new BigDecimal(s, new MathContext(scale)) : null;
   }
 
   @Override

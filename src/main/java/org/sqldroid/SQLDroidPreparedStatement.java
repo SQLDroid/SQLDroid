@@ -499,8 +499,7 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
 
   @Override
   public void setBigDecimal(int parameterIndex, BigDecimal theBigDecimal) throws SQLException {
-    // TODO: Xerial implements this as setObject(parameterIndex, theBigDecimal.toString());
-    throw new UnsupportedOperationException("setBigDecimal not implemented yet");
+    setObject(parameterIndex, theBigDecimal.toString());
   }
 
   /**
