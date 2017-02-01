@@ -12,6 +12,7 @@ import org.robolectric.annotation.Config;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.math.BigDecimal;
 import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.Date;
@@ -116,6 +117,35 @@ public class SQLDroidTest2 {
                 assertThat(text)
                         .isEqualTo(rs.getString(9)).isEqualTo(rs.getString("aText"))
                         .isEqualTo(rs.getObject(9)).isEqualTo(rs.getObject("aText"));
+            }
+        }
+    }
+    
+    @Test
+    public void shouldRetrieveInsertedBigDecimals() throws SQLException {
+        String createTableStatement = "CREATE TABLE bdTable (id int, aBigDecimal numeric)";
+        conn.createStatement().execute(createTableStatement);
+
+        int id = 100500;
+        // Potential accuracy loss
+        BigDecimal bigDecimal = new BigDecimal("10005000.00050001");
+
+        String insertStmt = "insert into bdTable (id, aBigDecimal) values (?, ?)";
+        try (PreparedStatement stmt = conn.prepareStatement(insertStmt)) {
+            stmt.setInt(1, id);
+            stmt.setBigDecimal(2, bigDecimal);
+            int rowCount = stmt.executeUpdate();
+            assertThat(rowCount).as("rowCount").isEqualTo(1);
+        }
+
+        String selectStmt = "SELECT aBigDecimal FROM bdTable where id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(selectStmt)) {
+            stmt.setInt(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                rs.next();
+
+                assertThat(bigDecimal)
+                        .isEqualTo(rs.getBigDecimal(1)).isEqualTo(rs.getBigDecimal("aBigDecimal"));
             }
         }
     }
