@@ -150,7 +150,7 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
   @Override
   public void clearWarnings() throws SQLException {
     // TODO: Evaluate if implementation is sufficient (if so, delete comment and log)
-    System.err.println(" ********************* not implemented @ "
+    Log.e(" ********************* not implemented @ "
         + DebugPrinter.getFileName() + " line "
         + DebugPrinter.getLineNumber());
   }
@@ -405,7 +405,7 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
 
   @Override
   public SQLWarning getWarnings() throws SQLException {
-    System.err.println(" ********************* not implemented @ "
+    Log.e(" ********************* not implemented @ "
         + DebugPrinter.getFileName() + " line "
         + DebugPrinter.getLineNumber());
     return null;

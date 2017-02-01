@@ -58,7 +58,7 @@ public class SQLDroidStatement implements Statement {
   @Override
   public void clearWarnings() throws SQLException {
     // TODO Evaluate if the implementation is sufficient (if so, delete comment and log)
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
+    Log.e(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line " + DebugPrinter.getLineNumber());
   }
 
   @Override
@@ -196,7 +196,7 @@ public class SQLDroidStatement implements Statement {
   public int getMaxRows() throws SQLException {
     // TODO: return rs.getMaxRows()
     // TODO: Avoid NPE for rs
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "
+    Log.e(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "
         + DebugPrinter.getLineNumber());
     return 0;
   }
@@ -254,7 +254,7 @@ public class SQLDroidStatement implements Statement {
   @Override
   public SQLWarning getWarnings() throws SQLException {
     // TODO Evaluate if the implementation is sufficient (if so, delete comment and log)
-    System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "
+    Log.e(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "
         + DebugPrinter.getLineNumber());
     return null;
   }

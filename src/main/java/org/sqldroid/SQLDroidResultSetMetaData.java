@@ -164,7 +164,7 @@ public class SQLDroidResultSetMetaData implements ResultSetMetaData {
     @Override
     public boolean isDefinitelyWritable(int column) throws SQLException {
         // TODO Evaluate if this is a sufficient implementation (if so, delete comment and log)
-        System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "
+        Log.e(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "
                 + DebugPrinter.getLineNumber());
         return false;
     }
@@ -177,7 +177,7 @@ public class SQLDroidResultSetMetaData implements ResultSetMetaData {
     @Override
     public boolean isReadOnly(int column) throws SQLException {
         // TODO Evaluate if the implementation is sufficient (if so, delete comment and log)
-        System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "
+        Log.e(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "
                 + DebugPrinter.getLineNumber());
         return true;
     }
@@ -185,7 +185,7 @@ public class SQLDroidResultSetMetaData implements ResultSetMetaData {
     @Override
     public boolean isSearchable(int column) throws SQLException {
         // TODO Evaluate if the implementation is sufficient (if so, delete comment and log)
-        System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "
+        Log.e(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "
                 + DebugPrinter.getLineNumber());
         return true;
     }
@@ -193,7 +193,7 @@ public class SQLDroidResultSetMetaData implements ResultSetMetaData {
     @Override
     public boolean isSigned(int column) throws SQLException {
         // TODO Evaluate if the implementation is sufficient (if so, delete comment and log)
-        System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "
+        Log.e(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "
                 + DebugPrinter.getLineNumber());
         return true;
     }
@@ -201,7 +201,7 @@ public class SQLDroidResultSetMetaData implements ResultSetMetaData {
     @Override
     public boolean isWritable(int column) throws SQLException {
         // TODO Evaluate if the implementation is sufficient (if so, delete comment and log)
-        System.err.println(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "
+        Log.e(" ********************* not implemented @ " + DebugPrinter.getFileName() + " line "
                 + DebugPrinter.getLineNumber());
         return false;
     }
