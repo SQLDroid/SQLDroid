@@ -265,9 +265,7 @@ public class SQLDroidStatement implements Statement {
 
   @Override
   public void setEscapeProcessing(boolean enable) throws SQLException {
-    if (!enable) {
-      throw new UnsupportedOperationException("setEscapeProcessing not implemented yet");
-    }
+    // Code removed, caused crash when migrating SQLite database
   }
 
   @Override
