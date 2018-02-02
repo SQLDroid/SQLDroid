@@ -309,7 +309,11 @@ public class SQLDroidDatabaseMetaData implements DatabaseMetaData {
 	}
 	@Override
 	public int getDatabaseMajorVersion() throws SQLException {
-		return con.getDb().getSqliteDatabase().getVersion();
+		// The original implementation of this method returned user version of the database metadata
+		// (which will always be 1 when using Flyway for database migration).
+		// Instead we return 3 for Flyway not to crash due to unsupported SQLite version
+		// (it requires 3.7, Android 5.0 has 3.8.6).
+		return 3;
 	}
 
 	@Override
