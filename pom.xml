@@ -15,9 +15,9 @@
         </license>
     </licenses>
     <scm>
-        <connection>scm:git:git@github.com:SQLDroid/SQLDroid.git</connection>
-        <url>scm:git:git@github.com:SQLDroid/SQLDroid.git</url>
-        <developerConnection>scm:git:git@github.com:SQLDroid/SQLDroid.git</developerConnection>
+        <connection>scm:git@github.com:ngti/SQLDroid.git</connection>
+        <url>scm:git@github.com:ngti/SQLDroid.git</url>
+        <developerConnection>scm:git@github.com:ngti/SQLDroid.git</developerConnection>
     </scm>
     <developers>
         <developer>
@@ -43,8 +43,8 @@
     </developers>
     <distributionManagement>
         <repository>
-            <id>bintray</id>
-            <url>https://api.bintray.com/maven/yanaga/maven/sqldroid</url>
+            <id>ngti.sonatype</id>
+            <url>https://repo.ngti.nl/nexus/content/repositories/snapshots/</url>
         </repository>
     </distributionManagement>
     <properties>
@@ -132,18 +132,18 @@
                             </execution>
                         </executions>
                     </plugin>
-                    <plugin>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>2.9.1</version>
-                        <executions>
-                            <execution>
-                                <id>attach-javadocs</id>
-                                <goals>
-                                    <goal>jar</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
+                    <!--<plugin>-->
+                        <!--<artifactId>maven-javadoc-plugin</artifactId>-->
+                        <!--<version>2.9.1</version>-->
+                        <!--<executions>-->
+                            <!--<execution>-->
+                                <!--<id>attach-javadocs</id>-->
+                                <!--<goals>-->
+                                    <!--<goal>jar</goal>-->
+                                <!--</goals>-->
+                            <!--</execution>-->
+                        <!--</executions>-->
+                    <!--</plugin>-->
                 </plugins>
             </build>
         </profile>
