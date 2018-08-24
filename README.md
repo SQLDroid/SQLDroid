@@ -109,3 +109,17 @@ To make a gem for use with Ruboto run
 To release the gem to rubygems.org (requires permissions on rubygems.org) run
 
 ```rake release```
+
+## Building with mvn
+
+SQLDroid is a normal Maven project. If you have Android 21 installed (`sdkmanager --install platforms;android-21`), you can generate the JAR using
+
+``mvn install``
+
+To release the jar to Maven Central (requires permissions and a [PGP key](https://central.sonatype.org/pages/working-with-pgp-signatures.html)) first tag the release version
+
+``mvn -Prelease release:prepare``
+
+Then deploy the artifact to Maven Central
+
+``mvn -Prelease release:perform``
