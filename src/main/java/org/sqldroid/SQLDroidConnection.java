@@ -570,8 +570,6 @@ public class SQLDroidConnection implements Connection {
 	/**
 	 * @return The number of database rows that were changed or inserted or deleted
 	 * by the most recently completed INSERT, DELETE, or UPDATE statement.
-	 *
-	 * @throws SQLException
 	 */
 	public int changedRowsCount() {
 		int changedRows = -1;
