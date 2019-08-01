@@ -28,7 +28,7 @@ public class DroidDataSource implements DataSource {
         
     @Override
     public Connection getConnection() throws SQLException {
-      	String url = "jdbc:sqldroid:" + "/data/data/" + packageName + "/" + databaseName + ".db";
+        String url = getJdbcUrl();
         connection = new org.sqldroid.SQLDroidDriver().connect(url , new Properties());
         return connection;
     }
@@ -90,8 +90,16 @@ public class DroidDataSource implements DataSource {
 
     public void setDatabaseName(String databaseName) {
      	this.databaseName = databaseName;
-    }             
-        
+    }
+    
+    public String getJdbcUrl() {
+        return "jdbc:sqldroid:" + getDbFilename();
+    }
+    
+    public String getDbFilepath() {
+        return "/data/data/" + packageName + "/" + databaseName + ".db";
+    }
+    
     @Override
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
       return iface != null && iface.isAssignableFrom(getClass());
