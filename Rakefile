@@ -2,14 +2,6 @@ require 'fileutils'
 require File.expand_path 'lib/sqldroid/version', File.dirname(__FILE__)
 require 'rake/clean'
 
-unless ENV['ANDROID_HOME'] && Dir.exist?(ENV['ANDROID_HOME'])
-  dx_location = `which dx`
-  unless $? == 0
-    raise 'Unable to find ANDROID_HOME environment variable or the "dx" command.'
-  end
-  ENV['ANDROID_HOME'] = File.dirname(File.dirname(File.dirname(dx_location)))
-end
-
 TARGET_DIR       = File.expand_path 'target'
 JAR              = "sqldroid-#{SQLDroid::MAVEN_VERSION}.jar"
 JAR_IN_TARGET    = "#{TARGET_DIR}/#{JAR}"
@@ -23,7 +15,7 @@ CLEAN.include('target')
 CLOBBER.include('target', 'lib/sqldroid/sqldroid-*.jar')
 
 desc 'Generate the binary and source jars'
-task :jar => JAR_IN_TARGET
+task jar: JAR_IN_TARGET
 
 file JAR_IN_TARGET => JAVA_SRC_FILES do
   sh 'mvn install -B'
@@ -35,7 +27,7 @@ file JAR_IN_GEM => JAR_IN_TARGET do
 end
 
 desc 'Create a RubyGem for SQLDroid'
-task :gem => GEM_FILE_TARGET
+task gem: GEM_FILE_TARGET
   
 file GEM_FILE_TARGET => JAR_IN_GEM do
   sh 'gem build sqldroid.gemspec'
@@ -51,6 +43,6 @@ task :tag do
 end
 
 desc 'Release SQLDroid as a Ruby gem to rubygems.org'
-task :release => [:tag, GEM_FILE_TARGET] do
+task release: [:tag, GEM_FILE_TARGET] do
   sh "gem push #{GEM_FILE_TARGET}"
 end
