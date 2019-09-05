@@ -2,6 +2,18 @@ require 'fileutils'
 require File.expand_path 'lib/sqldroid/version', File.dirname(__FILE__)
 require 'rake/clean'
 
+unless ENV['ANDROID_HOME'] && Dir.exist?(ENV['ANDROID_HOME'])
+  if ENV['ANDROID_SDK']
+    ENV['ANDROID_HOME'] = ENV['ANDROID_SDK']
+  else
+    dx_location = `which dx`
+    unless $? == 0
+      raise 'Unable to find ANDROID_HOME environment variable or the "dx" command.'
+    end
+    ENV['ANDROID_HOME'] = File.dirname(File.dirname(File.dirname(dx_location)))
+  end
+end
+
 TARGET_DIR       = File.expand_path 'target'
 JAR              = "sqldroid-#{SQLDroid::MAVEN_VERSION}.jar"
 JAR_IN_TARGET    = "#{TARGET_DIR}/#{JAR}"
@@ -30,8 +42,17 @@ desc 'Create a RubyGem for SQLDroid'
 task gem: GEM_FILE_TARGET
   
 file GEM_FILE_TARGET => JAR_IN_GEM do
+  pom = File.read(File.expand_path('pom.xml', __dir__))
+  maven_version = pom[%r{(?<=<version>)([0-9a-zA-Z.-]*)(?=</version>)}]
+  version_file_name = File.expand_path('lib/sqldroid/version.rb', __dir__)
+  version_file_content = File.read(version_file_name)
+  version_file_content.sub!(/^\s*pom = .*$/, '')
+  version_file_content.sub!(/^\s*MAVEN_VERSION = .*$/, "MAVEN_VERSION = '#{maven_version}'")
+
   sh 'gem build sqldroid.gemspec'
   FileUtils.mv GEM_BASE_FILE, GEM_FILE_TARGET
+
+  sh "git checkout #{version_file_name}"
 end
 
 desc 'Tag the project and push the tag to GitHub'
