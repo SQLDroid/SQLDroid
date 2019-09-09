@@ -1,4 +1,9 @@
 language: android
+android:
+  components:
+    - tools
+    - build-tools-25.0.2
+    - platform-tools
 jdk:
   - openjdk8
 script:
