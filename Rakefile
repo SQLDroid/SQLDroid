@@ -47,7 +47,8 @@ file GEM_FILE_TARGET => JAR_IN_GEM do
   version_file_name = File.expand_path('lib/sqldroid/version.rb', __dir__)
   version_file_content = File.read(version_file_name)
   version_file_content.sub!(/^\s*pom = .*$/, '')
-  version_file_content.sub!(/^\s*MAVEN_VERSION = .*$/, "MAVEN_VERSION = '#{maven_version}'")
+  version_file_content.sub!(/^\s*MAVEN_VERSION = .*$/, "  MAVEN_VERSION = '#{maven_version}'")
+  File.write(version_file_name, version_file_content)
 
   sh 'gem build sqldroid.gemspec'
   FileUtils.mv GEM_BASE_FILE, GEM_FILE_TARGET
