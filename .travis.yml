@@ -7,7 +7,6 @@ android:
 jdk:
   - openjdk8
 script:
-  - mvn install -B
   - rake gem
 cache:
   directories:
