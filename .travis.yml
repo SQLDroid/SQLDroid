@@ -4,6 +4,8 @@ android:
     - tools
     - build-tools-25.0.2
     - platform-tools
+    - android-21
+    - sys-img-armeabi-v7a-android-21
 jdk:
   - openjdk8
 script:
