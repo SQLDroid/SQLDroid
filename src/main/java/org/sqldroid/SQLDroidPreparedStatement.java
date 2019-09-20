@@ -218,12 +218,12 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
   public ResultSet executeQuery() throws SQLException {
     updateCount = -1;
     closeResultSet();
-    // Log.d("sqldroid", "executeQuery " + sql);
+    // Log.d("executeQuery " + sql);
     // when querying, all ? values must be converted to Strings for some reason
     Cursor c = db.rawQuery(sql, makeArgListQueryString());
-    // Log.d("sqldroid", "executeQuery " + 2);
+    // Log.d("executeQuery " + 2);
     rs = new SQLDroidResultSet(c);
-    // Log.d("sqldroid", "executeQuery " + 3);
+    // Log.d("executeQuery " + 3 + ": " + rs);
     return rs;
   }
 
@@ -770,8 +770,16 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
 
   @Override
   public void setCharacterStream(int parameterIndex, Reader reader, long length) throws SQLException {
-    // TODO setString(parameterIndex, IOUtils.toString(reader, length));
-    throw new UnsupportedOperationException("setCharacterStream not implemented yet");
+    try {
+      int intValueOfChar;
+      StringBuilder targetString = new StringBuilder();
+      while ((intValueOfChar = reader.read()) != -1) {
+        targetString.append((char) intValueOfChar);
+      }
+      setString(parameterIndex, targetString.toString());
+    } catch (IOException e) {
+      throw new SQLException("Failed to read reader.", e);
+    }
   }
 
   @Override

@@ -110,7 +110,7 @@ public class SQLiteDatabase {
    */
   public Cursor rawQuery(String sql, String[] makeArgListQueryString) throws SQLException {
     Log.v("SQLiteDatabase rawQuery: " + Thread.currentThread().getId() + " \"" + Thread.currentThread().getName() + "\" " + sql);
-    long timeNow = System.currentTimeMillis();
+    long queryStart = System.currentTimeMillis();
     long delta = 0;
     do {
       try {
@@ -119,7 +119,7 @@ public class SQLiteDatabase {
         return cursor;
       } catch (SQLiteException e) {
         if ( isLockedException(e) ) {
-          delta = System.currentTimeMillis() - timeNow;
+          delta = System.currentTimeMillis() - queryStart;
         } else {
           throw SQLDroidConnection.chainException(e);
         }

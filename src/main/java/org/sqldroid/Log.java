@@ -5,13 +5,9 @@ public class Log {
     public static int LEVEL = android.util.Log.WARN;
     public static ILog LOG = new AndroidLog();
 
-    static void d(String message) {
-        LOG.d(message);
-    }
+    static void d(String message) { LOG.d(message); }
 
-    static void e(String message) {
-        LOG.e(message);
-    }
+    static void e(String message) { LOG.e(message); }
 
     static void e(String message, Throwable t) {
         LOG.e(message, t);
