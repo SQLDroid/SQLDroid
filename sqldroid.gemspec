@@ -11,6 +11,7 @@ Gem::Specification.new do |s|
   s.summary     = %q{SQLDroid is a JDBC driver for Android's sqlite database (android.database.sqlite.SQLiteDatabase).}
   s.description = %q{SQLDroid is a JDBC driver for Android's sqlite database (android.database.sqlite.SQLiteDatabase).
 This gem makes the JAR available to your JRuby app.}
+  s.required_ruby_version = '>= 2.4'
 
   # s.rubyforge_project = "sqldroid"
 
