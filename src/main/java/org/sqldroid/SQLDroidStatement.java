@@ -265,7 +265,7 @@ public class SQLDroidStatement implements Statement {
 
   @Override
   public void setEscapeProcessing(boolean enable) throws SQLException {
-    if (!enable) {
+    if (enable) {
       throw new UnsupportedOperationException("setEscapeProcessing not implemented yet");
     }
   }
