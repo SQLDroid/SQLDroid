@@ -447,9 +447,19 @@ public class SQLDroidResultSet implements ResultSet {
                 //CONVERT TO BYTE[] OBJECT
                 return new SQLDroidBlob(c.getBlob(newIndex));
             case 2: // Cursor.FIELD_TYPE_FLOAT:
-                return new Float(c.getFloat(newIndex));
+                double d = c.getDouble(newIndex);
+                if (d == (double)(float)d) {
+                  return new Float((float)d);
+                } else {
+                  return new Double(d);
+                }
             case 1: // Cursor.FIELD_TYPE_INTEGER:
-                return new Integer(c.getInt(newIndex));
+                long v = c.getLong(newIndex);
+                if (v == (long)(int)v) {
+                  return new Integer((int)v);
+                } else {
+                  return new Long(v);
+                }
             case 3: // Cursor.FIELD_TYPE_STRING:
                 return c.getString(newIndex);
             case 0: // Cursor.FIELD_TYPE_NULL:
