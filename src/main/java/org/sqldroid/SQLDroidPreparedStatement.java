@@ -200,6 +200,7 @@ public class SQLDroidPreparedStatement implements PreparedStatement {
         } else {
             db.execSQL(sql, makeArgListQueryObject());
             updateCount = sqldroidConnection.changedRowsCount();
+            rowIdResultSet = sqldroidConnection.getGeneratedRowIdResultSet();
         }
         return isSelect;
     }
