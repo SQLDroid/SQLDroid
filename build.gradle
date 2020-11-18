@@ -1,0 +1,12 @@
+apply plugin : 'java-library'
+
+ext {
+    Properties properties = new Properties();
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
+    androidJar = properties.getProperty('sdk.dir') + '/platforms/android-' + compileSdk + '/android.jar'
+}
+
+dependencies {
+    compileOnly files("${androidJar}")
+}

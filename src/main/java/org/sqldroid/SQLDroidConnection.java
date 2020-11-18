@@ -24,11 +24,6 @@ import java.util.Properties;
 import java.util.concurrent.Executor;
 
 public class SQLDroidConnection implements Connection {
-    /**
-    * A map to a single instance of a SQLiteDatabase per DB.
-    */
-    private static final Map<String, SQLiteDatabase> dbMap =
-            new HashMap<String, SQLiteDatabase>();
 
     /**
     * A map from a connection to a SQLiteDatabase instance.
@@ -142,15 +137,8 @@ public class SQLDroidConnection implements Connection {
                 }
             }
         }
-        synchronized(dbMap) {
-            sqlitedb = dbMap.get(dbQname);
-            if (sqlitedb == null) {
-                Log.i("SQLDroidConnection: " + Thread.currentThread().getId() + " \"" + Thread.currentThread().getName() + "\" " + this + " Opening new database: " + dbQname);
-                sqlitedb = new SQLiteDatabase(dbQname, timeout, retryInterval, flags);
-                dbMap.put(dbQname, sqlitedb);
-            }
-            clientMap.put(this, sqlitedb);
-        }
+        sqlitedb = new SQLiteDatabase(dbQname, timeout, retryInterval, flags);
+        clientMap.put(this, sqlitedb);
     }
 
     private void ensureDbFileCreation(String dbQname) throws SQLException {
@@ -209,14 +197,11 @@ public class SQLDroidConnection implements Connection {
     public void close() throws SQLException {
         Log.v("SQLDroidConnection.close(): " + Thread.currentThread().getId() + " \"" + Thread.currentThread().getName() + "\" " + this);
         if (sqlitedb != null) {
-            synchronized(dbMap) {
                 clientMap.remove(this);
                 if (!clientMap.containsValue(sqlitedb)) {
                     Log.i("SQLDroidConnection.close(): " + Thread.currentThread().getId() + " \"" + Thread.currentThread().getName() + "\" " + this + " Closing the database since since last connection was closed.");
                     setAutoCommit(true);
                     sqlitedb.close();
-                    dbMap.remove(sqlitedb.dbQname);
-                }
             }
             sqlitedb = null;
         } else {
